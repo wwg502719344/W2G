@@ -1,9 +1,9 @@
-package cource_code;
+package w2g_lock;
 
 /**
  * Created by W2G on 2018/3/29.
  */
-public class AQS {
+public class w2g_AQS {
 
     /**
      * 共享式获取同步状态
