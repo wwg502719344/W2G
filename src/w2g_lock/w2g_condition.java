@@ -9,8 +9,8 @@ import java.util.concurrent.locks.*;
  * 提供类似Object的监视器方法，与lock配合实现等待/通知模式
  * AQS内部类ConditionObject，维护了首节点和尾节点
  */
-/*public class w2g_condition implements Lock{
-
+public class w2g_condition{
+/*
     //获取condition
     Lock lock=new ReentrantLock();
     Condition condition=lock.newCondition();
@@ -40,5 +40,5 @@ import java.util.concurrent.locks.*;
             if (interruptMode != 0)
                 reportInterruptAfterWait(interruptMode);
         }
-
-}*/
+*/
+}
