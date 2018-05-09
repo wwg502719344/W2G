@@ -23,16 +23,22 @@ public class w2g_condition{
     //以保存状态作为参数通过执行专业的acquire版本重新获得
     //如果被阻塞？？
     public final void await() throws InterruptedException {
+            //查看当前线程是否被中断线程
             if (Thread.interrupted())
                 throw new InterruptedException();
+            //新增一个node节点置队列中
             Node node = addConditionWaiter();
+            //释放当前线程的锁，也就是释放同步状态
             int savedState = fullyRelease(node);
             int interruptMode = 0;
+            //如果当前线程的状态是CONDITION(在队列中)，返回false，则进入循环中
             while (!isOnSyncQueue(node)) {
+                //循环阻塞该线程，直到该线程的状态为CONDITION
                 LockSupport.park(this);
                 if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
                     break;
             }
+
             if (acquireQueued(node, savedState) && interruptMode != THROW_IE)
                 interruptMode = REINTERRUPT;
             if (node.nextWaiter != null) // clean up if cancelled
