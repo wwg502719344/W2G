@@ -1,6 +1,6 @@
 package w2g_lock;
 
-import org.junit.Test;
+
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,12 +20,12 @@ public class w2g_FairAndUnfairTest {
     private static Lock unfairLock= new ReentrantLock2(false);
     private static CountDownLatch start;
 
-    @Test
+    //@Test
     public void fair(){
         testLock(fairLock);
     }
 
-    @Test
+    //@Test
     public void unfair(){
         testLock(unfairLock);
     }
