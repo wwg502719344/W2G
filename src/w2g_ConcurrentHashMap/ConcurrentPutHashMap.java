@@ -2,6 +2,7 @@ package w2g_ConcurrentHashMap;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by W2G on 2018/5/14 0014.
@@ -15,6 +16,8 @@ public class ConcurrentPutHashMap {
 
     public static void main(String[] args) throws InterruptedException {
         final HashMap<String,String> map=new HashMap<String,String>();
+
+        //ConcurrentHashMap
 
         Thread t=new Thread(new Runnable() {
             @Override
