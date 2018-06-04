@@ -1,1 +1,4 @@
-aaaa
+1-并发环境下为什么使用ConcurrentHashMap
+
+    1-1：java7中HashMap在高并发的情况下，通过put操作会导致HashMap的entry链表形成环链，从而造成entry的next节点用不为空
+因而产生死循环

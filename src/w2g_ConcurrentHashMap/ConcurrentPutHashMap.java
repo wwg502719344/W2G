@@ -17,7 +17,7 @@ public class ConcurrentPutHashMap {
     public static void main(String[] args) throws InterruptedException {
         final HashMap<String,String> map=new HashMap<String,String>();
 
-        //ConcurrentHashMap
+        ConcurrentHashMap concurrentHashMap=new ConcurrentHashMap();
 
         Thread t=new Thread(new Runnable() {
             @Override
