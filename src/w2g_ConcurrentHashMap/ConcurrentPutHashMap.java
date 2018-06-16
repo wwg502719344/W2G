@@ -3,6 +3,7 @@ package w2g_ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by W2G on 2018/5/14 0014.
@@ -18,6 +19,7 @@ public class ConcurrentPutHashMap {
         final HashMap<String,String> map=new HashMap<String,String>();
 
         ConcurrentHashMap concurrentHashMap=new ConcurrentHashMap();
+        //ConcurrentLinkedQueue
 
         Thread t=new Thread(new Runnable() {
             @Override
