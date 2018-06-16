@@ -1,4 +1,4 @@
-package w2g_ConcurrentHashMap;
+package w2g_ConcurrentHashMap.w2g_concurrentHashMap_demo;
 
 import java.util.HashMap;
 import java.util.UUID;
