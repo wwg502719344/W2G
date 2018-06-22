@@ -343,12 +343,13 @@ public class ConcurrentHashMap {
         ////对hashCode进行再散列，算法为(h ^ (h >>> 16)) & HASH_BITS
         int hash = spread(key.hashCode());
         int binCount = 0;
-        //循环容器数组
+        //获取table中的每个变量
         for (Node<K,V>[] tab = table;;) {
            //申明变量
             Node<K,V> f; int n, i, fh;
             //如果tab为空，进行初始化
-            //否则，根据hash值计算得到数组索引i，如果tab[i]为空，直接新建节点Node即可。注：tab[i]实质为链表或者红黑树的首节点。
+            //否则，根据hash值计算得到数组索引i，如果tab[i]为空，直接新建节点Node即可。
+            //注：tab[i]实质为链表或者红黑树的首节点。
             if (tab == null || (n = tab.length) == 0)
                 //给tab进行初始化
                 tab = initTable();
