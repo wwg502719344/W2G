@@ -39,7 +39,17 @@ public class ConcurrentHashMap {
         putAll(m);
     }*/
 
-    ///////////////////////////内部类Node-BEGIN///////////////////////////////
+
+
+
+
+
+
+
+
+
+
+    //////////////////BEGIN////内部类Node////BEGIN////////////////
     /**
      * Node是最核心的内部类，它包装了key-value键值对，所有插入ConcurrentHashMap的数据都包装在这里面。
      * 它与HashMap中的定义很相似，但是有一些差别它对value和next属性设置了volatile同步锁(与JDK7的Segment相同)，
@@ -53,7 +63,7 @@ public class ConcurrentHashMap {
      * @param <K>
      * @param <V>
      */
-    static class Node<K,V> implements Map.Entry<K,V> {
+    static class Node<K,V> implements Map.Entry<K,V> {  //Map.Entry表示一个映射项
 
         final int hash;
         final K key;
@@ -114,7 +124,7 @@ public class ConcurrentHashMap {
         /**
          * Virtualized support for map.get(); overridden in subclasses.
          * 辅助get方法，在子类中覆盖
-         * @param h
+         * @param h hash值(猜测)
          * @param k
          * @return
          */
@@ -126,7 +136,7 @@ public class ConcurrentHashMap {
                     if (e.hash == h &&
                             ((ek = e.key) == k || (ek != null && k.equals(ek))))
                         return e;
-                } while ((e = e.next) != null);
+                } while ((e = e.next) != null); //node节点的下一个节点，为什么?
             }
             return null;
         }
@@ -134,7 +144,21 @@ public class ConcurrentHashMap {
     ///////////////////////////内部类Node-END///////////////////////////////
 
 
-    ///////////////////////////内部类TreeNode-END///////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ///////////////////////////内部类TreeNode-BEGIN///////////////////////////////
 
     /**
      * Nodes for use in TreeBins
@@ -222,6 +246,12 @@ public class ConcurrentHashMap {
     ///////////////////////////内部类TreeNode-END///////////////////////////////
 
 
+
+
+
+
+
+
     ///////////////////////////内部类TreeBin-BEGIN///////////////////////////////
     /**
      * TreeNodes used at the heads of bins. TreeBins do not hold user
@@ -286,6 +316,22 @@ public class ConcurrentHashMap {
     ///////////////////////////内部类TreeBin-END///////////////////////////////
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /////////////////////////////////PUT方法-BEGIN////////////////////////////////////////
     /*
     public V put(K key, V value) {
@@ -297,32 +343,39 @@ public class ConcurrentHashMap {
         ////对hashCode进行再散列，算法为(h ^ (h >>> 16)) & HASH_BITS
         int hash = spread(key.hashCode());
         int binCount = 0;
-        //不断的去尝试
+        //循环容器数组
         for (Node<K,V>[] tab = table;;) {
+           //申明变量
             Node<K,V> f; int n, i, fh;
             //如果tab为空，进行初始化
             //否则，根据hash值计算得到数组索引i，如果tab[i]为空，直接新建节点Node即可。注：tab[i]实质为链表或者红黑树的首节点。
             if (tab == null || (n = tab.length) == 0)
                 //给tab进行初始化
                 tab = initTable();
-            如果tab
-            else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+            //如果tab对应的值为null的话
+            else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {  //获取索引处的node
                 if (casTabAt(tab, i, null,
                         new Node<K,V>(hash, key, value, null)))
                     break;                   // no lock when adding to empty bin
             }
             //如果tab[i]不为空，且hash值为MOVED(-1)，说明链表正在进行transfer操作
+            //MOVED:（forwarding nodes的hash值）、标示位
             else if ((fh = f.hash) == MOVED)
-                tab = helpTransfer(tab, f);
+                tab = helpTransfer(tab, f);     ////帮助其扩容
             else {
+
                 V oldVal = null;
-                //针对首个节点进行加锁操作，进一减小线程冲突
+                //针对当前节点进行加锁操作，进一减小线程冲突
                 synchronized (f) {
+                    //获取当前位置的node节点，并将f节点附给他
+                    //避免多线程，需要重新检查
                     if (tabAt(tab, i) == f) {
-                        if (fh >= 0) {
+                        if (fh >= 0) {      //链表节点
                             binCount = 1;
+                            //循环获取链表节点(如果出现了则更新value值，如果没有则加入到链表末尾并跳出循环)
                             for (Node<K,V> e = f;; ++binCount) {
                                 K ek;
+                                //查看是否有相同的k值，如果有则更新value值
                                 if (e.hash == hash &&
                                         ((ek = e.key) == key ||
                                                 (ek != null && key.equals(ek)))) {
@@ -332,6 +385,8 @@ public class ConcurrentHashMap {
                                     break;
                                 }
                                 Node<K,V> pred = e;
+
+                                //插入到列表末尾并退出循环(没理解)
                                 if ((e = e.next) == null) {
                                     pred.next = new Node<K,V>(hash, key,
                                             value, null);
@@ -339,9 +394,11 @@ public class ConcurrentHashMap {
                                 }
                             }
                         }
+                        // 如果首节点为TreeBin类型，说明为红黑树结构，执行putTreeVal操作
                         else if (f instanceof TreeBin) {
                             Node<K,V> p;
                             binCount = 2;
+                            //寻找或新增一个节点
                             if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key,
                                     value)) != null) {
                                 oldVal = p.val;
@@ -351,7 +408,9 @@ public class ConcurrentHashMap {
                         }
                     }
                 }
+                //转换为树结构
                 if (binCount != 0) {
+                    //如果容器数量大于=8，那么转换链表结构为红黑树结构。
                     if (binCount >= TREEIFY_THRESHOLD)
                         treeifyBin(tab, i);
                     if (oldVal != null)
@@ -363,5 +422,45 @@ public class ConcurrentHashMap {
         addCount(1L, binCount);
         return null;
     }*/
+
+
+     /**
+     * Replaces all linked nodes in bin at given index unless table is
+     * 将数组中给定索引位置转换为树
+     * too small, in which case resizes instead.
+     */
+    /*
+    private final void treeifyBin(Node<K,V>[] tab, int index) {
+        Node<K,V> b; int n, sc;
+        //数组不能为空
+        if (tab != null) {
+            //如果数组的长度小于指定的长度，执行扩容操作
+            if ((n = tab.length) < MIN_TREEIFY_CAPACITY)
+                tryPresize(n << 1);
+            //如果指定索引位置的节点不为空
+            else if ((b = tabAt(tab, index)) != null && b.hash >= 0) {
+                synchronized (b) {
+                    //如果b是指定位置的节点
+                    if (tabAt(tab, index) == b) {
+                        TreeNode<K,V> hd = null, tl = null;
+                        for (Node<K,V> e = b; e != null; e = e.next) {
+                            //创建p的treeNode节点
+                            TreeNode<K,V> p =
+                                    new TreeNode<K,V>(e.hash, e.key, e.val,
+                                            null, null);
+
+                            if ((p.prev = tl) == null)
+                                hd = p;
+                            else
+                                tl.next = p;
+                            tl = p;
+                        }
+                        setTabAt(tab, index, new TreeBin<K,V>(hd));
+                    }
+                }
+            }
+        }
+    }*/
+
     /////////////////////////////////PUT方法-END////////////////////////////////////////
 }
