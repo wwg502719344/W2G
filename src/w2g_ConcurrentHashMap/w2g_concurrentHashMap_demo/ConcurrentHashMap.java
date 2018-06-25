@@ -338,36 +338,46 @@ public class ConcurrentHashMap {
         return putVal(key, value, false);
     }
     final V putVal(K key, V value, boolean onlyIfAbsent) {
+
         //如果key或者value为空，抛出异常
         if (key == null || value == null) throw new NullPointerException();
-        ////对hashCode进行再散列，算法为(h ^ (h >>> 16)) & HASH_BITS
+
+        //对hashCode进行再散列，算法为(h ^ (h >>> 16)) & HASH_BITS
+        //计算hash值，2次hash值，用于在指定位置保存查询
+        //hash是key的哈希值经过高16位转低16位的int值
         int hash = spread(key.hashCode());
+
         int binCount = 0;
-        //获取table中的每个变量
+
+        //死循环，直到插入成功
         for (Node<K,V>[] tab = table;;) {
-           //申明变量
             Node<K,V> f; int n, i, fh;
+
             //如果tab为空，进行初始化
             //否则，根据hash值计算得到数组索引i，如果tab[i]为空，直接新建节点Node即可。
             //注：tab[i]实质为链表或者红黑树的首节点。
             if (tab == null || (n = tab.length) == 0)
-                //给tab进行初始化
-                tab = initTable();
-            //如果tab对应的值为null的话
-            else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {  //获取索引处的node
-                if (casTabAt(tab, i, null,
-                        new Node<K,V>(hash, key, value, null)))
+
+            //给tab进行初始化,tab = initTable();
+            //取出table位置中相关位置的节点赋值给f
+            //这里计算节点在table数组的位置的算法是i = (n - 1) & hash
+            else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+
+                //如果相关位置为空，则利用cas操作直接存储在指定位置
+                if (casTabAt(tab, i, null,new Node<K,V>(hash, key, value, null)))
                     break;                   // no lock when adding to empty bin
             }
+
             //如果tab[i]不为空，且hash值为MOVED(-1)，说明链表正在进行transfer操作
             //MOVED:（forwarding nodes的hash值）、标示位
             else if ((fh = f.hash) == MOVED)
                 tab = helpTransfer(tab, f);     ////帮助其扩容
             else {
-
                 V oldVal = null;
+
                 //针对当前节点进行加锁操作，进一减小线程冲突
                 synchronized (f) {
+
                     //获取当前位置的node节点，并将f节点附给他
                     //避免多线程，需要重新检查
                     if (tabAt(tab, i) == f) {
@@ -425,6 +435,9 @@ public class ConcurrentHashMap {
     }*/
 
 
+    /*static final <K,V> java.util.concurrent.ConcurrentHashMap.Node<K,V> tabAt(java.util.concurrent.ConcurrentHashMap.Node<K,V>[] tab, int i) {
+        return (java.util.concurrent.ConcurrentHashMap.Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
+    }*/
      /**
      * Replaces all linked nodes in bin at given index unless table is
      * 将数组中给定索引位置转换为树
