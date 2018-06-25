@@ -376,28 +376,34 @@ public class ConcurrentHashMap {
                 V oldVal = null;
 
                 //针对当前节点进行加锁操作，进一减小线程冲突
+                //锁定(hash值相同的链表的头结点)
                 synchronized (f) {
 
                     //获取当前位置的node节点，并将f节点附给他
                     //避免多线程，需要重新检查
                     if (tabAt(tab, i) == f) {
                         if (fh >= 0) {      //链表节点
-                            binCount = 1;
+
                             //循环获取链表节点(如果出现了则更新value值，如果没有则加入到链表末尾并跳出循环)
+                            //无限循环，保证插入节点数据
+                            binCount = 1;
                             for (Node<K,V> e = f;; ++binCount) {
                                 K ek;
+
                                 //查看是否有相同的k值，如果有则更新value值
+                                //查看当前节点的key值是否相同，如果相同则替换值并退出
                                 if (e.hash == hash &&
                                         ((ek = e.key) == key ||
                                                 (ek != null && key.equals(ek)))) {
                                     oldVal = e.val;
                                     if (!onlyIfAbsent)
-                                        e.val = value;
+                                        e.val = value;  //替换当前value值
                                     break;
                                 }
+
                                 Node<K,V> pred = e;
 
-                                //插入到列表末尾并退出循环(没理解)
+                                //如果e是尾节点，插入节点并退出
                                 if ((e = e.next) == null) {
                                     pred.next = new Node<K,V>(hash, key,
                                             value, null);
