@@ -358,7 +358,9 @@ public class ConcurrentHashMap {
             //注：tab[i]实质为链表或者红黑树的首节点。
             if (tab == null || (n = tab.length) == 0)
 
-            //给tab进行初始化,tab = initTable();
+                //给tab进行初始化,
+                tab = initTable();
+
             //取出table位置中相关位置的节点赋值给f
             //这里计算节点在table数组的位置的算法是i = (n - 1) & hash
             else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
@@ -382,7 +384,9 @@ public class ConcurrentHashMap {
                     //获取当前位置的node节点，并将f节点附给他
                     //避免多线程，需要重新检查
                     if (tabAt(tab, i) == f) {
-                        if (fh >= 0) {      //链表节点
+
+                        //说明该节点是链表节点，hash值对应状态的表示MOVED,TREEBIN,RESERVED,HASH_BITS
+                        if (fh >= 0) {
 
                             //循环获取链表节点(如果出现了则更新value值，如果没有则加入到链表末尾并跳出循环)
                             //无限循环，保证插入节点数据
