@@ -1,12 +1,19 @@
 1-并发环境下为什么使用ConcurrentHashMap
 
-    1-1：java7中HashMap在高并发的情况下，通过put操作会导致HashMap的entry链表形成环链，从而造成entry的next节点
-用不为空因而产生死循环
+    1-1：
+        java7中HashMap在高并发的情况下，通过put操作会导致HashMap的entry链表形成环链，
+    从而造成entry的next节点用不为空因而产生死循环
 
-    1-2:Unsafe类:java不能直接访问操作系统底层，而是通过native方法来访问，Unsafe提供了硬件级别的原子操作
-        (有空研究源码)
+    1-2:
+        Unsafe类:java不能直接访问操作系统底层，而是通过native方法来访问，Unsafe提供了硬件级别的原子操作
+    (有空研究源码)
         1-2-1：分配内存，释放内存
         1-2-2：可以定位对象字段的内存位置，也可以修改字段值
         1-2-3：挂起与恢复-LockSupport中的park方法也是调用了Unsafe.park()
         1-2-4：CAS操作
+
+
+    1-3:
+        concurrentHashMap源码解析put操作
+        1，根据key值计算出hash值，根据hash值找到table数组相应位置是否已经存在相同的key值
 
