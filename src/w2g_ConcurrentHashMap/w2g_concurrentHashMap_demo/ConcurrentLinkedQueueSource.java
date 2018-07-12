@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ConcurrentLinkedQueueSource {
     ConcurrentLinkedQueue v=new ConcurrentLinkedQueue();
 
-    //offer:新增方法
+    //offer:新增方法11
     /**
      * Inserts the specified element at the tail of this queue.
      * As the queue is unbounded, this method will never return {@code false}.
