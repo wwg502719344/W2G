@@ -21,6 +21,8 @@ public class hashMapSource {
             System.out.print(key+"="+hashMap.get(key));
         }
 
+        Thread a=new Thread("1");
+        //a.join();
         Iterator iter=hashMap.keySet().iterator();
         while(iter.hasNext()){
             Object key=iter.next();
