@@ -97,6 +97,63 @@ public class w2g_AQS {
 
 
 
+
+
+
+    /**
+     * P2:共享式同步状态的获取
+     * @param arg
+     */
+    /*
+    public final void acquireShared(int arg) {
+        //调用重写的tryAcquireShared方法，
+        if (tryAcquireShared(arg) < 0)
+            doAcquireShared(arg);
+    }
+
+    private void doAcquireShared(int arg) {
+        //将当前节点加入到等待队列中去并且设为共享模式
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                //获取当前节点的前驱节点
+                final Node p = node.predecessor();
+                if (p == head) {
+                    //尝试获取同步状态
+                    int r = tryAcquireShared(arg);
+                    if (r >= 0) {
+                        //设置当前节点为首节点并传播 and wake-up next node
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        if (interrupted)
+                            selfInterrupt();
+                        failed = false;
+                        return;
+                    }
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &&
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+    */
+
+
+
+
+
+
+
+
+
+
+
     /**
      * P10
      * 共享式获取同步状态

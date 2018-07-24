@@ -21,6 +21,17 @@ public class TwinsLock implements Lock {
             }
             setState(count);
         }
+
+        public int tryAcquireShared(int reduceCount){
+            for (;;){
+                int current=getState();
+                int newCount=current-reduceCount;
+                //当前资源数被正确更新或是小于0(小于0时可以未被正确cas)时返回
+                if (newCount<0||compareAndSetState(current,newCount)){
+                    return newCount;
+                }
+            }
+        }
     }
 
 
