@@ -37,7 +37,7 @@ public class TwinsLock implements Lock {
 
     @Override
     public void lock() {
-        sync.acquireShared(1);
+        sync.acquireShared(1);//尝试获取锁资源
     }
 
     @Override

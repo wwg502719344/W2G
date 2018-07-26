@@ -106,9 +106,8 @@ public class w2g_AQS {
      */
     /*
     public final void acquireShared(int arg) {
-        //调用重写的tryAcquireShared方法，
-        if (tryAcquireShared(arg) < 0)
-            doAcquireShared(arg);
+        if (tryAcquireShared(arg) < 0)  //尝试获取资源，成功则直接返回 Q：首节点在哪里设置
+            doAcquireShared(arg);   //进入等待队列，直到被unpark()/interrupt()并成功获取到资源才返回。整个等待过程也是忽略中断的
     }
 
     /**
@@ -164,7 +163,7 @@ public class w2g_AQS {
 
     /**
      *P2-1-1
-     * 唤起后继节点！！！！
+     * 唤起当前头节点的后继节点！！！！
      *
      */
     /*private void doReleaseShared() {
@@ -180,7 +179,7 @@ public class w2g_AQS {
          * fails, if so rechecking.
          *//*
         for (;;) {
-            Node h = head;  //当前节点赋值
+            Node h = head;  //头节点h
             if (h != null && h != tail) {   //当前节点不为空且不为尾节点
                 int ws = h.waitStatus;  //获取当前节点的状态
                 if (ws == Node.SIGNAL) {    //如果当前节点是可以唤起后继结点的
