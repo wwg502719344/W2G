@@ -111,6 +111,11 @@ public class w2g_AQS {
             doAcquireShared(arg);
     }
 
+    /**
+     * 获取同步状态失败进入等待队列并尝试获取同步状态
+     * @param arg
+     */
+    /*
     private void doAcquireShared(int arg) {
         //将当前节点加入到等待队列中去并且设为共享模式
         final Node node = addWaiter(Node.SHARED);
@@ -118,16 +123,13 @@ public class w2g_AQS {
         try {
             boolean interrupted = false;
             for (;;) {
-                //获取当前节点的前驱节点
-                final Node p = node.predecessor();
-                if (p == head) {
-                    //尝试获取同步状态
-                    int r = tryAcquireShared(arg);
-                    if (r >= 0) {
-                        //设置当前节点为首节点并传播 and wake-up next node
-                        setHeadAndPropagate(node, r);
+                final Node p = node.predecessor();  //获取当前节点的前驱节点
+                if (p == head) {    //如果前驱结点是首节点
+                    int r = tryAcquireShared(arg);  //尝试获取资源
+                    if (r >= 0) {   //获取资源成功，r<0表示获取资源失败，等于0表示获取成功但没有剩余资源
+                        setHeadAndPropagate(node, r);   //p2-1设置当前节点为首节点并传播 and wake-up next node
                         p.next = null; // help GC
-                        if (interrupted)
+                        if (interrupted)    //如果等待过程有打断此时补上
                             selfInterrupt();
                         failed = false;
                         return;
@@ -144,10 +146,56 @@ public class w2g_AQS {
     }
     */
 
+    /**
+     * 设置首节点，有剩余资源就继续唤醒后续资源
+     * P2-1
+     */
+    /*private void setHeadAndPropagate(Node node, int propagate) {
+        Node h = head; // Record old head for check below
+        setHead(node);//设置node为头节点
 
+        if (propagate > 0 || h == null || h.waitStatus < 0 ||
+                (h = head) == null || h.waitStatus < 0) {   //如果可以继续传播
+            Node s = node.next; //获取node节点的下一个节点
+            if (s == null || s.isShared())  //如果s是空或者是共享模式
+                doReleaseShared();  //P2-1-1
+        }
+    }*/
 
-
-
+    /**
+     *P2-1-1
+     * 唤起后继节点！！！！
+     *
+     */
+    /*private void doReleaseShared() {
+        *//*
+         * Ensure that a release propagates, even if there are other
+         * in-progress acquires/releases.  This proceeds in the usual
+         * way of trying to unparkSuccessor of head if it needs
+         * signal. But if it does not, status is set to PROPAGATE to
+         * ensure that upon release, propagation continues.
+         * Additionally, we must loop in case a new node is added
+         * while we are doing this. Also, unlike other uses of
+         * unparkSuccessor, we need to know if CAS to reset status
+         * fails, if so rechecking.
+         *//*
+        for (;;) {
+            Node h = head;  //当前节点赋值
+            if (h != null && h != tail) {   //当前节点不为空且不为尾节点
+                int ws = h.waitStatus;  //获取当前节点的状态
+                if (ws == Node.SIGNAL) {    //如果当前节点是可以唤起后继结点的
+                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                        continue;            // loop to recheck cases
+                    unparkSuccessor(h); //唤醒当前节点的下一个可用节点
+                }
+                else if (ws == 0 &&
+                        !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                    continue;                // loop on failed CAS
+            }
+            if (h == head)                   // loop if head changed
+                break;
+        }
+    }*/
 
 
 
