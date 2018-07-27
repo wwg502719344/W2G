@@ -1,5 +1,40 @@
+笔记模块：
 实现容错的原因
     当微服务所依赖的服务不可用时，大量的请求，大量的并发不做任何处理的等待，会耗尽系统的资源，拖垮自身的服务
+
+
+
+
+
+问题模块：
+
+问题1：
+    通过UserFeignClient进行降级处理的时候，如果掐断user服务，理论上应该出现降级情况，服务应该主动去触发fallbackFactory
+指定的降级类，但是实际情况确实返回connect timed out
+
+解决方案:
+    未开启Hystrix导致降级失败，需要在yml文件中添加feign.hystrix.enabled=true开启hystrix服务。ps(多看官方文档)
+
+
+问题2：
+    项目添加Hystrix监控，理论上在访问接口后访问ip:端口号/hystrix.stream即可查看Hystrix相关参数，但是在添加了
+相关maven，包括在启动文件上添加@EnableHystrixDashboard后依然无效，访问ip:端口号/hystrix.stream提示404
+
+解决方案：
+    提示404，猜测可能是服务没有启动成功导致，在网上查了下，发现缺少 @Configuration 的配置类去启动，然后添加
+HystrixConfig 配置类，注入servlet，在此访问，即可访问到相关监控数据
+添加HystrixConfig 配置类是因为springboot的默认路径不是 "/hystrix.stream"，只要在自己的项目里配置上下面的servlet就可以了，
+相关查阅资料：
+https://www.cnblogs.com/wangdaijun/p/8891220.html
+https://www.cnblogs.com/java-zhao/p/5813439.html
+
+
+问题3：
+    监控图形化界面显示Unable to connect to Command Metric Stream.
+
+解决方案：
+    http://ip:端口/hystrix.stream,之前写的是接口名称
+
 
 
 
