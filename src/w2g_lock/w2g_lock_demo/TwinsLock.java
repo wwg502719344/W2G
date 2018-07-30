@@ -24,9 +24,9 @@ public class TwinsLock implements Lock {
 
         public int tryAcquireShared(int reduceCount){
             for (;;){
-                int current=getState();
-                int newCount=current-reduceCount;
-                //当前资源数被正确更新或是小于0(小于0时可以未被正确cas)时返回
+                int current=getState(); //获取当前同步状态的值
+                int newCount=current-reduceCount;  //获取当前同步状态的剩余量(可用资源数)
+                //资源数小于0时或成功获取同步状态时返回最新资源数
                 if (newCount<0||compareAndSetState(current,newCount)){
                     return newCount;
                 }
@@ -37,7 +37,7 @@ public class TwinsLock implements Lock {
 
     @Override
     public void lock() {
-        sync.acquireShared(1);//尝试获取锁资源
+        sync.acquireShared(1);//尝试获取锁资源(源码：w2g_AQS下P2)
     }
 
     @Override
