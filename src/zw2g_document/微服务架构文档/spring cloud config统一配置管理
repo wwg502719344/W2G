@@ -1,0 +1,22 @@
+
+
+
+
+
+
+
+
+
+问题模块
+
+
+Q1:配置config-server/config-client文件时，相关git的参数需要配置在bootstrap.yml中而不是配置在
+application.yml中，为什么
+
+A1:bootstrap.yml加载于application.yml之前，并且会对application.yml进行覆盖,bootstrap.yml
+由父 Spring ApplicationContext进行加载，父 Spring ApplicationContext加载于application.yml
+之前
+
+参考资料:
+https://www.cnblogs.com/EasonJim/p/7589546.html
+https://stackoverflow.com/questions/32997352/what-is-the-difference-between-putting-a-property-on-application-yml-or-bootstra
