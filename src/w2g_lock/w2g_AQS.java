@@ -106,7 +106,7 @@ public class w2g_AQS {
      */
     /*
     public final void acquireShared(int arg) {
-        if (tryAcquireShared(arg) < 0)  //尝试获取资源，成功则直接返回 Q：首节点在哪里设置
+        if (tryAcquireShared(arg) < 0)  //尝试获取资源，Q：首节点在哪里设置
             doAcquireShared(arg);   //进入等待队列，直到被unpark()/interrupt()并成功获取到资源才返回。整个等待过程也是忽略中断的
     }
 
@@ -125,8 +125,9 @@ public class w2g_AQS {
                 final Node p = node.predecessor();  //获取当前节点的前驱节点
                 if (p == head) {    //如果前驱结点是首节点
                     int r = tryAcquireShared(arg);  //尝试获取资源
-                    if (r >= 0) {   //获取资源成功，r<0表示获取资源失败，等于0表示获取成功但没有剩余资源
-                        setHeadAndPropagate(node, r);   //p2-1设置当前节点为首节点并传播 and wake-up next node
+                    if (r >= 0) {   //获取资源成功
+                        //设置node节点为首节点
+                        setHeadAndPropagate(node, r);//源码解析p2-1
                         p.next = null; // help GC
                         if (interrupted)    //如果等待过程有打断此时补上
                             selfInterrupt();
@@ -134,12 +135,13 @@ public class w2g_AQS {
                         return;
                     }
                 }
+                //如果自己可以休息了，就进入waiting状态，直到被unpark()
                 if (shouldParkAfterFailedAcquire(p, node) &&
-                    parkAndCheckInterrupt())
+                    parkAndCheckInterrupt())    //继续挂起
                     interrupted = true;
             }
         } finally {
-            if (failed)
+            if (failed) //如果循环获取失败则取消排队
                 cancelAcquire(node);
         }
     }
@@ -163,7 +165,8 @@ public class w2g_AQS {
 
     /**
      *P2-1-1
-     * 唤起当前头节点的后继节点！！！！
+     * 唤起当前节点的后继节点
+     *
      *
      */
     /*private void doReleaseShared() {
@@ -178,13 +181,14 @@ public class w2g_AQS {
          * unparkSuccessor, we need to know if CAS to reset status
          * fails, if so rechecking.
          *//*
+         *
         for (;;) {
-            Node h = head;  //头节点h
+            Node h = head;  //setHeadAndPropagate方法中node就是现在的头节点
             if (h != null && h != tail) {   //当前节点不为空且不为尾节点
                 int ws = h.waitStatus;  //获取当前节点的状态
-                if (ws == Node.SIGNAL) {    //如果当前节点是可以唤起后继结点的
-                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
-                        continue;            // loop to recheck cases
+                if (ws == Node.SIGNAL) {    //如果头节点可以唤起后继结点
+                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0)) //将h节点的waitStatus设为0
+                        continue;            // 循环复查
                     unparkSuccessor(h); //唤醒当前节点的下一个可用节点
                 }
                 else if (ws == 0 &&
