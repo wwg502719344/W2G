@@ -66,4 +66,12 @@ https://www.cnblogs.com/java-zhao/p/5813439.html
 
 
 
+问题5:
+    配置了actuator，却无法访问到相应的结果
+解决方案:
+    这种问题一般缺少2点，1是yml没有配置开启，2是springboot2.0以上访问相应插件的内容需要在访问路径上添加
+插件名称。http://localhost:8100/actuator/routes即可，类似的还有
+
+
+
 
