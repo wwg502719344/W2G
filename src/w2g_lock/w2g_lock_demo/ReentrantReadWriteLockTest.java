@@ -31,7 +31,7 @@ public class ReentrantReadWriteLockTest {
     }
 
     public static final Object set(String key,Object value){
-        w.lock();
+        w.lock();//p2
         try{
             return map.put(key, value);
         }finally {
