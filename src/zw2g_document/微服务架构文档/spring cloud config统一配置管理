@@ -1,4 +1,4 @@
-
+基本笔记
 
 
 
@@ -9,14 +9,48 @@
 
 问题模块
 
+QUESTION
 
 Q1:配置config-server/config-client文件时，相关git的参数需要配置在bootstrap.yml中而不是配置在
 application.yml中，为什么
 
+
+Q2:通过配置config-server项目，如何访问相关联的配置文件，访问路径规则
+
+
+Q3:config-server访问路径http://localhost:8000/cloud-dev/dev，最后的dev代表的是什么
+当我不加上dev的时候，访问显示404，加上以后，随便写也可以，返回的参数中对应的是profile的显示值
+
+
+Q4:访问指定配置文件时，访问参数未显示指定的git分支，但是boot2.0以下版本会默认显示
+
+
+Q5:config-client访问config-server，访问失败，一直显示的是配置文件中配置的profile而不是git上的值
+
+
+
+ANSWER
+
 A1:bootstrap.yml加载于application.yml之前，并且会对application.yml进行覆盖,bootstrap.yml
 由父 Spring ApplicationContext进行加载，父 Spring ApplicationContext加载于application.yml
-之前
+之前，spring cloud有个启动上下文，这个启动上下文就是用来加载远端服务的，又因为client需要加载
+远端服务，所以需要配置在bootstrap.yml中
 
 参考资料:
+https://www.cnblogs.com/fengli9998/p/8534821.html
 https://www.cnblogs.com/EasonJim/p/7589546.html
 https://stackoverflow.com/questions/32997352/what-is-the-difference-between-putting-a-property-on-application-yml-or-bootstra
+
+
+A2:通过git方式存储配置文件，访问路径一般是IP:PORT/配置文件名称/profile/分支的方式
+
+
+A3:dev显示的是yml配置文件中配置的profile，通过放在访问路径中来对配置文件进行访问，访问路径
+遵从官方文档格式
+
+
+A4:在boot2.0以上版本可能不会默认显示master分支，需要在访问路径中指定，因为我在配置文件中已经指定了
+label，但是在访问路径中没有写明，访问结果还是不会显示当前分支，所以在路径中指定当前分支才会显示
+
+
+A5:在控制器方法中注入属性方式错误，应该是@Value("${profile}")，之前把整个路径都写出来了
