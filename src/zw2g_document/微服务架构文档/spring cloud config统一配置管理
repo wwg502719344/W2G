@@ -27,7 +27,7 @@ Q4:访问指定配置文件时，访问参数未显示指定的git分支，但�
 
 Q5:config-client访问config-server，访问失败，一直显示的是配置文件中配置的profile而不是git上的值
 
-
+Q6:profile是什么，作用是是什么
 
 ANSWER
 
@@ -54,3 +54,7 @@ label，但是在访问路径中没有写明，访问结果还是不会显示当
 
 
 A5:在控制器方法中注入属性方式错误，应该是@Value("${profile}")，之前把整个路径都写出来了
+
+
+A6:application_xxx.yml，里面的xxx，代表不同的profile.配置文件同理，
+如果传参过程中profile错误，会默认匹配到默认配置文件
