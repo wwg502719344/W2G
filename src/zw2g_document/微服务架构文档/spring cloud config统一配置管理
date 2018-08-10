@@ -1,11 +1,3 @@
-基本笔记
-
-
-
-
-
-
-
 
 问题模块
 
@@ -27,7 +19,16 @@ Q4:访问指定配置文件时，访问参数未显示指定的git分支，但�
 
 Q5:config-client访问config-server，访问失败，一直显示的是配置文件中配置的profile而不是git上的值
 
-Q6:profile是什么，作用是是什么
+
+Q6:{application}/{profile}[/{label}各是什么，作用是是什么
+
+
+Q7:bootstrap.xml相当一个怎样的存在
+
+
+Q8:springboot2.x访问health indicator,无法直接通过IP:PORT/health进行访问，boot1.X可以
+
+
 
 ANSWER
 
@@ -56,5 +57,18 @@ label，但是在访问路径中没有写明，访问结果还是不会显示当
 A5:在控制器方法中注入属性方式错误，应该是@Value("${profile}")，之前把整个路径都写出来了
 
 
-A6:application_xxx.yml，里面的xxx，代表不同的profile.配置文件同理，
+A6:{application}:配置在客户端的spring.application.name的属性中
+如果没有配置，我自己使用的结果是配置文件的名称,比如{application}.properties
+   {profile}:配置在客户端的spring.profiles.active属性中
+如果没有配置，默认如下{application.name}-{application.profile}.properties
+   {label}:配置在服务端的，git版本
 如果传参过程中profile错误，会默认匹配到默认配置文件
+
+
+A7:bootstrap.xml优先加载于xxx.yml，原因是xxx.yml加载于spring cloud启动上下文后，而boot配置文件
+更像是执行java -jar xxx.jar这样的外部启动命令
+
+
+Q8:访问路径，IP:PORT/actuator/health
+参看资料:
+https://github.com/spring-projects/spring-boot/issues/13238
