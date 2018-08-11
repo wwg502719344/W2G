@@ -36,6 +36,10 @@ http://localhost:8001/refresh
 
 Q10:java客户端连接rabbitmq失败，端口号也是没问题的，但是报错
 
+
+Q11:cloud配置 bus 动态更改配置文件，访问config-server刷新最新配置，使的每个client都可以动态的
+读取到最新更改的配置文件，但是实际操作中client无法刷新最新配置，还是只能读取启动时候的配置
+
 ANSWER
 
 A1:bootstrap.yml加载于application.yml之前，并且会对application.yml进行覆盖,bootstrap.yml
@@ -86,3 +90,13 @@ A9:springboot 在2.x发生了很大的变化，其中/info和/health等是默认
 https://stackoverflow.com/questions/49363043/spring-boot-2-refresh-properties-on-the-fly-not-working
 具体boot2.X变化参考
 https://www.oschina.net/translate/spring-boot-2-0-migration-guide?print
+
+
+A10:账号权限问题，需要把配置在java中的账号在mq页面开通相关权限，再次启动就不会报错了
+(google解决)
+
+
+A11:在最新版本的boot中，首先刷新最新全体配置的请求方式不是之前的/actuator/refresh，而是
+/actuator/bus-refresh，其次，之前在配置文件中配置的暴露的访问端口写的是*，但是这里要改成
+bus-refresh，以上两点修改完毕，就可以使用config server的方式刷新所有配置文件了，具体参考
+官方文档(阅读文档解决)
