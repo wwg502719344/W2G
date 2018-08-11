@@ -29,6 +29,12 @@ Q7:bootstrap.xml相当一个怎样的存在
 Q8:springboot2.x访问health indicator,无法直接通过IP:PORT/health进行访问，boot1.X可以
 
 
+Q9:更新了git配置后，使用refresh手动刷新配置文件，显示404，请求路径
+http://localhost:8001/actuator/refresh or
+http://localhost:8001/refresh
+
+
+Q10:java客户端连接rabbitmq失败，端口号也是没问题的，但是报错
 
 ANSWER
 
@@ -69,6 +75,14 @@ A7:bootstrap.xml优先加载于xxx.yml，原因是xxx.yml加载于spring cloud�
 更像是执行java -jar xxx.jar这样的外部启动命令
 
 
-Q8:访问路径，IP:PORT/actuator/health
+A8:访问路径，IP:PORT/actuator/health
 参看资料:
 https://github.com/spring-projects/spring-boot/issues/13238
+
+
+A9:springboot 在2.x发生了很大的变化，其中/info和/health等是默认暴露的，现在需要自己启动，
+具体启动文件可看项目或是查询
+参考资料:
+https://stackoverflow.com/questions/49363043/spring-boot-2-refresh-properties-on-the-fly-not-working
+具体boot2.X变化参考
+https://www.oschina.net/translate/spring-boot-2-0-migration-guide?print
