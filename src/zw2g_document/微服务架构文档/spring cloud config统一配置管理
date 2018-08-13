@@ -1,22 +1,102 @@
 
-
-
-
-
-
-
-
-
 问题模块
 
+QUESTION
 
 Q1:配置config-server/config-client文件时，相关git的参数需要配置在bootstrap.yml中而不是配置在
 application.yml中，为什么
 
+
+Q2:通过配置config-server项目，如何访问相关联的配置文件，访问路径规则
+
+
+Q3:config-server访问路径http://localhost:8000/cloud-dev/dev，最后的dev代表的是什么
+当我不加上dev的时候，访问显示404，加上以后，随便写也可以，返回的参数中对应的是profile的显示值
+
+
+Q4:访问指定配置文件时，访问参数未显示指定的git分支，但是boot2.0以下版本会默认显示
+
+
+Q5:config-client访问config-server，访问失败，一直显示的是配置文件中配置的profile而不是git上的值
+
+
+Q6:{application}/{profile}[/{label}各是什么，作用是是什么
+
+
+Q7:bootstrap.xml相当一个怎样的存在
+
+
+Q8:springboot2.x访问health indicator,无法直接通过IP:PORT/health进行访问，boot1.X可以
+
+
+Q9:更新了git配置后，使用refresh手动刷新配置文件，显示404，请求路径
+http://localhost:8001/actuator/refresh or
+http://localhost:8001/refresh
+
+
+Q10:java客户端连接rabbitmq失败，端口号也是没问题的，但是报错
+
+
+Q11:cloud配置 bus 动态更改配置文件，访问config-server刷新最新配置，使的每个client都可以动态的
+读取到最新更改的配置文件，但是实际操作中client无法刷新最新配置，还是只能读取启动时候的配置
+
+ANSWER
+
 A1:bootstrap.yml加载于application.yml之前，并且会对application.yml进行覆盖,bootstrap.yml
 由父 Spring ApplicationContext进行加载，父 Spring ApplicationContext加载于application.yml
-之前
+之前，spring cloud有个启动上下文，这个启动上下文就是用来加载远端服务的，又因为client需要加载
+远端服务，所以需要配置在bootstrap.yml中
 
 参考资料:
+https://www.cnblogs.com/fengli9998/p/8534821.html
 https://www.cnblogs.com/EasonJim/p/7589546.html
 https://stackoverflow.com/questions/32997352/what-is-the-difference-between-putting-a-property-on-application-yml-or-bootstra
+
+
+A2:通过git方式存储配置文件，访问路径一般是IP:PORT/配置文件名称/profile/分支的方式
+
+
+A3:dev显示的是yml配置文件中配置的profile，通过放在访问路径中来对配置文件进行访问，访问路径
+遵从官方文档格式
+
+
+A4:在boot2.0以上版本可能不会默认显示master分支，需要在访问路径中指定，因为我在配置文件中已经指定了
+label，但是在访问路径中没有写明，访问结果还是不会显示当前分支，所以在路径中指定当前分支才会显示
+
+
+A5:在控制器方法中注入属性方式错误，应该是@Value("${profile}")，之前把整个路径都写出来了
+
+
+A6:{application}:配置在客户端的spring.application.name的属性中
+如果没有配置，我自己使用的结果是配置文件的名称,比如{application}.properties
+   {profile}:配置在客户端的spring.profiles.active属性中
+如果没有配置，默认如下{application.name}-{application.profile}.properties
+   {label}:配置在服务端的，git版本
+如果传参过程中profile错误，会默认匹配到默认配置文件
+
+
+A7:bootstrap.xml优先加载于xxx.yml，原因是xxx.yml加载于spring cloud启动上下文后，而boot配置文件
+更像是执行java -jar xxx.jar这样的外部启动命令
+
+
+A8:访问路径，IP:PORT/actuator/health
+参看资料:
+https://github.com/spring-projects/spring-boot/issues/13238
+
+
+A9:springboot 在2.x发生了很大的变化，其中/info和/health等是默认暴露的，现在需要自己启动，
+具体启动文件可看项目或是查询
+参考资料:
+https://stackoverflow.com/questions/49363043/spring-boot-2-refresh-properties-on-the-fly-not-working
+具体boot2.X变化参考
+https://www.oschina.net/translate/spring-boot-2-0-migration-guide?print
+
+
+A10:账号权限问题，需要把配置在java中的账号在mq页面开通相关权限，再次启动就不会报错了
+(google解决)
+
+
+A11:在最新版本的boot中，首先刷新最新全体配置的请求方式不是之前的/actuator/refresh，而是
+/actuator/bus-refresh，其次，之前在配置文件中配置的暴露的访问端口写的是*，但是这里要改成
+bus-refresh，以上两点修改完毕，就可以使用config server的方式刷新所有配置文件了，具体参考
+官方文档(阅读文档解决)
