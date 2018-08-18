@@ -1,26 +1,24 @@
 BlockingQueue
 阻塞队列的方法接口，相关的阻塞队列需要实现它
- * ArrayBlockQueue
- * LinkedBlockQueue
- * PriorityBlockQueue
- * DelayQueue
- * SynchronousQueue
- * LinkedBlockQueue
+    * ArrayBlockQueue
+    * LinkedBlockQueue
+    * PriorityBlockQueue
+    * DelayQueue
+    * SynchronousQueue
+    * LinkedBlockQueue
 
 
- *注意点
- 1-是有界的
- 2-不接受null值
-
-
- 代码:BlockingQueue_source
- 参考:http://tool.oschina.net/apidocs/apidoc?api=jdk-zh
+    代码:BlockingQueue_source
+    参考:http://tool.oschina.net/apidocs/apidoc?api=jdk-zh
 
 
 
 DelayQueue源码解析
-继承AbstractQueue，实现BlockingQueue
-申明ReentrantLock，可重入锁，实现
+    继承AbstractQueue，实现BlockingQueue
+    内部使用PriorityQueue，存放数据
+    申明ReentrantLock，实现线程同步
+
+
 
 DelayQueue的实现→Delayed接口
 生产者：
@@ -30,3 +28,11 @@ DelayQueue的实现→Delayed接口
 
 消费者：
 获取队列元素时，如果元素未达到延迟时间，则阻塞该线程
+
+
+
+*注意事项
+ 1-是有界的
+ 2-不接受null值
+ 3-队列内部的元素实现Delayed接口
+    Q:队列内部的元素怎么实现Delayed接口

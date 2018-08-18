@@ -1,1 +1,16 @@
 Q1:DelayQueue队列为什么要使用ReentrantLock来实现队列的加锁问题
+
+
+Q2:集合内部的元素怎么实现接口？比如DelayQueue<E extends Delayed>，指的就是内部元素实现了Delayed接口
+
+
+
+
+
+
+
+A1:
+
+
+A2:元素在加入到DelayedQueue队列中的时候，元素本身应该是实现了Delayed的类，这样才能加入到队列中来
+
