@@ -15,7 +15,7 @@ BlockingQueue
 
 DelayQueue源码解析
     继承AbstractQueue，实现BlockingQueue
-    内部使用PriorityQueue，存放数据
+    内部使用PriorityQueue，存放数据，目的是保证数据的有序性
     申明ReentrantLock，实现线程同步
 
 
