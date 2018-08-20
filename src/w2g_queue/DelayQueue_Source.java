@@ -92,6 +92,7 @@ public class DelayQueue_Source {
      * 如果优先级队列不为空，查看当前首元素是否到达过期时间，到达过期时间了就获取并移除队列
      * 如果没有到达过期时间，将first变量置为null，如果leader线程不为空则进入等待队列
      * 如果leader为空，则当前线程为leader，并限时进入等待队列中进行等待
+     * 如果leader为空，队列中还有元素存在，则唤醒所有等待的follower线程
      * 继续循环，直到获取延时队列中的元素
      */
     /*public E take() throws InterruptedException {

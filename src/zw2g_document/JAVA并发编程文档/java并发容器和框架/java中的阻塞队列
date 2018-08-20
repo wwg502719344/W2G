@@ -20,7 +20,7 @@ DelayQueue源码解析
 
 
 
-DelayQueue的实现→Delayed接口
+DelayQueue的实现方式
 生产者：
 1：创建对象，初始化对象
 2：实现getDelay方法，计算延时元素剩余时间
@@ -29,6 +29,14 @@ DelayQueue的实现→Delayed接口
 消费者：
 获取队列元素时，如果元素未达到延迟时间，则阻塞该线程
 
+
+优点:
+    采用了l/f设计模式，减少了请求线程无谓的循环和多线程上下文之间的切换，提高了效率
+缺点:
+    在应对并发上效率会有所下降，因为
+
+项目使用参考资料：
+https://my.oschina.net/lujianing/blog/705894
 
 
 *注意事项
