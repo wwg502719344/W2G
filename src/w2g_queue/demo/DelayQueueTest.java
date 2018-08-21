@@ -12,9 +12,9 @@ public class DelayQueueTest {
     public static void main(String args[]){
         DelayQueue<DelayedElement> delayQueue=new DelayQueue<DelayedElement>();
 
-        producer(delayQueue);
+        producer(delayQueue);//朝生产队列中添加任务事件
 
-        consumer(delayQueue);
+        consumer(delayQueue);//从队列中获取任务并执行
 
         while (true){
             try {
