@@ -60,7 +60,7 @@ public class DelayQueue_Source {
 
 
     /**
-     * P2
+     * P1-1
      * 优先级队列下的offer方法
      * 将元素加入到优先级队列中去，设置操作优先队列的数量和队列元素的数量
      * 如果队列为空，则将当前加入的节点设为头节点，如果不为空，则调整新元素和之前元素的数据结构
@@ -82,7 +82,7 @@ public class DelayQueue_Source {
 
 
     /**
-     * P3
+     * P2
      * 获取延迟队列中的元素
      * Retrieves and removes the head of this queue, waiting if necessary
      * 检索并移除这个队列的头部，等待(如果有必要的话)直到这个队列的过期元素可用
@@ -128,4 +128,73 @@ public class DelayQueue_Source {
             lock.unlock();
         }
     }*/
+
+
+
+
+    /**
+     * P2-1：关于队列元素中compareTo方法的源码解析
+     * Inserts the specified element into this delay queue.
+     * 插入指定的元素进入延迟队列中
+     */
+    /*public boolean offer(E e) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            q.offer(e); //向优先级队列中添加元素P4-1
+            if (q.peek() == e) {
+                leader = null;
+                available.signal();
+            }
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }*/
+
+
+    /*
+    //P4:对新加入的元素进行插入操作前的准备工作
+    public boolean offer(E e) {
+        if (e == null)
+            throw new NullPointerException();
+        modCount++;
+        int i = size;//获取当前优先级队列元素数量
+        if (i >= queue.length)//如果数量大于队列当前大小
+            grow(i + 1);//进行扩容操作
+        size = i + 1;//数量加1
+        if (i == 0)
+            queue[0] = e;
+        else
+            siftUp(i, e);//P4-2:对新加入的元素进行排序
+        return true;
+    }
+
+    //P4-1
+    //根据comparator判断优先级队列采用不同的排序方式，具体回家在研究一下
+    //
+    private void siftUp(int k, E x) {
+        if (comparator != null)
+            siftUpUsingComparator(k, x);
+        else
+            siftUpComparable(k, x);//P4-3这个方法采用自己元素实现的排序规则，具体在研究
+    }
+
+    //P4-2
+    //对队列中的元素进行排序
+    private void siftUpComparable(int k, E x) {
+        //x元素继承实现了Comparable接口
+        Comparable<? super E> key = (Comparable<? super E>) x;
+        while (k > 0) { //当元素位置小于根节点的时候
+            int parent = (k - 1) >>> 1;
+            Object e = queue[parent];
+            if (key.compareTo((E) e) >= 0)//如果不满足比较原则退出循环
+                break;
+            queue[k] = e;
+            k = parent;
+        }
+        queue[k] = key;
+    }
+
+    */
 }
