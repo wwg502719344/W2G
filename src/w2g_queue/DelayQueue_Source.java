@@ -1,6 +1,8 @@
 package w2g_queue;
 
 import java.util.concurrent.DelayQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by W2G on 2018/8/17 0017.
@@ -22,6 +24,9 @@ public class DelayQueue_Source {
     //priorityQueue实现数据的保存
     private final PriorityQueue<E> q = new PriorityQueue<E>();
 
+    private Thread leader = null;
+
+    private final Condition available = lock.newCondition();*/
 
     /**
      * P1
@@ -32,31 +37,32 @@ public class DelayQueue_Source {
      *
      */
     /*public boolean offer(E e) {
-    //获取重入锁
-    final ReentrantLock lock = this.lock;
-    //获取锁资源
-    lock.lock();
-    try {
-        //P2源码
-        //元素加入优先级队列
-        q.offer(e);
-        //获取但不移除此队列的头
-        //如果头元素就是元素e
-        if (q.peek() == e) {
-            //设置当前等待线程的首线程为null
-            //此处使用了设计模式leader-follower模式，为了减少不必要的线程等待
-            //此处leader设置为null，可能原因是因为此时的e是快要过期的元素，直接调用等待队列来获取元素,leader
-            //此处将leader设置为null原因很简单，因为元素只有一个，而且还是没有被消费的元素，这时候就有唤醒等待...
-            //队列中的follower线程
-            leader = null;
-            //唤醒等待队列线程
-            available.signal();
-        }
-        return true;
-    } finally {
-        lock.unlock();
-    }
-}*/
+        //获取重入锁
+        final ReentrantLock lock = this.lock;
+        //获取锁资源
+        lock.lock();
+        try {
+            //P2源码
+            //元素加入优先级队列
+            q.offer(e);
+            //获取但不移除此队列的头
+            //如果头元素就是元素e
+            if (q.peek() == e) {
+                //设置当前等待线程的首线程为null
+                //此处使用了设计模式leader-follower模式，为了减少不必要的线程等待
+                //此处leader设置为null，可能原因是因为此时的e是快要过期的元素，直接调用等待队列来获取元素,leader
+                //此处将leader设置为null原因很简单，因为元素只有一个，而且还是没有被消费的元素，这时候就有唤醒等待...
+                //队列中的follower线程
+                leader = null;
+                //唤醒等待队列线程
+                available.signal();
+                }
+                return true;
+            } finally {
+                lock.unlock();
+            }
+        }*/
+
 
 
     /**
