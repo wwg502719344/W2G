@@ -21,7 +21,7 @@ public class DelayQueue_Source {
 
     //priorityQueue实现数据的保存
     private final PriorityQueue<E> q = new PriorityQueue<E>();
-    */
+
 
     /**
      * P1
@@ -53,12 +53,12 @@ public class DelayQueue_Source {
                 leader = null;
                 //唤醒等待队列线程
                 available.signal();
+                }
+                return true;
+            } finally {
+                lock.unlock();
             }
-            return true;
-        } finally {
-            lock.unlock();
-        }
-    }*/
+        }*/
 
 
     /**
@@ -80,38 +80,6 @@ public class DelayQueue_Source {
         else
             siftUp(i, e);
         return true;
-    }*/
-
-
-    /**
-     * P1-2
-     * 根据comparator判断优先级队列采用不同的排序方式，具体回家在研究一下
-     *
-     */
-    /*private void siftUp(int k, E x) {
-        if (comparator != null)
-            siftUpUsingComparator(k, x);
-        else
-            siftUpComparable(k, x);//P4-3这个方法采用自己元素实现的排序规则，具体在研究
-    }*/
-
-    /**
-     * P1-3
-     * 对队列中的元素进行排序
-     *
-     */
-    /*private void siftUpComparable(int k, E x) {
-        //x元素继承实现了Comparable接口
-        Comparable<? super E> key = (Comparable<? super E>) x;
-        while (k > 0) { //当元素位置小于根节点的时候
-            int parent = (k - 1) >>> 1;
-            Object e = queue[parent];
-            if (key.compareTo((E) e) >= 0)//如果不满足比较原则退出循环
-                break;
-            queue[k] = e;
-            k = parent;
-        }
-        queue[k] = key;
     }*/
 
 
@@ -204,7 +172,31 @@ public class DelayQueue_Source {
         return true;
     }
 
+    //P4-1
+    //根据comparator判断优先级队列采用不同的排序方式，具体回家在研究一下
+    //
+    private void siftUp(int k, E x) {
+        if (comparator != null)
+            siftUpUsingComparator(k, x);
+        else
+            siftUpComparable(k, x);//P4-3这个方法采用自己元素实现的排序规则，具体在研究
+    }
 
+    //P4-2
+    //对队列中的元素进行排序
+    private void siftUpComparable(int k, E x) {
+        //x元素继承实现了Comparable接口
+        Comparable<? super E> key = (Comparable<? super E>) x;
+        while (k > 0) { //当元素位置小于根节点的时候
+            int parent = (k - 1) >>> 1;
+            Object e = queue[parent];
+            if (key.compareTo((E) e) >= 0)//如果不满足比较原则退出循环
+                break;
+            queue[k] = e;
+            k = parent;
+        }
+        queue[k] = key;
+    }
 
     */
 }
