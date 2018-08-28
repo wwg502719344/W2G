@@ -1,6 +1,5 @@
 package w2g_concurrent_utils.demo;
 
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 /**
