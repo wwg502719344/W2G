@@ -1,8 +1,6 @@
 package w2g_queue;
 
 import java.util.concurrent.DelayQueue;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by W2G on 2018/8/17 0017.
@@ -24,15 +22,14 @@ public class DelayQueue_Source {
     //priorityQueue实现数据的保存
     private final PriorityQueue<E> q = new PriorityQueue<E>();
 
-    private Thread leader = null;
-
-    private final Condition available = lock.newCondition();*/
 
     /**
      * P1
      * 将实现了Delay的元素加入到延迟队列中去
      * 当前元素节点加入到优先级队列中去(priorityQueue)
-     * 如果优先级队列的首节点就是刚才加入的元素，则leader线程置为空(原因是什么？目的是什么？原因在下面)，唤醒等待队列的头节点加入到同步队列中去
+     * 如果优先级队列的首节点就是刚才加入的元素，则leader线程置为空，唤醒等待队列的头节点加入到同步队列中去
+     * leader置为空，原因是什么？目的是什么？因为此时队列中只有一个元素，所以不需要leader一直在检查...
+     * 而是去唤醒等待队列中的元素，目的可能是考虑到效率问题
      *
      *
      */
@@ -62,7 +59,6 @@ public class DelayQueue_Source {
                 lock.unlock();
             }
         }*/
-
 
 
     /**
@@ -96,7 +92,7 @@ public class DelayQueue_Source {
      *
      * 首先获取优先队列的首个元素，如果为空则调用线程沉睡。
      * 如果优先级队列不为空，查看当前首元素是否到达过期时间，到达过期时间了就获取并移除队列
-     * 如果没有到达过期时间，将first变量置为null，如果leader线程不为空则进入等待队列
+     * 如果没有到达过期时间，将first变量置为null(防止内存泄漏)，如果leader线程不为空则进入等待队列
      * 如果leader为空，则当前线程为leader，并限时进入等待队列中进行等待
      * 如果leader为空，队列中还有元素存在，则唤醒所有等待的follower线程
      * 继续循环，直到获取延时队列中的元素
@@ -113,7 +109,7 @@ public class DelayQueue_Source {
                     long delay = first.getDelay(NANOSECONDS);   //获取当前元素还需要延时多长时间
                     if (delay <= 0) //如果延时时间小于或是等于0，则移出队列
                         return q.poll();
-                    first = null; // don't retain ref while waiting
+                    first = null; // don't retain ref while waiting防止内存泄漏
                     if (leader != null) //说明leader线程正在工作，当前线程就进入等待队列中
                         available.await();//当前线程转变为follower线程
                     else {  //如果首节点不为空，延时时间还没到，没有相应的处理线程
