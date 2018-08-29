@@ -151,8 +151,8 @@ public class DelayQueue_Source {
                     if (delay <= 0) //如果延时时间小于或是等于0，则移出队列
                         return q.poll();
                     first = null; // don't retain ref while waiting防止内存泄漏
-                    if (leader != null) //说明leader线程正在工作，当前线程就进入等待队列中
-                        available.await();//当前线程转变为follower线程
+                    if (leader != null) //说明首元素已经有leader线程跟踪了
+                        available.await();//当前线程转变为follower线程，当前线程就进入等待队列中
                     else {  //如果首节点不为空，延时时间还没到，没有相应的处理线程
                         Thread thisThread = Thread.currentThread(); //获取当前线程
                         leader = thisThread;    //当前线程设置为首线程
