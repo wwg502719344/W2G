@@ -1,0 +1,18 @@
+设计模式实现类
+
+产生真实数据步骤
+    1-main类:主类，运行相关方法,向client类发出请求，返回data(实则为futureData)
+    2-Client类:主方法请求该类，返回一个data数据，这时候返回的是futureData，并不是真实数据，同时会异步发出请求去获取真实数据...
+    并将最终realdata数据装载进futureData，主类在进行调用
+    3-realData类:构造执行相应的方法，得到实际数据
+    4-future类:装载realData类
+
+
+获取真实数据步骤
+    1-main类:通过方法返回的data数据，调用future类，获取future装载的realData数据
+    2-future类:调用realData类方法获取真实数据
+    3-realData类:返回真实数据
+
+
+Q:往future类中装载的realData到底有什么作用
+A:一方面修改状态，提示后面可以进行获取操作，一方面可以使用装载得到的realdata数据获取得到真实数据
