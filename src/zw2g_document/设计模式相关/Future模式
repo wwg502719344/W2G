@@ -12,13 +12,40 @@ realData-->返回真实数据，构造比较慢
 
 
 
+设计模式实现类
 
+产生真实数据步骤
+    1-main类:主类，运行相关方法,向client类发出请求，返回data(实则为futureData)
+    2-Client类:主方法请求该类，返回一个data数据，这时候返回的是futureData，并不是真实数据，同时会异步发出请求去获取真实数据...
+    并将最终realdata数据装载进futureData，主类在进行调用
+    3-realData类:构造执行相应的方法，得到实际数据
+    4-future类:装载realData类
+
+
+获取真实数据步骤
+    1-main类:通过方法返回的data数据，调用future类，获取future装载的realData数据
+    2-future类:调用realData类方法获取真实数据
+    3-realData类:返回真实数据
+
+
+总结:
+    主要思路是通过异步的方式实现程序对未来数据的获取，比如说
+    线程A的执行需要B的结果，但是实际上A并不需要等待B执行完，而是先获取一个B的future，等待将来的某个时候获取B的数据
 
 
 =============================QUESTION=====================================
 Q1:服务端返回给客户端的契约是什么
+A1:返回的契约就是futureData数据，实际上并没有获取真实数据
 
+Q2:往future类中装载的realData到底有什么作用
+A2:一方面修改状态，提示后面可以进行获取操作，一方面可以使用装载得到的realdata数据获取得到真实数据
 
+Q3:如何得知实际数据已经完成了呢
+A3:调用获取实际数据的方法，如果数据已经装载成功则直接返回数据，否则进入await
 =============================ANSWER=====================================
 参考文章:
+demo源码和jdk源码
 https://blog.csdn.net/xlgen157387/article/details/78390642
+
+future设计模式的核心关键点
+https://blog.csdn.net/yangkai_hudong/article/details/12904813

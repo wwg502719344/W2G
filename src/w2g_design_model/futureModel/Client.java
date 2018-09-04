@@ -3,6 +3,7 @@ package w2g_design_model.futureModel;
 /**
  * Created by W2G on 2018/9/3 0003.
  * 客户端返回future，实际开启ClientThread去计算数据结果
+ *
  */
 public class Client {
 

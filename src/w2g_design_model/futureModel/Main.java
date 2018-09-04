@@ -8,6 +8,7 @@ public class Main {
     public static void main(String args[]){
         Client client=new Client();
 
+        //调用client发送请求
         Data data=client.request("Hello Future!");
 
         System.out.println("请求完毕！");
@@ -19,6 +20,7 @@ public class Main {
             e.printStackTrace();
         }
 
+        //调用实际返回的数据
         System.out.println("真实数据：" + data.getResult());
 
     }

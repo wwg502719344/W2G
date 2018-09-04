@@ -38,6 +38,7 @@ public class FutureData implements Data {
             return;
         }
 
+        //装载实际数据对象
         this.realData = realData;
         isReady = true;
         condition.signal();
