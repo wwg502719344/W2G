@@ -1,5 +1,7 @@
 package w2g_queue;
 
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -8,4 +10,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ThreadPoolExecutor_source {
 
     ThreadPoolExecutor a=null;
+
+    //future设计模式,jdk内置实现
+    FutureTask futureTask=null;
+
 }
