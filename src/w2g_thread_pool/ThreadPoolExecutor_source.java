@@ -1,4 +1,4 @@
-package w2g_queue;
+package w2g_thread_pool;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
