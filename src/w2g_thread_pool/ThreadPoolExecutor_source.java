@@ -1,6 +1,5 @@
 package w2g_thread_pool;
 
-import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 
