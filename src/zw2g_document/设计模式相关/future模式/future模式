@@ -34,7 +34,14 @@ realData-->返回真实数据，构造比较慢
 =============================Future模式在源码中的实现BEGIN=====================================
 
 jdk中实现类:
-    futureTask：实现了runnableFuture方法，runnableFuture方法继承了runnable方法和future方法，
+    futureTask：实现了runnableFuture方法，runnableFuture方法继承了runnable方法和future方法
+    继承runnableFuture的目的是为了实现run方法，在futureTask被执行的时候，执行run方法可以获取返回的数据
+    继承future方法是为了将得到的数据封装到future对象中，实现数据的读取存放
+
+    callable对象:构造futureTask对象的时候需要传入实体类(需要实现callable接口)作为构造传参，
+    在执行run方法中，调用call方法(获取数据方法)，并将数据返回
+
+    Executor类:运行futureTask类，执行run方法
 
 ====================================================================================================
 总结:
