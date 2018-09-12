@@ -1,5 +1,9 @@
 package w2g_thread_pool;
 
+import w2g_design_model.futureModel.RealData;
+
+import java.util.concurrent.FutureTask;
+
 /**
  * Created by W2G on 2018/9/10.
  * 该类源码解析主要是分析Future设计模式的实现原理
@@ -18,7 +22,7 @@ package w2g_thread_pool;
  */
 public class FutureTask_Source {
 
-
+    FutureTask<String> futureTask = null;
     /**
      * P0:使用future模式，调用主方法逻辑
      */

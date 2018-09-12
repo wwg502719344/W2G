@@ -5,5 +5,13 @@ ThreadPoolExecutor(线程池执行类)
 
 2-通过的Executors创建线程池
 通过的 Executors 创建的线程池已经为绝大多数的场景做了预配置
+1-Executors.newCachedThreadPool()：无界线程池，可以进行自动线程回收
+2-Executors.newFixedThreadPool(int)：固定线程池大小
+3-Executors.newSingleThreadExecutor()：单个后台线程
+
+
+3-关于线程池创建线程与corePoolSize和maximumPoolSize之间的关系
+实际线程池中的线程数并不是初始化的时候就创建好的，而是当有任务提交的时候(执行execute方法)，线程池会去判断当前运行的线程数量是否达到
+corePoolSize，如果不够则会创建线程，注意，是正在运行的线程，而不是所有的核心线程数
 
 
