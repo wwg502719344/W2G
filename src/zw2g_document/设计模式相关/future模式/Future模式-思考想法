@@ -18,7 +18,7 @@ A1：future类实现了对实际数据的调用工作，可通过future获取调
 
 2-FutureTask基本数据结构构成和组成成分关系理解
 FutureTask实现了RunnableFuture，RunnableFuture又继承了runnable类和future类，实现runnable的目的是可以将futureTask
-提交给execute进行执行，作为runnable的future，成功执行run方法可以完成future，并允许他访问其结果,future提供了异步结果的访问
+提交给execute进行执行，作为runable的future，成功执行run方法可以完成future，并允许他访问其结果,future提供了异步结果的访问
 
 3-RunnableFuture类执行逻辑
 RunnableFuture类在执行完run方法后完成future,futureTask实现了RunnableFuture类，那么futureTask实现了run方法后，提交给
@@ -41,6 +41,11 @@ Q3:在futureData调用回调函数的时候，是在哪里启动的线程
 A3:在构造futureData后，会通过Executors方法创建ExecutorService，然后执行futureTask
 
 
+6:FutureTask使用场景(线程池中)
+在线程池当中，通过继承AbstractExecutorService类来达到异步处理任务的作用，在AbstractExecutorService类当中，大量的返回了futureTask对象...
+
+参考:
+https://blog.csdn.net/linchunquan/article/details/22382487
 
 =========================================================================================
 
