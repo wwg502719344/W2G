@@ -2,6 +2,8 @@ package w2g_thread_pool;
 
 import w2g_design_model.futureModel.RealData;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 /**

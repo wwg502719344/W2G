@@ -20,9 +20,10 @@ public class ThreadPoolExecutor_source {
      * P1 执行类基本组成结构
      * 继承类AbstractExecutorService，该类实现了executorService方法，
      * executorService是executor的子接口
-     * executor是超级接口，只要是实现了
+     * executor是超级接口，详情查看Executor_Source类及QA(Q8)
+     *
      */
     /*public class ThreadPoolExecutor extends AbstractExecutorService {
-
     }*/
+
 }

@@ -1,8 +1,5 @@
 package w2g_thread_pool;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.concurrent.Executor;
 
 /**
  * Created by W2G on 2018/9/12.
@@ -10,6 +7,8 @@ import java.util.concurrent.Executor;
  * 主要是执行提交的runnable任务，此接口主要是实现了一种将任务提交与任务执行分离开来的方法，普通的线程执行时在线程创建后，在线程中...
  * 去实现业务，在传统方法中Thread和Runnable是紧耦合的，而Executor就是为了将任务提交和执行解耦，executor负责将任务进行提交，...
  * 具体任务在何时执行则由实现类决定，例如生产者-消费者模式
+ *
+ *
  */
 public class Executor_Source {
 
@@ -36,7 +35,7 @@ public class Executor_Source {
 
 
     /**
-     *
+     * Executor的实现类
      */
     /*class SerialExecutor implements Executor {
         final Queue<Runnable> tasks = new ArrayDeque<Runnable>();
@@ -64,7 +63,7 @@ public class Executor_Source {
 
         protected synchronized void scheduleNext() {
             if ((active = tasks.poll()) != null) {
-                executor.execute(active);   //此处的实现方法是什么？
+                executor.execute(active);   //提交active任务
             }
         }
     }*/

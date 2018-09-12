@@ -50,8 +50,9 @@ A8:其实我们应该理解为这是一个解耦的行为，对于异步程序�
 A8-1:严格来说executor是一种执行思路，本身和异步任务无关，但是executor本身接受的参数是Runnable，即是实现了Runnable接口的，所以
 executor是一种异步任务的解决方案-思路
 A8-2:调用该线程的方法，则会在这个线程中提交这个task，至于这个task要怎么执行，都不做要求，提交线程的方法只负责把task提交出去，等会能...
-取到结构就行
+取到结果就行
+A8-3:详细的使用场景可以参考FutureTask_Source类
 参考:executor的理解(该博客较丰富的介绍了executor，值得通读)
 https://blog.csdn.net/LWJdear/article/details/77048501
-参考:较为详细的介绍了Executor的作用和使用场景
+参考*:较为详细的介绍了Executor的作用和使用场景
 http://www.idouba.net/power-of-java-concurrency-executor/
