@@ -1,0 +1,9 @@
+1-通过ThreadPoolExecutor创建线程池
+线程池的构造方法通过调用Executors类的方法去创建和返回一个线程工厂，在根据默认的参数和线程工厂和(被拒绝的处理程序??)创建一个。。。
+ThreadPoolExecutor(线程池执行类)
+
+
+2-通过的Executors创建线程池
+通过的 Executors 创建的线程池已经为绝大多数的场景做了预配置
+
+
