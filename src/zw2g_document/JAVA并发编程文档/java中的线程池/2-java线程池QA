@@ -27,6 +27,10 @@ Q7:根据corePoolSize的解释，当有新任务的时候线程池就会创建�
 
 
 Q8:在Executor的实现类中，是如何实现executor方法的，和传统的创建Thread，实现Runnable有什么区别
+
+
+Q9:ThreadPoolExecutor继承了AbstractExecutorService，AbstractExecutorService实现了executorService...
+在实现类方法中，主要是接受参数实现了Runnable的task，返回的是future对象，主要作用是什么
 ============================================ANSWER=============================================
 A0:当创建一个线程和销毁一个线程所需要的时间大于这个线程的执行时间，那么这就是一个资源上的浪费，线程池中保存了空闲的线程，
 可以利用空闲的线程，避免创建销毁的资源浪费

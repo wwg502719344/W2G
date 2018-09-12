@@ -22,8 +22,13 @@ public class ThreadPoolExecutor_source {
      * executorService是executor的子接口
      * executor是超级接口，详情查看Executor_Source类及QA(Q8)
      *
+     * P1-1 AbstractExecutorService是executorService的实现类，实现了相关方法
+     * 大多数方法通过提交task返回future对象
      */
     /*public class ThreadPoolExecutor extends AbstractExecutorService {
     }*/
+
+
+
 
 }
