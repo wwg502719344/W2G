@@ -15,3 +15,25 @@ ThreadPoolExecutor(线程池执行类)
 corePoolSize，如果不够则会创建线程，注意，是正在运行的线程，而不是所有的核心线程数
 
 
+=============================================AbstractExecutorService=====================================================
+4:FutureTask使用场景(线程池中)
+在线程池当中，通过继承AbstractExecutorService类来达到异步处理任务的作用，在AbstractExecutorService类当中，大量的返回了futureTask对象...
+futureTask用于异步执行任务或取消任务，通过调用run方法来执行相应的方法，之后获取数据可以通过get方法获取数据，run方法中通常也会进行set
+操作将callable获取的返回值放入类中
+参考:
+https://blog.csdn.net/linchunquan/article/details/22382487
+**Q**:FutureTask中run方法的调用发生在什么时候
+
+
+
+5:关于ThreadPoolExecutor与FutureTask之间的关系
+futureTask是通过将需要进行异步执行的数据通过实现类runnable和future类，在futureTask中异步调用执行相关类数据方法，获取异步执行的结果
+所以futureTask应该是一个为了执行异步方法，并获取相关结果的类
+类中包含了数据的实现逻辑，包含了run方法可直接调用,就是实际需要执行的任务/数据实现类
+在线程池中，线程执行类ThreadPoolExecutor需要实现AbstractExecutorService类，
+AbstractExecutorService类(该类中实现了ExecutorService接口，实现了Executor超级接口)，在该类的实现方法中，通过接受...
+Runnable/callable的参数，返回fatureTask对象，而futureTask对象是为了实现异步数据的请求
+初步判断，ThreadPoolExecutor是需要将执行任务设计成一个异步任务，且可以查询返回结果，所以在实现类中返回了futureTask(数据实现逻辑)
+简单猜测，当线程池收到任务后，线程池会将任务封装成一个futureTask。然后在对这个异步任务进行执行
+正常执行流程，线程池需要创建并返回一个ExecutorSercice，通过该对象的executor方法，开始执行futureTask对象
+Q:在ThreadPoolExecutor执行executor方法的时候，是否会启动新的线程去执行相关方法

@@ -41,11 +41,6 @@ Q3:在futureData调用回调函数的时候，是在哪里启动的线程
 A3:在构造futureData后，会通过Executors方法创建ExecutorService，然后执行futureTask
 
 
-6:FutureTask使用场景(线程池中)
-在线程池当中，通过继承AbstractExecutorService类来达到异步处理任务的作用，在AbstractExecutorService类当中，大量的返回了futureTask对象...
-
-参考:
-https://blog.csdn.net/linchunquan/article/details/22382487
 
 =========================================================================================
 
