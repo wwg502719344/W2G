@@ -65,4 +65,5 @@ P2:线程池申明了一个特殊变量用来表示线程池中运行线程数�
 P3:
 execute方法:调用execute方法将会根据线程池的状态去创建worker
 1-当工作线程小于核心线程数的时候，调用addWorker方法创建worker
-2-当
+2-当工作线程的数量(大于核心线程数+小于最大线程数(isRunning(c)返回true)+可以加入到工作队列(workQueue)中)的时候，加入workQueue等待调度
+3-

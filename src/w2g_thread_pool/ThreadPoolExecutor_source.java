@@ -48,7 +48,7 @@ public class ThreadPoolExecutor_source {
     private static final int CAPACITY   = (1 << COUNT_BITS) - 1;//最大线程数容量
 
     private static final int RUNNING    = -1 << COUNT_BITS;//线程池可以接受新任务
-    private static final int SHUTDOWN   =  0 << COUNT_BITS;//线程池不在接受新任务
+    private static final int SHUTDOWN   =  0 << COUNT_BITS;//线程池不在接受新任务(当工作线程大于等于最大线程的时候)
     private static final int STOP       =  1 << COUNT_BITS;//线程池不在接受新任务，不在执行队列中的任务
     private static final int TIDYING    =  2 << COUNT_BITS;//线程池中所有任务均终止
     private static final int TERMINATED =  3 << COUNT_BITS;//
@@ -87,6 +87,7 @@ public class ThreadPoolExecutor_source {
             c = ctl.get();
         }
         //当线程池状态是否是运行状态且成功加入工作队列中
+        //当workerCountOf(c)的数量大于等于corePoolSize的时候
         if (isRunning(c) && workQueue.offer(command)) {
             int recheck = ctl.get();//重新获取线程池运行状态
             if (! isRunning(recheck) && remove(command))//如果运行状态不是可运行且移除当前任务
