@@ -99,7 +99,7 @@ public class ThreadPoolExecutor_source {
             if (! isRunning(recheck) && remove(command))//如果运行状态不是可运行且移除当前任务
                 reject(command);
             else if (workerCountOf(recheck) == 0)
-                //如果发现没有worker，则会补充一个null。。。
+                //如果发现没有worker，则会补充一个null的worker什么意思？
                 addWorker(null, false);//P3-1
         }
         else if (!addWorker(command, false))
@@ -172,10 +172,12 @@ public class ThreadPoolExecutor_source {
                     // shut down before lock acquired.
                     int rs = runStateOf(ctl.get());
 
-                    //不太理解这个if,条件rs == SHUTDOWN && firstTask == null时，不应该继续创建线程了吧
+                    //rs < SHUTDOWN表示线程池处于可运行状态
+                    //Q1:不太理解这个if,条件rs == SHUTDOWN && firstTask == null时，不应该继续创建线程了吧
+                    //A1:当
                     if (rs < SHUTDOWN ||
                             (rs == SHUTDOWN && firstTask == null)) {
-                        if (t.isAlive()) // t为新创建的线程，为什么存活要抛出异常？
+                        if (t.isAlive()) // t为新创建的线程，为什么存活要抛出异常？(因为此时t还没有启动start操作)
                             throw new IllegalThreadStateException();
 
                         workers.add(w); //将创建的线程添加到worker容器中，workers也可移除
@@ -193,9 +195,59 @@ public class ThreadPoolExecutor_source {
                 }
             }
         } finally {
-            if (! workerStarted)//如果worker创建失败
+            if (! workerStarted)//如果worker创建失败，则加入addWorkerFailed
                 addWorkerFailed(w);
         }
         return workerStarted;
+    }*/
+
+
+    /**
+     * P4:Worker中run方法的实现类
+     */
+    /*final void runWorker(Worker w) {
+        Thread wt = Thread.currentThread();//获取当前线程，即为正在执行的，创建了worker的线程
+        Runnable task = w.firstTask;//获取封装进worker中的task任务
+        w.firstTask = null;
+        w.unlock(); // allow interrupts
+        boolean completedAbruptly = true;
+        try {
+            while (task != null || (task = getTask()) != null) {//如果创建该worker时传递的task不为空
+                w.lock();
+                // If pool is stopping, ensure thread is interrupted;
+                // 如果线程池停止了，确保线程被打断
+                // if not, ensure thread is not interrupted.  This
+                // requires a recheck in second case to deal with
+                // shutdownNow race while clearing interrupt
+                // 如果没有被打断，第二种情况要求在清除中断时去处理shutdownNow方法的竞争
+                if ((runStateAtLeast(ctl.get(), STOP) ||
+                        (Thread.interrupted() &&
+                                runStateAtLeast(ctl.get(), STOP))) &&
+                        !wt.isInterrupted())
+                    wt.interrupt();
+                try {
+                    beforeExecute(wt, task);
+                    Throwable thrown = null;
+                    try {
+                        task.run();
+                    } catch (RuntimeException x) {
+                        thrown = x; throw x;
+                    } catch (Error x) {
+                        thrown = x; throw x;
+                    } catch (Throwable x) {
+                        thrown = x; throw new Error(x);
+                    } finally {
+                        afterExecute(task, thrown);
+                    }
+                } finally {
+                    task = null;
+                    w.completedTasks++;
+                    w.unlock();
+                }
+            }
+            completedAbruptly = false;
+        } finally {
+            processWorkerExit(w, completedAbruptly);
+        }
     }*/
 }
