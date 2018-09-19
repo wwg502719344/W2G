@@ -40,7 +40,8 @@ public class ThreadPoolExecutor_source {
 
          * 代码逻辑主要是以下3个步骤：
          * 1.如果运行的线程少于核心线程，启动一个新线程处理提交的任务,对addWorker
-         * 的调用以原子方式
+         * 的调用以原子方式,对addWorker的调用需要进行runState和workerCount
+         * 的检查，为了防止false的警告在添加线程的时候当不应该添加的时候
          * 1. If fewer than corePoolSize threads are running, try to
          * start a new thread with the given command as its first
          * task.  The call to addWorker atomically checks runState and
