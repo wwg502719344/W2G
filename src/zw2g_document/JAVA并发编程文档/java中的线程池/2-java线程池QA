@@ -43,6 +43,18 @@ Q9:ThreadPoolExecutor继承了AbstractExecutorService，AbstractExecutorService�
 Q12:在进行execute方法的时候，如果可以成功加入到工作队列中的时候，在addWorker方法中，会执行workers.add(w);
 如果加入成功，则会开启线程，那么workers.add(w)本身有什么作用，为什么不能直接开启线程
 
+
+Q13:每一个任务对应一个worker,worker是一个实现了AQS的阻塞队列，那么worker实现AQS的目的是什么，worker是否会加入到
+workerQueue当中，Set类型的workers又是做什么的，为什么worker会加入到workers当中
+
+
+Q14:当运行线程数大于核心线程数时，将该任务加入到workerQueu中，那么实际执行时在哪里呢？
+
+
+Q15:worker对象为什么要设计成一个继承了AQS的同步队列，作用是什么？
+
+
+
 ============================================ANSWER=============================================
 A0:当创建一个线程和销毁一个线程所需要的时间大于这个线程的执行时间，那么这就是一个资源上的浪费，线程池中保存了空闲的线程，
 可以利用空闲的线程，避免创建销毁的资源浪费
@@ -81,3 +93,8 @@ A11:在源码中可以发现FutureTask实际上是实现了runnable接口的，�
 
 参考:submit传入futureTask问题(文章建议通读)
 https://blog.csdn.net/qq_33689414/article/details/72955253
+
+
+A13:通过观察ThreadPoolExecutor源码中的executor方法，可以发现，其实addWorker和workerQueue是不同的两个操作，在第一次判断中
+如果当前运行线程数少于核心线程数，则会直接将command放入addWork中进行启动，而当不满足条件时，则会执行workQueue.offer(command),
+将command加入到workQueue当中

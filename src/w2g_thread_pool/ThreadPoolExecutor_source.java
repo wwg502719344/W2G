@@ -7,6 +7,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by W2G on 2018/8/30.
  * 线程池执行类源码解析
+ * P1:ThreadPoolExecutor类所继承类极其相关关系
+ * P2:线程池状态源码基本变量组成及解析
+ * P3:ThreadPoolExecutor执行方法
  *
  */
 public class ThreadPoolExecutor_source {
@@ -24,7 +27,7 @@ public class ThreadPoolExecutor_source {
      * executor是超级接口，详情查看Executor_Source类及QA(Q8)
      *
      * P1-1 AbstractExecutorService是executorService的实现类，实现了相关方法
-     * 大多数方法通过提交task返回future对象
+     * 核心点:大多数方法通过提交task返回future对象
      */
     /*public class ThreadPoolExecutor extends AbstractExecutorService {
     }*/
@@ -65,18 +68,12 @@ public class ThreadPoolExecutor_source {
         if (command == null)
             throw new NullPointerException();
 
-         * 代码逻辑主要是以下3个步骤：
+         * 代码逻辑主要是以下4种情况：
          * 1.如果运行的线程少于核心线程，启动一个新线程处理提交的任务,对addWorker
          * 的调用以原子方式检查运行状态和任务数量，以便防止出现false警告当不应该
          * 添加线程的时候
          *
          * 2方法也会启动一个新线程
-         * 2. If a task can be successfully queued, then we still need
-         * to double-check whether we should have added a thread
-         * (because existing ones died since last checking) or that
-         * the pool shut down since entry into this method. So we
-         * recheck state and if necessary roll back the enqueuing if
-         * stopped, or start a new thread if there are none.
          *
          * 3. 如果我们不能加入任务队列，我们就尝试在添加一个新的线程，如果添加失败了
          * 我们就应该知道我们已经停止了然后把reject任务
@@ -91,12 +88,12 @@ public class ThreadPoolExecutor_source {
         }
         //当线程池状态是否是运行状态且成功加入工作队列中
         if (isRunning(c) && workQueue.offer(command)) {
-            int recheck = ctl.get();
-            if (! isRunning(recheck) && remove(command))
+            int recheck = ctl.get();//重新获取线程池运行状态
+            if (! isRunning(recheck) && remove(command))//如果运行状态不是可运行且移除当前任务
                 reject(command);
             else if (workerCountOf(recheck) == 0)
-                //
-                addWorker(null, false);//P3-1:核心代码
+                //如果发现没有worker，则会补充一个null。。。
+                addWorker(null, false);//P3-1
         }
         else if (!addWorker(command, false))
             reject(command);
@@ -110,7 +107,7 @@ public class ThreadPoolExecutor_source {
     /*private boolean addWorker(Runnable firstTask, boolean core) {
 
 
-        //第一阶段，主要作用是检查，检查线程池运行状态和活动线程数量相关问题
+        //第一阶段，主要作用是检查，检查线程池运行状态和活动线程数量是否符合要求，否则返回false
 
         retry:// continue/break跳出标记位，其中break表示要跳过这个标记的循环，continue表示从这个标记的循环继续执行
         for (;;) {
@@ -144,16 +141,17 @@ public class ThreadPoolExecutor_source {
         }
 
 
-        //第二阶段：创建Worker，并启动线程
+        //第二阶段：创建Worker对象，并启动线程
 
 
         boolean workerStarted = false;
         boolean workerAdded = false;
         Worker w = null;
         try {
+            //Worker类继承了AQS，相当于一个阻塞队列，入队阻塞，出队唤醒，worker
+            //AQS采用的是CLH同步队列，并不是一般的阻塞队列
             //根据你给的task创建worker对象,通过ThreadFactory获取thread的引用
             //Worker的也是Runnable的实现类
-            //Worker类继承了AQS，相当于一个阻塞队列，入队阻塞，出队唤醒
             w = new Worker(firstTask);
             //因为在构造方法中不可以创建线程，所以此处将引用赋值并新创建的线程
             final Thread t = w.thread;
