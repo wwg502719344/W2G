@@ -46,3 +46,24 @@
 
 
 
+==========================================源码内容分析===========================================================
+说明:源码实现细节及细节解析参考ThreadPoolExecutor_source
+
+内容：
+P1:ThreadPoolExecutor基本构成
+P2:线程池状态源码基本变量组成及解析
+P3:ThreadPoolExecutor执行方法
+P4:Worker组成及作用
+
+P1:ThreadPoolExecutor继承了AbstractExecutorService类，AbstractExecutorService是executorService的实现类，executorService是executor的子接口
+executorService创建线程池，在实现类中，通常是接受一个callable对象或是runnable对象，最后返回一个future对象,而最终future的实现
+则是由futureTask来实现，futureTask中则会实现一个run方法，此处为一闭环
+
+P2:线程池申明了一个特殊变量用来表示线程池中运行线程数量和线程池状态，还有表示当前线程池各个阶段状态的变量，以及获取当前状态的方法，
+内部类Worker，用来执行任务
+
+P3:
+execute方法:调用execute方法将会根据线程池的状态去创建worker
+1-当工作线程小于核心线程数的时候，调用addWorker方法创建worker
+2-当工作线程的数量(大于核心线程数+小于最大线程数(isRunning(c)返回true)+可以加入到工作队列(workQueue)中)的时候，加入workQueue等待调度
+3-

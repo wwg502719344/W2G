@@ -37,3 +37,10 @@ Runnable/callable的参数，返回fatureTask对象，而futureTask对象是为�
 简单猜测，当线程池收到任务后，线程池会将任务封装成一个futureTask。然后在对这个异步任务进行执行
 正常执行流程，线程池需要创建并返回一个ExecutorSercice，通过该对象的executor方法，开始执行futureTask对象
 Q:在ThreadPoolExecutor执行executor方法的时候，是否会启动新的线程去执行相关方法
+A:既然是executor方法，肯定是要线程执行起来的，所有启动线程的方法是在addWorker方法当中的，所以在线程池当中，线程的启动是在addWorker
+当中的
+
+
+
+
+
