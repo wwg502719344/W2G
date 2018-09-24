@@ -42,5 +42,18 @@ A:既然是executor方法，肯定是要线程执行起来的，所有启动线�
 
 
 
+***6***:关于线程池执行中各类及其所扮演角色的作用
+ThreadPoolExecutor类->runWorker(Worker w):该方法主要是执行w中封装的Runnable对象
+Worker->run()方法调用runWorker()方法，传递实现了Runnable接口的任务，该类中封装了任务和初始化创建的线程，run方法可通过该线程进行启动...
+该方法调用runWorker(Worker w),最终实现Runnable对象，在该类中实现了getTask()，该方法使线程不停的去获取任务(在想想)
+ThreadPoolExcutor类->通过调用addWork()实现创建一个work对象，封装传入的firstTask，并启动执行worker中的线程，该方法通过.start启动...
+Worker中的run()方法
+ThreadPoolExcutor类->调用execute方法，传入command(就是addWork()中的firstTask)，在工作线程小于核心线程及工作队列已满时，调用addWork()...
+方法，该方法的作用是去实现传入的任务command
+
+
+
+
+
 
 

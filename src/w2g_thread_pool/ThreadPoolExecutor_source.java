@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * P1:ThreadPoolExecutor类所继承类极其相关关系
  * P2:线程池状态源码基本变量组成及解析
  * P3:ThreadPoolExecutor执行方法
- *
+ * P4:Worker中run方法的实现类
  */
 public class ThreadPoolExecutor_source {
 
@@ -212,7 +212,9 @@ public class ThreadPoolExecutor_source {
         w.unlock(); // allow interrupts
         boolean completedAbruptly = true;
         try {
-            while (task != null || (task = getTask()) != null) {//如果创建该worker时传递的task不为空
+            //如果创建该worker时传递的task不为空
+            //P4-1此处通过不断的循环获取任务，来达到线程不停复用的作用，让线程处理多个任务
+            while (task != null || (task = getTask()) != null) {
                 w.lock();
                 // If pool is stopping, ensure thread is interrupted;
                 // 如果线程池停止了，确保线程被打断
@@ -224,12 +226,12 @@ public class ThreadPoolExecutor_source {
                         (Thread.interrupted() &&
                                 runStateAtLeast(ctl.get(), STOP))) &&
                         !wt.isInterrupted())
-                    wt.interrupt();
+                    wt.interrupt();//中断该线程
                 try {
                     beforeExecute(wt, task);
                     Throwable thrown = null;
                     try {
-                        task.run();
+                        task.run();//futureTask执行的地方
                     } catch (RuntimeException x) {
                         thrown = x; throw x;
                     } catch (Error x) {
@@ -248,6 +250,71 @@ public class ThreadPoolExecutor_source {
             completedAbruptly = false;
         } finally {
             processWorkerExit(w, completedAbruptly);
+        }
+    }*/
+
+
+    /**
+     * Performs blocking or timed wait for a task, depending on
+     * current configuration settings, or returns null if this worker
+     * must exit because of any of:
+     * 1. There are more than maximumPoolSize workers (due to
+     *    a call to setMaximumPoolSize).
+     * 2. The pool is stopped.
+     * 3. The pool is shutdown and the queue is empty.
+     * 4. This worker timed out waiting for a task, and timed-out
+     *    workers are subject to termination (that is,
+     *    {@code allowCoreThreadTimeOut || workerCount > corePoolSize})
+     *    both before and after the timed wait, and if the queue is
+     *    non-empty, this worker is not the last thread in the pool.
+     *
+     * 执行阻塞或是定时等待任务，根据当前的配置，或者返回null如果这个worker因为如下任意原因必须退出
+     * 1.这里有超过最大线程的worker线程
+     * 2.线程池已经停止工作了
+     * 3.队列已经空了
+     * 4.这个工作线程等待任务超时
+     * @return task, or null if the worker must exit, in which case
+     *         workerCount is decremented
+     */
+    /*private Runnable getTask() {
+        boolean timedOut = false; // Did the last poll() time out?
+
+        for (;;) {//不断获取任务，直到成功获取任务
+            int c = ctl.get();
+            int rs = runStateOf(c);//获取当前线程池的运行状态
+
+            // Check if queue empty only if necessary.
+            // 检查队列是否为空仅在必要的时候
+            if (rs >= SHUTDOWN && (rs >= STOP || workQueue.isEmpty())) {
+                decrementWorkerCount();
+                return null;
+            }
+
+            int wc = workerCountOf(c);//获取工作线程的数量
+
+            // Are workers subject to culling?
+            // workers是否需要剔除
+            boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
+
+            //如果工作线程的数量大于最大设定线程数量||(超时&&工作队列是空的)
+            if ((wc > maximumPoolSize || (timed && timedOut))
+                    && (wc > 1 || workQueue.isEmpty())) {
+                if (compareAndDecrementWorkerCount(c))//cas减少任务数量
+                    return null;
+                continue;//继续进行循环
+            }
+
+            try {
+                //获取并从workQueue中移除该任务
+                Runnable r = timed ?
+                        workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+                        workQueue.take();
+                if (r != null)
+                    return r;
+                timedOut = true;
+            } catch (InterruptedException retry) {
+                timedOut = false;
+            }
         }
     }*/
 }
