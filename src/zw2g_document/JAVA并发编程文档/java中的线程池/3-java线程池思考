@@ -50,6 +50,7 @@ ThreadPoolExcutor类->通过调用addWork()实现创建一个work对象，封装
 Worker中的run()方法
 ThreadPoolExcutor类->调用execute方法，传入command(就是addWork()中的firstTask)，在工作线程小于核心线程及工作队列已满时，调用addWork()...
 方法，该方法的作用是去实现传入的任务command
+execute方法为所有线程池执行任务的入口，实际在使用中的时候，通常还会使用submit方法，这个方法和execute的区别是，它可以返回执行的结果
 
 
 
