@@ -1,32 +1,33 @@
-1-通过ThreadPoolExecutor创建线程池
+P1-通过ThreadPoolExecutor创建线程池
 线程池的构造方法通过调用Executors类的方法去创建和返回一个线程工厂，在根据默认的参数和线程工厂和(被拒绝的处理程序??)创建一个。。。
 ThreadPoolExecutor(线程池执行类)
 
 
-2-通过的Executors创建线程池
+P2-通过的Executors创建线程池
 通过的 Executors 创建的线程池已经为绝大多数的场景做了预配置
 1-Executors.newCachedThreadPool()：无界线程池，可以进行自动线程回收
 2-Executors.newFixedThreadPool(int)：固定线程池大小
 3-Executors.newSingleThreadExecutor()：单个后台线程
 
 
-3-关于线程池创建线程与corePoolSize和maximumPoolSize之间的关系
+P3-关于线程池创建线程与corePoolSize和maximumPoolSize之间的关系
 实际线程池中的线程数并不是初始化的时候就创建好的，而是当有任务提交的时候(执行execute方法)，线程池会去判断当前运行的线程数量是否达到
 corePoolSize，如果不够则会创建线程，注意，是正在运行的线程，而不是所有的核心线程数
 
 
 =============================================AbstractExecutorService=====================================================
-4:FutureTask使用场景(线程池中)
-在线程池当中，通过继承AbstractExecutorService类来达到异步处理任务的作用，在AbstractExecutorService类当中，大量的返回了futureTask对象...
-futureTask用于异步执行任务或取消任务，通过调用run方法来执行相应的方法，之后获取数据可以通过get方法获取数据，run方法中通常也会进行set
-操作将callable获取的返回值放入类中
+P4:FutureTask使用场景(线程池中)
+1:在线程池当中，通过继承AbstractExecutorService类来达到异步处理任务的作用，在AbstractExecutorService类当中，大量的返回了...
+futureTask对象,futureTask用于异步执行任务或取消任务，通过调用run方法来执行相应的方法或者放入线程池当中通过run()进行执行，之后...
+获取数据可以通过get方法获取数据，run方法中通常也会进行set操作将callable获取的返回值放入类中
 参考:
 https://blog.csdn.net/linchunquan/article/details/22382487
-**Q**:FutureTask中run方法的调用发生在什么时候
+Q:FutureTask中run方法的调用发生在什么时候
+A:可以通过自行调用run()方法或者放入到线程池当中，通过线程池的run()方法进行调用
 
 
 
-5:关于ThreadPoolExecutor与FutureTask之间的关系
+*P5*:关于ThreadPoolExecutor与FutureTask之间的关系
 futureTask是通过将需要进行异步执行的数据通过实现类runnable和future类，在futureTask中异步调用执行相关类数据方法，获取异步执行的结果
 所以futureTask应该是一个为了执行异步方法，并获取相关结果的类
 类中包含了数据的实现逻辑，包含了run方法可直接调用,就是实际需要执行的任务/数据实现类
@@ -42,15 +43,49 @@ A:既然是executor方法，肯定是要线程执行起来的，所有启动线�
 
 
 
-***6***:关于线程池执行中各类及其所扮演角色的作用
-ThreadPoolExecutor类->runWorker(Worker w):该方法主要是执行w中封装的Runnable对象
-Worker->run()方法调用runWorker()方法，传递实现了Runnable接口的任务，该类中封装了任务和初始化创建的线程，run方法可通过该线程进行启动...
-该方法调用runWorker(Worker w),最终实现Runnable对象，在该类中实现了getTask()，该方法使线程不停的去获取任务(在想想)
-ThreadPoolExcutor类->通过调用addWork()实现创建一个work对象，封装传入的firstTask，并启动执行worker中的线程，该方法通过.start启动...
-Worker中的run()方法
-ThreadPoolExcutor类->调用execute方法，传入command(就是addWork()中的firstTask)，在工作线程小于核心线程及工作队列已满时，调用addWork()...
-方法，该方法的作用是去实现传入的任务command
-execute方法为所有线程池执行任务的入口，实际在使用中的时候，通常还会使用submit方法，这个方法和execute的区别是，它可以返回执行的结果
+
+**P6**:
+关于submit()/execute()和runnable/callable之间的关系及区别
+1:线程池的执行入口通常为submit()/execute(),而submit()方法可以返回线程执行的结果，使用execute()方法则不需要返回执行的结果，在...
+submit()方法中是包含有execute(),但是会直接返回一个futureTask
+2:在submit()中，可以传入两个参数，一个是Runnable对象，一个是callable对象，但是在submit()方法中会调用newTaskFor()返回一个...
+FutureTask对象，在构造FutureTask对象的时候，如果传入的是Runnable类型，也会被转换成Callable类型，此处的目的就是为了实现结果数据...
+的返回,FutureTask补充详见P4-1
+3:Callable类型的实现，简单点说就是实现了call()(对应类中实现，详见futureTask_demo中实现)，而在futureTask对象调用run()方法的...
+时候,实际上在futureTask源码类内部则调用了call()方法，并将结果set()进了futureTask对象中，该对象实际上可以通过get()方法直接...
+获取到实际值结果
+
+
+P7:
+执行execute的几种情况
+1:如果工作线程数量小于核心线程数量，则执行addWork()。。。(加入Worker集合)
+2:当线程池状态是运行状态，且不能加入线程池Worker中，则加入队列中workQueue等待执行....(加入Worker队列)
+3:如果线程池本身的状态关闭了，我们则不能再提交线程进去了，而且要reject他们，还要移除
+4:如果加入集合和加入队列都失败了，我们则要加入新线程去执行，但这时候addWork()中传入的是false，表明新建的线程不是核心线程
+5:第四步也失败了我们则拒绝提交线程执行任务
+参考材料
+http://shmilyaw-hotmail-com.iteye.com/blog/1897638
+
+
+
+
+***P10***:关于线程池执行流程中各类及其所扮演角色的作用总结
+
+1:execute方法为所有线程池执行任务的入口，通常使用submit()/execute()来提交runnable/callable，两者的区别参考P6,但是在submit()...
+中包含execute(futureTask)
+1-1:ThreadPoolExcutor类->调用execute方法，传入command(就是addWork()中的firstTask)，在工作线程小于核心线程及工作队列已满时,...
+调用addWork()方法去执行该任务，该方法的作用是去实现传入的任务command，其余情况详解P7
+
+2:ThreadPoolExcutor类->通过调用addWorker()实现创建一个work对象，封装传入的firstTask，并启动执行worker中的线程，该方法通过...
+.start()启动Worker中的run()方法
+
+3:Worker->run()方法调用runWorker()方法，传递实现了Runnable接口的任务，该类中封装了任务和初始化创建的线程，run方法可通过该线程...
+进行启动，该方法调用runWorker(Worker w),最终实现Runnable对象，在该类中实现了getTask()，该方法使核心线程不停的去获取任务...
+(当自己worker中封装的任务完成后去获取workQueue中的任务)
+
+4:ThreadPoolExecutor类->runWorker(Worker w):该方法主要是执行w中封装的Runnable对象,实现内部的相关逻辑,调用run()方法实际...
+调用的是futureTask对象的run方法，内部实现了call()方法，可获取实际结果
+
 
 
 

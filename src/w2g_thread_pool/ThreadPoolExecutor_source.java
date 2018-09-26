@@ -100,6 +100,7 @@ public class ThreadPoolExecutor_source {
                 reject(command);
             else if (workerCountOf(recheck) == 0)
                 //如果发现没有worker，则会补充一个null的worker什么意思？
+                //Q16
                 addWorker(null, false);//P3-1
         }
         else if (!addWorker(command, false))
@@ -212,8 +213,9 @@ public class ThreadPoolExecutor_source {
         w.unlock(); // allow interrupts
         boolean completedAbruptly = true;
         try {
-            //如果创建该worker时传递的task不为空
-            //P4-1此处通过不断的循环获取任务，来达到线程不停复用的作用，让线程处理多个任务
+            //P4-1:getTask()源码解析
+            //1:如果创建该worker时传递的task不为空(当前worker对应的任务还没有执行)，则去执行task
+            //2:如果worker中的task已经执行完了，则去检查是否还有task任务没有执行，如果有则获取workQueue的task并执行
             while (task != null || (task = getTask()) != null) {
                 w.lock();
                 // If pool is stopping, ensure thread is interrupted;
