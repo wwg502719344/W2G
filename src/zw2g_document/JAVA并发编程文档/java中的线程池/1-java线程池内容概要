@@ -1,4 +1,4 @@
-1-基本流程
+P1-基本流程
     1-当提交新任务到线程池
         1-1:判断-->线程池检查核心线程池中的线程是否都在执行任务-->如果不是，则创建工作线程-->如果是，则执行1-2
         1-2:前提-->核心线程都在执行任务-->判断:线程池判断工作队列是否已满-->如果线程没满，则将当前任务加入到队列中去-->如果满了,1-3
@@ -12,7 +12,7 @@
 
 
 
-2-常见线程池-通过executors工厂方法创建
+P2-常见线程池-通过executors工厂方法创建
     1-CachedThreadPool:可缓存线程池
         1-1:线程数量无限制
         1-2:有空闲线程就复用空闲线程，没有空闲线程就创建空闲线程
@@ -31,12 +31,12 @@
 
 
 
-3-线程池创建线程源码实现理解
+P3-线程池创建线程源码实现理解
     1-工作线程:线程池创建线程后，会将线程封装成工作线程，工作线程在执行完任务后，会不断的从队列中获取任务去执行
 
 
 
-4-线程池的核心参数与元素
+P4-线程池的核心参数与元素
     1:创建线程池所需的参数
         1-1:corePoolSize:核心线程数
         1-2:runnableTaskQueue:任务队列
@@ -45,24 +45,34 @@
         1-5:RejectExcutionHandler
 
 
+P5-通过ThreadPoolExecutor创建线程池
+线程池的构造方法通过调用Executors类的方法去创建和返回一个线程工厂，在根据默认的参数和线程工厂和(被拒绝的处理程序??)创建一个。。。
+ThreadPoolExecutor(线程池执行类)
+
+
+P6-通过的Executors创建线程池
+通过的 Executors 创建的线程池已经为绝大多数的场景做了预配置
+1-Executors.newCachedThreadPool()：无界线程池，可以进行自动线程回收
+2-Executors.newFixedThreadPool(int)：固定线程池大小
+3-Executors.newSingleThreadExecutor()：单个后台线程
 
 ==========================================源码内容分析===========================================================
 说明:源码实现细节及细节解析参考ThreadPoolExecutor_source
 
 内容：
-P1:ThreadPoolExecutor基本构成
-P2:线程池状态源码基本变量组成及解析
-P3:ThreadPoolExecutor执行方法
-P4:Worker组成及作用
+P7:ThreadPoolExecutor基本构成
+P8:线程池状态源码基本变量组成及解析
+P9:ThreadPoolExecutor执行方法
+P10:Worker组成及作用
 
-P1:ThreadPoolExecutor继承了AbstractExecutorService类，AbstractExecutorService是executorService的实现类，executorService是executor
+P7:ThreadPoolExecutor继承了AbstractExecutorService类，AbstractExecutorService是executorService的实现类，executorService是executor
 的子接口,executorService创建线程池，在实现类中，通常是接受一个callable对象或是runnable对象，最后返回一个future对象,而最终future的实现
 则是由futureTask来实现，futureTask中则会实现一个run方法，此处为一闭环
 
-P2:线程池申明了一个特殊变量用来表示线程池中运行线程数量和线程池状态，还有表示当前线程池各个阶段状态的变量，以及获取当前状态的方法，
+P8:线程池申明了一个特殊变量用来表示线程池中运行线程数量和线程池状态，还有表示当前线程池各个阶段状态的变量，以及获取当前状态的方法，
 内部类Worker，用来执行任务
 
-P3:
+P9:
 execute方法:调用execute方法将会根据线程池的状态去创建worker
 1-当工作线程小于核心线程数的时候，调用addWorker方法创建worker
 2-当工作线程的数量(大于核心线程数+小于最大线程数(isRunning(c)返回true可知)+可以加入到工作队列(workQueue)中)的时候，加入workQueue等待调度
@@ -74,7 +84,7 @@ addWork()逻辑流程
 第二部分:启动执行worker里面的线程
 
 
-P4:
+P10:
 1:Worker为addWork中构建的执行对象，Worker中包含了所需执行的线程，所以addWork()方法的本质也就是为了启动Worker中的线程
 2:Worker的构造方法中，会创建一个基于Worker的线程引用，这个引用赋值给Worker类的变量thread，所以Worker类中的thread就是自己通过构造方法创建的
 3:在addWorker()方法中，最终启动线程是t.start();实际启动的就是Worker中的线程，将会执行Worker类中的run()
