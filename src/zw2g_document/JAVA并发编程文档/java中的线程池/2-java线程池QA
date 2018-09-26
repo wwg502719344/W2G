@@ -44,8 +44,10 @@ Q12:在进行execute方法的时候，如果可以成功加入到工作队列中
 如果加入成功，则会开启线程，那么workers.add(w)本身有什么作用，为什么不能直接开启线程
 
 
-Q13:每一个任务对应一个worker,worker是一个实现了AQS的阻塞队列，那么worker实现AQS的目的是什么，worker是否会加入到
-workerQueue当中，Set类型的workers又是做什么的，为什么worker会加入到workers当中
+Q13:每一个任务对应一个worker,worker是一个实现了AQS的阻塞队列，那么worker实现AQS的目的是什么，worker是否会加入到workerQueue中
+
+
+Q13-1:Set类型的workers又是做什么的，为什么worker会加入到workers当中
 
 
 Q14:当运行线程数大于核心线程数时，将该任务加入到workerQueu中，那么实际执行时在哪里呢？
@@ -103,6 +105,9 @@ https://blog.csdn.net/qq_33689414/article/details/72955253
 A13:通过观察ThreadPoolExecutor源码中的executor方法，可以发现，其实addWorker和workerQueue是不同的两个操作，在第一次判断中
 如果当前运行线程数少于核心线程数，则会直接将command放入addWork中进行启动，而当不满足条件时，则会执行workQueue.offer(command),
 将command加入到workQueue当中
+
+
+A13-1:workers集合中保存的是线程池的核心线程组，当有新线程加入到线程执行任务的时候，都是从这个集合中获取线程(核心线程存放的地方)
 
 
 A17:一般情况下Executors即可创建默认配置的线程池，executors中创建的4种线程池的源码中实际也是调用的ThreadPoolExecutor...
