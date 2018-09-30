@@ -3,7 +3,7 @@ package w2g_concurrent_utils;
 /**
  * Created by W2G on 2018/8/26 0026.
  * 允许一个或多个线程等待其他线程完成操作
- *
+ * mac
  *
  */
 public class countDownLatch_source {
@@ -28,7 +28,7 @@ public class countDownLatch_source {
              return getState();
          }
 
-         //
+         //尝试获取同步状态
          protected int tryAcquireShared(int acquires) {
              return (getState() == 0) ? 1 : -1;
          }
