@@ -28,7 +28,7 @@ public class countDownLatch_source {
              return getState();
          }
 
-         //
+         //尝试获取同步状态
          protected int tryAcquireShared(int acquires) {
              return (getState() == 0) ? 1 : -1;
          }
