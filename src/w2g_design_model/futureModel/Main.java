@@ -3,6 +3,7 @@ package w2g_design_model.futureModel;
 /**
  * Created by W2G on 2018/9/3 0003.
  * future设计模式的理念是通过预先返回
+ * 该类只是简单表达了future设计模式的思想，实际并没有调用future源码，没有采用futureTask类
  */
 public class Main {
 

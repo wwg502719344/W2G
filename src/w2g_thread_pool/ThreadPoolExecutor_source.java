@@ -100,8 +100,9 @@ public class ThreadPoolExecutor_source {
             int recheck = ctl.get();//重新获取线程池运行状态
             if (! isRunning(recheck) && remove(command))//如果运行状态不是可运行且移除当前任务
                 reject(command);
-            else if (workerCountOf(recheck) == 0)
-                //如果发现没有worker，则会补充一个null的worker什么意思？
+            else if (workerCountOf(recheck) == 0)//当线程池中的线程数是0时
+                //如果发现没有worker，则会补充一个null的worker什么意思？为什么这么做
+                //如果为null的话最后会被移除核心线程池，那这个操作到底有什么意义
                 //Q16
                 addWorker(null, false);//P3-1
         }
@@ -246,8 +247,8 @@ public class ThreadPoolExecutor_source {
                         afterExecute(task, thrown);
                     }
                 } finally {
-                    task = null;
-                    w.completedTasks++;
+                    task = null;//任务变量变为null
+                    w.completedTasks++;//之前线程的数量加1
                     w.unlock();
                 }
             }
@@ -283,24 +284,25 @@ public class ThreadPoolExecutor_source {
     /*private Runnable getTask() {
         boolean timedOut = false; // Did the last poll() time out?
 
-        for (;;) {//不断获取任务，直到成功获取任务
+        for (;;) {
             int c = ctl.get();
             int rs = runStateOf(c);//获取当前线程池的运行状态
 
             // Check if queue empty only if necessary.
             // 检查队列是否为空仅在必要的时候
+            // 如果线程池当前状态已经停止且队列是空的
             if (rs >= SHUTDOWN && (rs >= STOP || workQueue.isEmpty())) {
-                decrementWorkerCount();
-                return null;
+                decrementWorkerCount();//重新设置当前线程池状态，内部通过cas方式实现状态的修改
+                return null;//返回
             }
 
             int wc = workerCountOf(c);//获取工作线程的数量
 
             // Are workers subject to culling?
-            // workers是否需要剔除
+            // 当前线程数是否大于核心线程数，是则返回true
             boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
 
-            //如果工作线程的数量大于最大设定线程数量||(超时&&工作队列是空的)
+            //如果工作线程的数量大于最大设定线程数量||(超时&&工作队列是空的)，则
             if ((wc > maximumPoolSize || (timed && timedOut))
                     && (wc > 1 || workQueue.isEmpty())) {
                 if (compareAndDecrementWorkerCount(c))//cas减少任务数量
@@ -310,10 +312,11 @@ public class ThreadPoolExecutor_source {
 
             try {
                 //获取并从workQueue中移除该任务
+                //如果false则从队列中获取任务，如果为true则。。。
                 Runnable r = timed ?
                         workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
                         workQueue.take();
-                if (r != null)
+                if (r != null)//如果获取的任务不为null则返回该对象，设置timeout为true
                     return r;
                 timedOut = true;
             } catch (InterruptedException retry) {
