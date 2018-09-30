@@ -11,14 +11,19 @@ public class FutureData implements Data {
 
     private RealData realData;
 
-    private boolean isReady=false;
+    private boolean isReady=false;//如果已经获取数据此处为true
 
     private ReentrantLock lock=new ReentrantLock();
     private Condition condition=lock.newCondition();
 
+    /**
+     * 获取实际数据
+     * @return
+     */
     @Override
     public String getResult()
     {
+        //如果尚未成功获取数据，则当前线程加入等待队列
         while (!isReady){
             try {
                 lock.lock();

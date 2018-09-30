@@ -2,6 +2,7 @@ package w2g_design_model.futureModel;
 
 /**
  * Created by W2G on 2018/9/3 0003.
+ * future设计模式的理念是通过预先返回
  */
 public class Main {
 
