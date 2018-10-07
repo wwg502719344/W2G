@@ -39,7 +39,8 @@ public class futureTask_demo {
              * 利用futureTask和executorService实现的异步任务调用，可以用多线程的方式提交计算任务，主线程可以继续执行自己的程序。。。
              * 可以通过get方法查看计算的结果
              */
-            /*FutureTaskForMultiCompute inst=new FutureTaskForMultiCompute();
+            /*
+            FutureTaskForMultiCompute inst=new FutureTaskForMultiCompute();
             // 创建任务集合
             List<FutureTask<Integer>> taskList = new ArrayList<FutureTask<Integer>>();
             // 创建线程池(固定的线程池大小)
@@ -102,7 +103,8 @@ public class futureTask_demo {
                 System.out.println("子线程计算任务: "+taskName+" 执行完成!");
                 return result;
             }
-        }*/
+        }
+        */
     }
 
 }
