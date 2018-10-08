@@ -31,9 +31,12 @@ realData-->返回真实数据，构造比较慢
 
 
 
+
+
+
 =============================Future模式在源码中的实现BEGIN=====================================
 
-jdk中实现类:
+jdk实现futuretask源码:
     futureTask：实现了runnableFuture方法，runnableFuture方法继承了runnable方法和future方法
     继承runnableFuture的目的是为了实现run方法，在futureTask被执行的时候，执行run方法可以获取返回的数据
     继承future方法是为了将得到的数据封装到future对象中，实现数据的读取存放
@@ -43,10 +46,30 @@ jdk中实现类:
 
     Executor类:运行futureTask类，执行run方法
 
+基本构造：
+    /** The thread running the callable; CASed during run() */
+    private volatile Thread runner;//指向当前正在运行的callable的线程
+
+    /** Treiber stack of waiting threads */
+    private volatile WaitNode waiters;//阻塞队列，如果当前任务还没有执行完成，调用get()方法的线程就会进入阻塞
+
+    构造方法:
+    有两种构造方法，一个是接收Callable对象，一个是接受Runnable对象，对于futuretask来说，我们实际上是需要返回结果的...
+    所以我们必须实现callable对象的call()方法，接收runnable对象的构造方法实际也是将runnable对象改造成了callable对象
+
+
 ====================================================================================================
 总结:
     主要思路是通过异步的方式实现程序对未来数据的获取，比如说
     线程A的执行需要B的结果，但是实际上A并不需要等待B执行完，而是先获取一个B的future，等待将来的某个时候获取B的数据
+
+
+
+
+
+
+
+
 
 
 =============================QUESTION=====================================
@@ -66,6 +89,9 @@ A4:futureTask实现了RunnableFuture接口，RunnableFuture接口继承了runnab
 参考文章:
 demo源码和jdk源码
 https://blog.csdn.net/xlgen157387/article/details/78390642
+
+futuretask源码详解
+https://www.jianshu.com/p/55221d045f39
 
 future设计模式的核心关键点:
 https://blog.csdn.net/yangkai_hudong/article/details/12904813
