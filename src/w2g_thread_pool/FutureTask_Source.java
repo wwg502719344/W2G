@@ -17,7 +17,7 @@ import java.util.concurrent.FutureTask;
  * 源码解析模块
  * P0:使用future模式，调用主方法逻辑
  * P1：源码类基本构成
- *
+ * P2：解析future实现异步获取数据
  */
 public class FutureTask_Source {
 
@@ -131,4 +131,8 @@ public class FutureTask_Source {
             s = awaitDone(false, 0L);   //p2-1:等待计算结果
         return report(s);//返回实际数据
     }*/
+
+
+
+
 }
