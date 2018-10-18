@@ -64,7 +64,8 @@ public class FutureTask_Source {
      * FutureTask实现了RunnableFuture接口，RunnableFuture接口实现了Runnable接口和Fature接口
      * 目的是实现run方法，FutureTask类则是Future类的实现类
      */
-    /*public class FutureTask<V> implements RunnableFuture<V> {
+    /*
+    public class FutureTask<V> implements RunnableFuture<V> {
         private volatile int state;
         private static final int NEW          = 0;//初始化时是NEW
         private static final int COMPLETING   = 1;//任务完成但是尚未赋值给outcome
@@ -95,7 +96,8 @@ public class FutureTask_Source {
             this.callable = callable;
             this.state = NEW;       // ensure visibility of callable
     }
-    }*/
+    }
+    */
 
 
     /**
