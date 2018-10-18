@@ -42,6 +42,22 @@ A3:在构造futureData后，会通过Executors方法创建ExecutorService，然�
 
 
 
+***6:FutureTask中WaitNode的作用及详细的处理细节
+6-1:WaitNode本质上在内存中是一个链表，内存中记录了WaitNode对象的内存偏移量，通过CAS方法将封装当前线程的WaitNode对象加入到链表的首位，...
+并记录之前的WaitNode对象
+6-2:WaitNode是FutureTask对象中内部类，该类的主要作用是包装请求来的线程，内部类的构造主要事当前线程和当前线程的前一个线程，还有一个构造...
+方法，构造方法就是将当前线程赋值给内部类的线程变量；
+6-3:WaitNode对象在内存中的获取:
+waitersOffset = UNSAFE.objectFieldOffset(k.getDeclaredField("waiters"));该方法是获取waiters在当前futureTsk对象中的...
+地址偏移量，通过该方法可以获取当前futureTask中的waiters对象
+所以在finishCompletion方法中，释放的只是当前futureTask对象中挂起的线程；
+6-3:使用方法:
+3-1:在futureTask对象调动get方法的时候,如果任务还没有结束，那么当前线程就会被包装成WaitNode对象，并且加入到队列当中，阻塞当前线程
+3-2:在finishCompletion方法中唤醒等待结果的的线程
+
+参考方法
+关于WaitNode对象在内存中的获取
+https://blog.csdn.net/jfengamarsoft/article/details/71055713
 =========================================================================================
 futureTask源码实现
 https://www.jianshu.com/p/1dd951412ff5

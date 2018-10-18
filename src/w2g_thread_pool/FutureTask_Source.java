@@ -18,10 +18,15 @@ import java.util.concurrent.FutureTask;
  * P0:使用future模式，调用主方法逻辑
  * P1：源码类基本构成
  * P2：解析future实现异步获取数据
+ * P2-1:获取实际数据,如果计算没有结束，则等待计算结果
+ * p2-1-1:等待完成或是超时或者打断导致的终止
+ * P2-2:将对应的值赋值给outcome
+ * P2-2-1:唤醒并通知所有等待的线程继续执行各自的方法
  */
 public class FutureTask_Source {
 
     FutureTask<String> futureTask = null;
+
     /**
      * P0:使用future模式，调用主方法逻辑
      * 情景:一个方法中由耗时较长的操作，我们可以把这个耗时较长的操作剥离出去再起一个线程进行执行
@@ -132,7 +137,9 @@ public class FutureTask_Source {
     }
     */
 
-    //获取实际数据,如果计算没有结束，则等待计算结果
+    /**
+     * P2-1:获取实际数据,如果计算没有结束，则等待计算结果
+     */
     /*public V get() throws InterruptedException, ExecutionException {
         int s = state;
         if (s <= COMPLETING)
@@ -141,7 +148,7 @@ public class FutureTask_Source {
     }*/
 
     /**
-     * p2-1:等待完成或是超时或者打断导致的终止
+     * p2-1-1:等待完成或是超时或者打断导致的终止
      * Awaits completion or aborts on interrupt or timeout.
      *
      * @param timed true if use timed waits
@@ -210,6 +217,7 @@ public class FutureTask_Source {
     }*/
 
     /**
+     * P2-2-1:唤醒并通知所有等待的线程继续执行各自的方法
      * Removes and signals all waiting threads, invokes done(), and
      * nulls out callable.
      * 移除并通知所有等待的线程，执行done方法
@@ -217,11 +225,12 @@ public class FutureTask_Source {
     /*
     private void finishCompletion() {
         // assert state > COMPLETING;
-        //waiters不为空的时候
+        //waiters不为空的时候,waiters是封装该futureTask对象的线程
         for (WaitNode q; (q = waiters) != null;) {
-            if (UNSAFE.compareAndSwapObject(this, waitersOffset, q, null)) {//如果当前等待线程就是当前线程则置为null
-                //当前循环体唤醒了所有等待队列中的节点(挂起的线程)，目的是什么呢，被唤醒的线程做什么呢
-                //被唤醒的线程继续执行awaitDone方法
+            //如果当前等待线程就是当前线程则置为null
+            if (UNSAFE.compareAndSwapObject(this, waitersOffset, q, null)) {
+                //当前循环体唤醒了当前futureTask中所有等待队列中的节点(挂起的线程)，目的是什么呢，被唤醒的线程做什么呢
+                //被唤醒的线程继续执行各自线程栈中的awaitDone方法，尝试获取对应的结果
                 for (;;) {
                     Thread t = q.thread;//获取当前节点中的线程
                     if (t != null) {//如果线程不为空

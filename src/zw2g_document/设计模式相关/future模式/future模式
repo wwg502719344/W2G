@@ -55,7 +55,9 @@ jdk实现futuretask源码:
     private volatile Thread runner;//指向当前正在运行的callable的线程
 
     /** Treiber stack of waiting threads */
-    private volatile WaitNode waiters;//阻塞队列，如果当前任务还没有执行完成，调用get()方法的线程就会进入阻塞
+    //链式队列，线程会被包装成一个waiter对象，并且加入到链表中
+    //这是一个链表而不是队列，用来记录保存被挂起的请求线程，通过内存偏移量可以找到内存中对象的具体位置
+    private volatile WaitNode waiters;
 
     /** The result to return or exception to throw from get() */
     // 返回的结果或者调用get()方法抛出的异常
@@ -82,7 +84,7 @@ jdk实现futuretask源码:
     所以我们必须实现callable对象的call()方法，接收runnable对象的构造方法实际也是将runnable对象改造成了callable对象
 
 
-使用场景:
+
 
 
 ====================================================================================================
