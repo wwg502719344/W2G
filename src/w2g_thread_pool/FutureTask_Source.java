@@ -104,7 +104,8 @@ public class FutureTask_Source {
      * P2：解析future实现异步执行获取callable数据
      * run方法启动异步线程，调用数据类，并返回计算结果，将数据封装进futureTask方法中
      */
-    /*public void run() {
+    /*
+    public void run() {
         //检查当前future线程的任务执行状态是否是可执行状态，如果不是则直接返回
         if (state != NEW ||
                 !UNSAFE.compareAndSwapObject(this, runnerOffset,
@@ -210,13 +211,15 @@ public class FutureTask_Source {
     /**
      * P2-2:将对应的值赋值给outcome
      */
-    /*protected void set(V v) {
+    /*
+    protected void set(V v) {
         if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) {
             outcome = v;//将最终结果赋值给outcome
             UNSAFE.putOrderedInt(this, stateOffset, NORMAL); // final state
             finishCompletion();//P2-2-1:
         }
-    }*/
+    }
+    */
 
     /**
      * P2-2-1:唤醒并通知所有等待的线程继续执行各自的方法

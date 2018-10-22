@@ -5,14 +5,16 @@
 
 
 
-Q1：在jdk实现的future设计模式中，futureTask就是对应futureData类，那么怎么实现realData类的功能，重新启动的客户端线程是如何实现的
-A1：future类实现了对实际数据的调用工作，可通过future获取调用实际数据结果，futureTask是future的实现，实际futureTask就是future，
-就是futureData
+
+Q1：在jdk实现的future设计模式中，futureTask就是对应futureData类+Client类，那么怎么实现realData类的功能，重新启动的客户端线程是如何实现的
+A1：futureTask类实现了对实际数据的调用工作，可通过futureTask对象获取调用实际数据结果，futureTask是future的实现，实际futureTask
+就是实现了futureData类(实际数据的获取和设置)和Client类(发起线程的启动和执行)的作用
+
 
 ***Q2：如何实现将realData中的数据放入到future当中，如何获取的实际数据？
-***A2：在构造future对象的时候，需要传入callback类对象作为参数(实际是编写realData类，实现Callback接口),一旦运行(执行run方法)，就执行给定的
-***callable(执行run方法后，会调用callable类中的call方法)，然后返回callable对象，产生结果后，调用set方法写进futureTask类，获取数据
-***的时候执行get方法就可以获取到set进futureTask中的result数据
+A2：在构造future对象的时候，需要传入callback类对象作为参数(实际是编写realData类，实现Callback接口),一旦运行(执行run方法)，就执行给定的
+callable(执行run方法后，会调用callable类中的call方法)，然后返回callable对象，产生结果后，调用set方法写进futureTask类，获取数据
+的时候执行get方法就可以获取到set进futureTask中的result数据
 
 
 
