@@ -7,7 +7,6 @@ public class RealData implements Data{
 
     private String result;//封装实际数据
 
-
     /**
      * 获取计算结果方法
      * @return
