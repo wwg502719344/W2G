@@ -1,18 +1,22 @@
-package w2g_thread_pool.demo;
+package w2g_thread_pool.future相关;
 
 /**
  * Created by W2G on 2018/9/13.
+ * 使用futureTask实现异步数据调用，可以获取异步数据的计算结果
+ *
+ *
+ * P1:
  */
 public class futureTask_demo {
 
         public static void main(String[] args) {
 
-
             /**
-             * P1:future设计模式中FutureTask的实现场景
+             * P1:future设计模式中FutureTask的实现场景,realData需要实现call方法或是run方法
+             * 该处主要是线程池去执行一个任务
              */
-            /*FutureTask<String> futureTask = new FutureTask<>(new RealData("Hello"));
-
+            /*
+            FutureTask<String> futureTask = new FutureTask<>(new RealData("Hello"));
             ExecutorService executorService = Executors.newFixedThreadPool(1);
             //此处注意，传入的实际是FutureTask对象,但是executorService接收的是Runnable/callable对象
             //并且executorService还会将他们封装到FutureTask当中去，尼玛的搞不明白了，下面的也是这个情况P1-1
@@ -76,20 +80,9 @@ public class futureTask_demo {
 
         }
 
+
+
         private class ComputeTask implements Callable<Integer> {
-
-            private Integer result = 0;
-            private String taskName = "";
-
-            public ComputeTask(Integer iniResult, String taskName){
-                result = iniResult;
-                this.taskName = taskName;
-                System.out.println("生成子线程计算任务: "+taskName);
-            }
-
-            public String getTaskName(){
-                return this.taskName;
-            }
 
             @Override
             public Integer call() throws Exception {
