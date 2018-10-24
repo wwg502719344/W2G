@@ -10,6 +10,7 @@ import java.util.concurrent.locks.*;
  * AQS内部类ConditionObject，维护了首节点和尾节点
  */
 public class w2g_condition{
+    ReentrantLock lock=new ReentrantLock();
 /*
     //获取condition
     Lock lock=new ReentrantLock();
