@@ -36,12 +36,10 @@ public class w2g_AQS {
     /*
     public final void acquire(int arg) {
         if (!tryAcquire(arg)
-        //P1-1:构造节点并加入到等待队列中去
+        //P1-1:构造节点并加入到等待队列中去，如果当前线程在被挂起的时候被中断过，则该线程被唤醒的时候进行自我中断
         && acquireQueued(addWaiter(AbstractQueuedSynchronizer.Node.EXCLUSIVE), arg)){
-                    //如果acquireQueued返回true,则执行该行代码
-                    //acquire(int arg)对中断不敏感，被中断后不会移除队列
-                    //直到获取到资源为止，且整个过程忽略中断的影响
-                    //返回true是因为之前被中断过，只不过在队列中中断的过程中未相应，所以当获取到同步状态的时候激活中断操作
+                    //执行该行代码是因为在acquireQueued方法中调用parkAndCheckInterrupt()的时候，发现该线程被中断过...
+                    //但是线程被挂起的时候是不会相应中断的，当线程被唤醒后，发现被中断过，此时将会对自己进行中断操作
                     selfInterrupt();
                 }
     }
@@ -68,7 +66,9 @@ public class w2g_AQS {
                     return interrupted;
                 }
                 //P1-2:如果自己可以休息了，就进入waiting状态，直到被unpark()
-                //shouldParkAfterFailedAcquire(p, node)方法保证节点node前面的节点都是大于
+                //shouldParkAfterFailedAcquire(p, node)方法清除当前节点之前waitStatus>0的节点(已经标注被取消的节点)。。。
+                //并返回false
+                //parkAndCheckInterrupt方法的作用是挂起当前线程，此时从自旋中退出
                 if (shouldParkAfterFailedAcquire(p, node) &&
                     parkAndCheckInterrupt())//阻塞当前线程且没有比中断
                     interrupted = true; //如果等待过程中被中断过，哪怕只有那么一次，就将interrupted标记为true
@@ -85,7 +85,7 @@ public class w2g_AQS {
     /*
     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
         int ws = pred.waitStatus;
-        //r如果前驱节点是signal表示前驱结点会通知它，可以安心挂起
+        //如果前驱节点是signal表示前驱结点可以被唤醒
         if (ws == Node.SIGNAL)
              *//*
              * This node has already set status asking a release
