@@ -10,6 +10,8 @@ import java.util.concurrent.locks.Lock;
  * 距离首节点最近的，waitStatus<0的节点，被唤起的线程唤起后执行acquireQueued方法，如果传入节点的前驱节点不是首节点，则调用
  * shouldParkAfterFailedAcquire方法，清除所有当前节点前驱节点waitStatus>0的节点，直至成为首节点的下一个节点
  *
+ * P0:节点属性
+ *
  * ===========节点释放===========================
  * P1:独占式获取同步状态
  * P1-1:线程在等待队列中等待获取资源
@@ -26,9 +28,36 @@ import java.util.concurrent.locks.Lock;
 public class w2g_AQS {
 
     AbstractQueuedSynchronizer a=null;
+
+
     /**
-     * P1
-     * 调用tryAcquire尝试获取同步状态，如果返回false则将该节点构造成
+     * P0:节点属性
+     */
+    /*
+    static final Node SHARED = new Node();//表明当前节点是共享式节点
+    static final Node EXCLUSIVE = null;//表明当前节点是独占式节点
+
+    //取消
+    static final int CANCELLED = 1;
+    //等待触发
+    static final int SIGNAL = -1;
+    //等待条件
+    static final int CONDITION = -2;
+    //状态需要向后传播
+    static final int PROPAGATE = -3;
+
+    volatile int waitStatus;//节点状态,具体值为上面四个,该变量为volatile类型，表明是在子线程中可见的
+    volatile Node prev;
+    volatile Node next;
+    volatile Thread thread;
+    Node nextWaiter;
+    */
+
+
+    /**
+     * P1:调用获取同步状态的方法
+     * 调用tryAcquire尝试获取同步状态，如果没有获取到同步状态且acquireQueued方法返回true(该线程在被挂起时被中断过)
+     * 则将当前线程进行中断
      * @param arg the acquire argument.  This value is conveyed to
      *        {@link #tryAcquire} but is otherwise uninterpreted and
      *        can represent anything you like.
@@ -37,6 +66,7 @@ public class w2g_AQS {
     public final void acquire(int arg) {
         if (!tryAcquire(arg)
         //P1-1:构造节点并加入到等待队列中去，如果当前线程在被挂起的时候被中断过，则该线程被唤醒的时候进行自我中断
+        //acquireQueued方法返回true
         && acquireQueued(addWaiter(AbstractQueuedSynchronizer.Node.EXCLUSIVE), arg)){
                     //执行该行代码是因为在acquireQueued方法中调用parkAndCheckInterrupt()的时候，发现该线程被中断过...
                     //但是线程被挂起的时候是不会相应中断的，当线程被唤醒后，发现被中断过，此时将会对自己进行中断操作
@@ -47,6 +77,10 @@ public class w2g_AQS {
 
     /**
      * P1-1:线程在等待队列中等待获取资源
+     * 获取同步资源，该方法主要做了两件事
+     * 1:前驱节点为首节点，且成功获取同步资源，则将node节点赋值给head
+     * 2:如果前驱节点不是首节点或者没有成功获取同步资源，首先是将当前节点前面waitStatus>0的节点清除掉，并且挂起当前线程
+     * 如果interrupted返回为true且当前线程还没有获取到同步资源，则将该线程进行中断操作
      */
     /*
     final boolean acquireQueued(final Node node, int arg) {
@@ -67,7 +101,7 @@ public class w2g_AQS {
                 }
                 //P1-2:如果自己可以休息了，就进入waiting状态，直到被unpark()
                 //shouldParkAfterFailedAcquire(p, node)方法清除当前节点之前waitStatus>0的节点(已经标注被取消的节点)。。。
-                //并返回false
+                //并返回false，返回false意味着当前节点无法被挂起，说明
                 //parkAndCheckInterrupt方法的作用是挂起当前线程，此时从自旋中退出
                 if (shouldParkAfterFailedAcquire(p, node) &&
                     parkAndCheckInterrupt())//阻塞当前线程且没有比中断
@@ -87,27 +121,22 @@ public class w2g_AQS {
         int ws = pred.waitStatus;
         //如果前驱节点是signal表示前驱结点可以被唤醒
         if (ws == Node.SIGNAL)
-             *//*
-             * This node has already set status asking a release
-             * to signal it, so it can safely park.
-             *//*
+             // This node has already set status asking a release
+             // to signal it, so it can safely park.
              return true;
           //如果前节点是已经被取消的节点
           if (ws > 0) {
-            *//*
-             * Predecessor(前任，前辈) was cancelled. Skip over predecessors and
-             * indicate(表明,指示) retry.
-             *//*
+             // Predecessor(前任，前辈) was cancelled. Skip over predecessors and
+             // indicate(表明,指示) retry.
+             //获取pred节点的前驱节点pred2，并将node节点的前驱节点指向pred2,当pred的状态是已取消节点的时候
                 do {
                     node.prev = pred = pred.prev;
                 } while (pred.waitStatus > 0);
                 pred.next = node;
             } else {
-                *//*
-                 * waitStatus must be 0 or PROPAGATE.  Indicate that we
-                 * need a signal, but don't park yet.  Caller will need to
-                 * retry to make sure it cannot acquire before parking.
-                 *//*
+                 // waitStatus must be 0 or PROPAGATE.  Indicate that we
+                 // need a signal, but don't park yet.  Caller will need to
+                 // retry to make sure it cannot acquire before parking.
             compareAndSetWaitStatus(pred, ws, Node.SIGNAL); //设置该节点的状态为SIGNAL
         }
         return false;
@@ -186,18 +215,36 @@ public class w2g_AQS {
 
     /**
      * P3:释放节点
+     * 调用tryReleaseShared释放同步资源，如果 tryReleaseShared(int) 返回 true，
+     * 则通过消除一个或多个线程的阻塞来实现该方法。
+     * 调用doReleaseShared释放锁并唤醒后继节点
+     */
+    /*
+    public final boolean releaseShared(int arg) {
+        if (tryReleaseShared(arg)) {
+            doReleaseShared();
+            return true;
+        }
+        return false;
+    }
+    */
+
+    /**
+     * P3-0:唤起后继节点，设置节点为可传播状态
+     * 共享式同步节点的释放不仅需要释放当前节点，还需要唤起后继节点，该方法就是将后继节点唤起且设置相应的状态，
      *
      */
     /*private void doReleaseShared() {
         for (;;) {
-            Node h = head;  //setHeadAndPropagate方法中node就是现在的头节点
+            Node h = head;
             if (h != null && h != tail) {   //当前节点不为空且不为尾节点(不止一个节点)
-                int ws = h.waitStatus;  //获取当前节点的状态
+                int ws = h.waitStatus;  //获取首节点的状态
                 if (ws == Node.SIGNAL) {    //如果头节点可以唤起后继结点
-                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0)) //将h节点的waitStatus设为0
+                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0)) //将h节点的状态更改为0，然后唤醒h节点
                         continue;            // 循环复查
                     unparkSuccessor(h); //P3-1:唤醒当前节点的下一个可用节点
                 }
+                //如果当前节点已经被唤起了且将waitStatus设置为可传播
                 else if (ws == 0 &&
                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
                     continue;                // loop on failed CAS
@@ -215,10 +262,14 @@ public class w2g_AQS {
     private void unparkSuccessor(Node node) {
 
         int ws = node.waitStatus;//获取当前节点状态
-        if (ws < 0) //如果当前节点状态小于0，则将状态修改为0
+        if (ws < 0) //如果当前节点的状态是待唤醒，则更改为唤起状态
             compareAndSetWaitStatus(node, ws, 0);
 
-        Node s = node.next;//获取首节点的下一个节点
+        //下面的方法主要是为了唤起子节点的线程，主要做了以下操作
+        //1-首先是获取首节点的下一个节点s
+        //2-如果s节点为空或者已经被标记为取消，则从尾节点开始循环往前，一直获取到离首节点最近的可被唤起的节点，然后指向s
+        //3-如果s节点不为null，则将s节点唤起
+        Node s = node.next;
         if (s == null || s.waitStatus > 0) {  //如果首节点的下一个节点为null或者已经被取消了
             s = null;
             for (Node t = tail; t != null && t != node; t = t.prev) //从节点链表尾部开始循环

@@ -95,7 +95,7 @@ public class Mutex implements Lock {
      */
     @Override
     public void unlock() {
-        sync.tryRelease(1);
+        sync.release(1);
     }
 
     /**
