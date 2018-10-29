@@ -34,7 +34,7 @@ futureTask可以被execute执行
 
 4-1:Callable作用
 Callback作用类似于runnable，都是实现了对异步调用的执行方法，区别是runnable不会返回异步调用的结果，但是callback可以返回异步调用结果
-自定义类需要实现calllable方法，并重写call方法，实现异步事件的计算，相当于realData类的功能
+自定义类需要实现calllable方法，并重写call方法，实现异步事件的计算，call方法中书写业务代码，相当于realData类的功能
 
 
 5:FutureTask实现realData功能

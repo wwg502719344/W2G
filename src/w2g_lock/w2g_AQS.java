@@ -215,8 +215,7 @@ public class w2g_AQS {
 
     /**
      * P3:释放节点
-     * 调用tryReleaseShared释放同步资源，如果 tryReleaseShared(int) 返回 true，
-     * 则通过消除一个或多个线程的阻塞来实现该方法。
+     * 调用tryReleaseShared修改state状态
      * 调用doReleaseShared释放锁并唤醒后继节点
      */
     /*
@@ -237,7 +236,7 @@ public class w2g_AQS {
     /*private void doReleaseShared() {
         for (;;) {
             Node h = head;
-            if (h != null && h != tail) {   //当前节点不为空且不为尾节点(不止一个节点)
+            if (h != null && h != tail) {   //当前节点不为空且不为尾节点(表示不止一个节点)
                 int ws = h.waitStatus;  //获取首节点的状态
                 if (ws == Node.SIGNAL) {    //如果头节点可以唤起后继结点
                     if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0)) //将h节点的状态更改为0，然后唤醒h节点
