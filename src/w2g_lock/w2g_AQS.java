@@ -114,7 +114,9 @@ public class w2g_AQS {
     }*/
 
     /**
-     * P1-2:返回true表示当前线程被成功挂起
+     * P1-2:返回true表示当前线程可以被成功挂起
+     * 当前节点的前驱节点是可以被触发的，所以返回true
+     * 如果当前节点是无效的，则一直往前找，知道node节点的前驱节点是有效的
      */
     /*
     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
@@ -152,16 +154,27 @@ public class w2g_AQS {
 
     /**
      * P2:共享式同步状态的获取
+     * 需要重写tryAcquireShared方法，当tryAcquireShared返回值大于0时，当前线程才能获取同步资源
+     * 当没有获取到同步状态当时候，执行doAcquireShared方法，进入等待队列并尝试获取同步资源
+     *
+     * Q1:当线程成功获取同步资源后，需要将首节点赋值给当前获取同步状态当节点吗，还是说就是单纯的通过CAS更改状态就可以了
      * @param arg
      */
     /*
     public final void acquireShared(int arg) {
-        if (tryAcquireShared(arg) < 0)  //尝试获取资源，Q：首节点在哪里设置
+        if (tryAcquireShared(arg) < 0)  //尝试获取资源，-1表示获取失败
             doAcquireShared(arg);   //进入等待队列，直到被unpark()/interrupt()并成功获取到资源才返回。整个等待过程也是忽略中断的
     }
+    */
+
 
     /**
-     * 获取同步状态失败进入等待队列并尝试获取同步状态
+     * P2-1:获取同步状态失败进入等待队列并尝试获取同步状态
+     * 调用doAcquireShared方法将获取同步状态失败的线程构造成节点加入到等待队列中去，并进行自旋操作，在自旋过程中
+     * 首先获取新构造的节点的前驱节点
+     * 如果前驱节点是首节点就再次尝试获取同步状态，如果获取成功，就将当前node节点指向首节点并返回
+     * 如果当前节点的前驱节点不是首节点，调用shouldParkAfterFailedAcquire方法，如果方法返回true，则挂起该线程
+     * 如果方法返回false，则继续进行自选，直到被挂起或是成为首节点
      * @param arg
      */
     /*
@@ -185,7 +198,10 @@ public class w2g_AQS {
                         return;
                     }
                 }
-                //如果自己可以休息了，就进入waiting状态，直到被unpark()
+                //shouldParkAfterFailedAcquire(p, node)方法清除当前节点之前waitStatus>0的节点(已经标注被取消的节点)。。。
+                //并返回false，返回false意味着当前节点无法被挂起，继续进行自旋操作直到可以被挂起或者成为首节点
+                //如果返回true，则直接被挂起
+                //parkAndCheckInterrupt方法的作用是挂起当前线程，此时从自旋中退出
                 if (shouldParkAfterFailedAcquire(p, node) &&
                     parkAndCheckInterrupt())    //继续挂起
                     interrupted = true;
@@ -198,7 +214,7 @@ public class w2g_AQS {
     */
 
     /**
-     * P2-1:设置首节点，有剩余资源就继续唤醒后续资源
+     * P2-2:设置首节点，有剩余资源就继续唤醒后续资源
      *
      */
     /*private void setHeadAndPropagate(Node node, int propagate) {
@@ -230,8 +246,11 @@ public class w2g_AQS {
 
     /**
      * P3-0:唤起后继节点，设置节点为可传播状态
-     * 共享式同步节点的释放不仅需要释放当前节点，还需要唤起后继节点，该方法就是将后继节点唤起且设置相应的状态，
-     *
+     * 共享式同步节点的释放不仅需要释放当前节点，当有后继节点时，根据首节点的状态进行判断
+     * 1-当首节点的状态是等待唤醒的状态，将首节点状态改为0，并唤醒后继节点
+     * 2-当首节点当状态已经是0，则将首节点当状态更改为可传播状态
+     * Q1:首节点当状态是在什么时候被设置的
+     * Q2:首节点被设置可传播后，在什么地方起作用
      */
     /*private void doReleaseShared() {
         for (;;) {
@@ -255,7 +274,9 @@ public class w2g_AQS {
 
     /**
      * P3-1：如果当前节点存在就唤醒当前节点
-     * @param node the node:该node应该为首节点
+     * 该方法主要是唤起传入首节点的后继节点，当首节点的状态小于0的时候，则将首节点的状态修改为0
+     * 如果后继节点不存在或者已经取消了，则从尾节点向前循环，获取到最靠近首节点的节点，然后唤醒它
+     * @param node the node:该node为首节点
      */
     /*
     private void unparkSuccessor(Node node) {
@@ -281,53 +302,6 @@ public class w2g_AQS {
             LockSupport.unpark(s.thread);
     }
     */
-
-
-
-    /**
-     * P10
-     * 共享式获取同步状态
-     */
-    /*
-    //尝试获取同步状态
-    public final void acquireShared(int arg) {
-        if (tryAcquireShared(arg) < 0)
-            doAcquireShared(arg);
-    }
-
-    //获取共享状态失败，进入等待队列，获取资源才返回
-    private void doAcquireShared(int arg) {
-        //构造共享节点加入队列
-        final Node node = addWaiter(Node.SHARED);
-        boolean failed = true;
-        try {
-            boolean interrupted = false;
-            for (;;) {
-                final Node p = node.predecessor();
-                if (p == head) {
-                    int r = tryAcquireShared(arg);
-                    if (r >= 0) {
-                        setHeadAndPropagate(node, r);
-                        p.next = null; // help GC
-                        if (interrupted)
-                            selfInterrupt();
-                        failed = false;
-                        return;
-                    }
-                }
-                if (shouldParkAfterFailedAcquire(p, node) &&
-                    parkAndCheckInterrupt())
-                    interrupted = true;
-            }
-        } finally {
-            if (failed)
-                cancelAcquire(node);
-        }
-    }
-    */
-
-
-
 
 
 }
