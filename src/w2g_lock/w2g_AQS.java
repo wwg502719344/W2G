@@ -46,7 +46,8 @@ public class w2g_AQS {
     //状态需要向后传播
     static final int PROPAGATE = -3;
 
-    volatile int waitStatus;//节点状态,具体值为上面四个,该变量为volatile类型，表明是在子线程中可见的
+    //节点状态,具体值为上面四个,该变量为volatile类型，表明是在子线程中可见的，初始值默认为0
+    volatile int waitStatus;
     volatile Node prev;
     volatile Node next;
     volatile Thread thread;
