@@ -43,8 +43,12 @@ public class w2g_AQS {
     static final int SIGNAL = -1;
     //等待条件
     static final int CONDITION = -2;
-    //状态需要向后传播
+    //状态需要向后传，仅在doReleaseShared中被设置，且只能是head节点被设置
+    //表示共享模式下，若当前节点被唤醒，它的下一个节点也可以被唤醒（自带唤起线程的变量）
     static final int PROPAGATE = -3;
+
+    //新创建的节点、出列的节点、队尾的节点、刚从条件队列中进入等待队列中的节点，都处于这种状态
+    0
 
     //节点状态,具体值为上面四个,该变量为volatile类型，表明是在子线程中可见的，初始值默认为0
     volatile int waitStatus;
@@ -179,6 +183,9 @@ public class w2g_AQS {
      * 如果前驱节点是首节点就再次尝试获取同步状态，如果获取成功，就将当前node节点指向首节点并返回
      * 如果当前节点的前驱节点不是首节点，调用shouldParkAfterFailedAcquire方法，如果方法返回true，则挂起该线程
      * 如果方法返回false，则继续进行自选，直到被挂起或是成为首节点
+     *
+     *
+     * 共享获取同步状态，在获取同步状态当时候也会唤醒后继节点一起获取同步状态
      * @param arg
      */
     /*
