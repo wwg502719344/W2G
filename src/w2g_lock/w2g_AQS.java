@@ -117,7 +117,7 @@ public class w2g_AQS {
     /**
      * P1-2:返回true表示当前线程可以被成功挂起
      * 当前节点的前驱节点是可以被触发的，所以返回true
-     * 如果当前节点是无效的，则一直往前找，知道node节点的前驱节点是有效的
+     * 如果当前节点是无效的，则一直往前找，直到node节点的前驱节点是有效的
      */
     /*
     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
@@ -149,7 +149,7 @@ public class w2g_AQS {
 
 
 
-
+/////////////////////////////////////////////共享模式下AQS/////////////////////////////////////////////////////////////
 
 
 
@@ -159,6 +159,9 @@ public class w2g_AQS {
      * 当没有获取到同步状态当时候，执行doAcquireShared方法，进入等待队列并尝试获取同步资源
      *
      * Q1:当线程成功获取同步资源后，需要将首节点赋值给当前获取同步状态当节点吗，还是说就是单纯的通过CAS更改状态就可以了
+     * A1:如果可以直接获取到资源，则不需要构造节点进入同步队列，只有获取资源失败才会构造节点，但是释放资源后都会去唤醒等待队列
+     * 中的等待节点
+     * https://blog.csdn.net/O11111001100/article/details/81279884?utm_source=blogxgwz0
      * @param arg
      */
     /*
@@ -209,10 +212,44 @@ public class w2g_AQS {
             }
         } finally {
             if (failed) //如果循环获取失败则取消排队
-                cancelAcquire(node);
+                cancelAcquire(node);//取消正在进行的获取
         }
     }
     */
+
+    /**
+     * P1-2:返回true表示当前线程可以被成功挂起
+     * 当前节点的前驱节点是可以被触发的，所以返回true
+     * 如果当前节点是无效的，则一直往前找，直到node节点的前驱节点是有效的
+     */
+    /*
+    private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+        int ws = pred.waitStatus;
+        //如果前驱节点是signal表示前驱结点可以被唤醒
+        if (ws == Node.SIGNAL)
+             // This node has already set status asking a release
+             // to signal it, so it can safely park.
+             return true;
+          //如果前节点是已经被取消的节点
+          if (ws > 0) {
+             // Predecessor(前任，前辈) was cancelled. Skip over predecessors and
+             // indicate(表明,指示) retry.
+             //获取pred节点的前驱节点pred2，并将node节点的前驱节点指向pred2,当pred的状态是已取消节点的时候
+                do {
+                    node.prev = pred = pred.prev;
+                } while (pred.waitStatus > 0);
+                pred.next = node;
+            } else {
+                 // waitStatus must be 0 or PROPAGATE.  Indicate that we
+                 // need a signal, but don't park yet.  Caller will need to
+                 // retry to make sure it cannot acquire before parking.
+            compareAndSetWaitStatus(pred, ws, Node.SIGNAL); //设置该节点的状态为SIGNAL
+        }
+        return false;
+    }
+
+    */
+
 
     /**
      * P2-2:设置首节点，有剩余资源就继续唤醒后续资源
@@ -250,6 +287,7 @@ public class w2g_AQS {
      * 共享式同步节点的释放不仅需要释放当前节点，当有后继节点时，根据首节点的状态进行判断
      * 1-当首节点的状态是等待唤醒的状态，将首节点状态改为0，并唤醒后继节点
      * 2-当首节点当状态已经是0，则将首节点当状态更改为可传播状态
+     * Q0:如果获取资源的线程并没有构造成首节点，那么调用doReleaseShared方法的head是什么
      * Q1:首节点当状态是在什么时候被设置的
      * Q2:首节点被设置可传播后，在什么地方起作用
      */
