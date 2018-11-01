@@ -43,8 +43,9 @@ public class w2g_AQS {
     static final int SIGNAL = -1;
     //等待条件
     static final int CONDITION = -2;
-    //状态需要向后传，仅在doReleaseShared中被设置，且只能是head节点被设置
-    //表示共享模式下，若当前节点被唤醒，它的下一个节点也可以被唤醒（自带唤起线程的变量）
+
+    //主要作用是唤起doReleaseShared方法(老head节点)，通过该方法可以唤起后继节点，只能是head节点被设置
+    //在共享模式中，该状态标识结点的线程处于可运行状态。
     static final int PROPAGATE = -3;
 
     //新创建的节点、出列的节点、队尾的节点、刚从条件队列中进入等待队列中的节点，都处于这种状态
@@ -122,6 +123,8 @@ public class w2g_AQS {
      * P1-2:返回true表示当前线程可以被成功挂起
      * 当前节点的前驱节点是可以被触发的，所以返回true
      * 如果当前节点是无效的，则一直往前找，直到node节点的前驱节点是有效的
+     * 剩下ws只有可能是0orPROPAGATE，这时候需要继续尝试获取同步状态，并将当前状态设置为SIGNAL
+     *
      */
     /*
     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
@@ -260,12 +263,15 @@ public class w2g_AQS {
 
     /**
      * P2-2:设置首节点，有剩余资源就继续唤醒后续资源
-     *
+     *这里需要特别注意，h是node成为首节点之前的首节点，当h的状态为PRPPAGATE的时候可以进行唤起操作，但是
+     *在唤起操作中取的是node节点，并不是这个h了!!!!
      */
     /*private void setHeadAndPropagate(Node node, int propagate) {
         Node h = head; // Record old head for check below
         setHead(node);//设置node为头节点
 
+        //这里需要特别注意，h是node成为首节点之前的首节点，当h的状态为PRPPAGATE的时候可以进行唤起操作，但是
+        //在唤起操作中取的是node节点，并不是这个h了
         if (propagate > 0 || h == null || h.waitStatus < 0 ||
                 (h = head) == null || h.waitStatus < 0) {   //如果可以继续传播
             Node s = node.next; //获取node节点的下一个节点
