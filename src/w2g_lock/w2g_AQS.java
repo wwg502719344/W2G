@@ -32,6 +32,7 @@ public class w2g_AQS {
      * P0:节点属性
      */
     /*
+
     static final Node SHARED = new Node();//表明当前节点是共享式节点
     static final Node EXCLUSIVE = null;//表明当前节点是独占式节点
 
@@ -43,18 +44,17 @@ public class w2g_AQS {
     static final int CONDITION = -2;
 
     //主要作用是唤起doReleaseShared方法(老head节点)，通过该方法可以唤起后继节点，只能是head节点被设置
-    //在共享模式中，该状态标识结点的线程处于可运行状态。
+    //当前节点成功获取同步状态后，如果首节点的waitStatus是PROPAGATE，则无条件释放当前节点
     static final int PROPAGATE = -3;
 
-    //新创建的节点、出列的节点、队尾的节点、刚从条件队列中进入等待队列中的节点，都处于这种状态
-    0
-
     //节点状态,具体值为上面四个,该变量为volatile类型，表明是在子线程中可见的，初始值默认为0
+    //当waitStatus为0时表示当前节点是新创建的节点、出列的节点、队尾的节点、刚从条件队列中进入等待队列中的节点，都处于这种状态
     volatile int waitStatus;
     volatile Node prev;
     volatile Node next;
     volatile Thread thread;
     Node nextWaiter;
+
     */
 
 
