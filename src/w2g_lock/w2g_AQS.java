@@ -264,7 +264,8 @@ public class w2g_AQS {
      *这里需要特别注意，h是node成为首节点之前的首节点，当h的状态为PRPPAGATE的时候可以进行唤起操作，但是
      *在唤起操作中取的是node节点，并不是这个h了!!!!
      */
-    /*private void setHeadAndPropagate(Node node, int propagate) {
+    /*
+    private void setHeadAndPropagate(Node node, int propagate) {
         Node h = head; // Record old head for check below
         setHead(node);//设置node为头节点
 
@@ -276,7 +277,8 @@ public class w2g_AQS {
             if (s == null || s.isShared())  //如果s是空或者是共享模式
                 doReleaseShared();  //P3
         }
-    }*/
+    }
+    */
 
     /**
      * P3:释放节点
@@ -302,7 +304,8 @@ public class w2g_AQS {
      * Q1:首节点当状态是在什么时候被设置的
      * Q2:首节点被设置可传播后，在什么地方起作用
      */
-    /*private void doReleaseShared() {
+    /*
+    private void doReleaseShared() {
         for (;;) {
             Node h = head;
             if (h != null && h != tail) {   //当前节点不为空且不为尾节点(表示不止一个节点)
@@ -312,7 +315,7 @@ public class w2g_AQS {
                         continue;            // 循环复查
                     unparkSuccessor(h); //P3-1:唤醒当前节点的下一个可用节点
                 }
-                //如果当前节点已经被唤起了且将waitStatus设置为可传播
+                //将waitStatus设置为可传播
                 else if (ws == 0 &&
                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
                     continue;                // loop on failed CAS
@@ -320,7 +323,8 @@ public class w2g_AQS {
             if (h == head)                   // loop if head changed
                 break;
         }
-    }*/
+    }
+    */
 
     /**
      * P3-1：如果当前节点存在就唤醒当前节点
