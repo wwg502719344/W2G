@@ -1,7 +1,6 @@
 package w2g_thread_pool;
 
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 /**
  * Created by W2G on 2018/8/30.
@@ -15,32 +14,64 @@ public class ThreadPoolExecutor_source {
 
     ThreadPoolExecutor a=null;
 
+    Executors e=null;
+
+    ExecutorService executorService=null;
+
     //future设计模式,jdk内置实现
     FutureTask futureTask=null;
 
 
     /**
      * P1 执行类基本组成结构
-     * 继承类AbstractExecutorService，该类实现了executorService方法，
-     * executorService是executor的子接口
+     * ThreadPoolExecutor类继承AbstractExecutorService，AbstractExecutorService是executorService接口的实现类，
+     * executorService是executor的子接口，线程池类
      * executor是超级接口，详情查看Executor_Source类及QA(Q8)
+     *
+     * executorService中的方法主要是对线程池任务进行控制管理，该类可以对任务进行执行和关闭等操作
+     * AbstractExecutorService是线程池类的实现类，里面主要executorService方法的实现
+     * ThreadPoolExecutor类内部通过调用线程池实现方法，对开发人员提供使用线程池的API
      *
      * P1-1 AbstractExecutorService是executorService的实现类，实现了相关方法
      * 核心点:大多数方法通过提交task返回future对象
      */
-    /*public class ThreadPoolExecutor extends AbstractExecutorService {
-    }*/
+    /*
+
+    public class ThreadPoolExecutor extends AbstractExecutorService {
+
+        //省略
+        ...
+    }
+
+    public abstract class AbstractExecutorService implements ExecutorService {
+
+        //省略
+        ...
+    }
+
+    public interface ExecutorService extends Executor {
+
+        //省略
+        ...
+    }
+
+    public interface Executor {
+
+        void execute(Runnable command);
+    }
+    */
 
 
     /**
      * P2:线程池状态源码基本变量组成及解析
-     *
+     * 变量ctl是非常特殊的一个变量，他是用来表示线程池状态和当前线程数量的一个变量
+     * 此处申明了final类型，说明AtomicInteger类不可以被继承,值得注意的是AtomicInteger并不能理解为一个变量
+     * 是一个原子整数，利用高低位包装了如下两个概念
+     * runState：线程池运行状态，占据高三位，主要有RUNNING,SHUTDOWN,STOP,TIDYING,TERMINATED
+     * workerCount：线程池中当前活动的线程数量，占据低29位
      **/
     /*
-    //非常特殊的一个变量，他是用来表示线程池状态和当前线程数量的一个变量
-    //此处申明了final类型，说明AtomicInteger的方法不可以被继承，get和set方法不可被重写(本身已经被final所修饰)
-    //runState：线程池运行状态
-    //workerCount：工作线程的数量
+    //通过ctl获取runState和workerCount状态
     private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 
     private static final int COUNT_BITS = Integer.SIZE - 3;//
@@ -50,7 +81,7 @@ public class ThreadPoolExecutor_source {
     private static final int SHUTDOWN   =  0 << COUNT_BITS;//线程池不在接受新任务(当工作线程大于等于最大线程的时候)
     private static final int STOP       =  1 << COUNT_BITS;//线程池不在接受新任务，不在执行队列中的任务
     private static final int TIDYING    =  2 << COUNT_BITS;//线程池中所有任务均终止
-    private static final int TERMINATED =  3 << COUNT_BITS;//
+    private static final int TERMINATED =  3 << COUNT_BITS;//线程池彻底终止
 
     // ctl操作
     private static int runStateOf(int c)     { return c & ~CAPACITY; }
@@ -59,7 +90,8 @@ public class ThreadPoolExecutor_source {
     */
 
     /**
-     * P3:ThreadPoolExecutor执行方法
+     * P3:ThreadPoolExecutor执行入口方法
+     * 该方法接收一个实现了Runnable接口的对象
      * 执行给出的任务在未来的某个时候，这个任务由一个新线程或是线程池中的线程进行执行
      * 如果这个任务不能被正确执行，不管什么原因，都提交给RejectedExecutionHandler去处理
      */
@@ -71,11 +103,6 @@ public class ThreadPoolExecutor_source {
          * 1.如果运行的线程少于核心线程，启动一个新线程处理提交的任务,对addWorker
          * 的调用以原子方式,对addWorker的调用需要进行runState和workerCount
          * 的检查，为了防止false的警告在添加线程的时候当不应该添加的时候
-         * 1. If fewer than corePoolSize threads are running, try to
-         * start a new thread with the given command as its first
-         * task.  The call to addWorker atomically checks runState and
-         * workerCount, and so prevents false alarms that would add
-         * threads when it shouldn't, by returning false.
          * 的调用以原子方式检查运行状态和任务数量，以便防止出现false警告当不应该
          * 添加线程的时候
          *
@@ -92,12 +119,12 @@ public class ThreadPoolExecutor_source {
                 return;
             c = ctl.get();
         }
-        //当线程池状态是否是运行状态且成功加入工作队列中
+        //当线程池状态是运行状态且成功加入工作队列中
         //当workerCountOf(c)的数量大于等于corePoolSize的时候
         if (isRunning(c) && workQueue.offer(command)) {
             int recheck = ctl.get();//重新获取线程池运行状态
             if (! isRunning(recheck) && remove(command))//如果运行状态不是可运行且移除当前任务
-                reject(command);
+                reject(command);//关闭当前任务
             else if (workerCountOf(recheck) == 0)//当线程池中的线程数是0时
                 //如果发现没有worker，则会补充一个null的worker什么意思？为什么这么做
                 //如果为null的话最后会被移除核心线程池，那这个操作到底有什么意义
