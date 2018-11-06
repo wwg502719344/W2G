@@ -83,11 +83,22 @@ public class ThreadPoolExecutor_source {
     private static final int TIDYING    =  2 << COUNT_BITS;//线程池中所有任务均终止
     private static final int TERMINATED =  3 << COUNT_BITS;//线程池彻底终止
 
+
     // ctl操作
     private static int runStateOf(int c)     { return c & ~CAPACITY; }
     private static int workerCountOf(int c)  { return c & CAPACITY; }
     private static int ctlOf(int rs, int wc) { return rs | wc; }
+
+    //
+    private final ReentrantLock mainLock = new ReentrantLock();
+
+    //工作线程集合，包含池中所有的工作线程,只能在拿着mainLock时才能访问。
+    //Worker 引用存在workers集合里面
+    private final HashSet<Worker> workers = new HashSet<Worker>();
+
+
     */
+
 
     /**
      * P3:ThreadPoolExecutor执行入口方法
@@ -129,14 +140,17 @@ public class ThreadPoolExecutor_source {
                 //如果发现没有worker，则会补充一个null的worker什么意思？为什么这么做
                 //如果为null的话最后会被移除核心线程池，那这个操作到底有什么意义
                 //Q16
+                //此处的含义应该是加入一个空的线程，目的是去执行队列中的任务
                 addWorker(null, false);//P3-1
         }
+        //如果队列也已经满了，则创建一个线程去执行任务，如果工作线程数量超过了最大线程数量，则执行拒绝策略
         else if (!addWorker(command, false))
             reject(command);
     }*/
 
     /**
-     * P3-1:核心方法,线程池启动线程的地方，实现run方法,主要是分为两个阶段
+     * P3-1:将
+     * 核心方法,线程池启动线程的地方，实现run方法,主要是分为两个阶段
      * 第一阶段，主要作用是检查，检查线程池运行状态和活动线程数量相关问题
      *
      */
@@ -209,7 +223,9 @@ public class ThreadPoolExecutor_source {
                         if (t.isAlive()) // t为新创建的线程，为什么存活要抛出异常？(因为此时t还没有启动start操作)
                             throw new IllegalThreadStateException();
 
-                        workers.add(w); //将创建的线程添加到worker容器中，workers也可移除
+                        //将创建的线程添加到worker容器中，workers也可移除
+                        //此处可以理解为如果默认的核心线程被创建后加入到线程池的集合中，即便什么都不做，也不会被消除
+                        workers.add(w);
                         int s = workers.size();
                         if (s > largestPoolSize)
                             largestPoolSize = s;
@@ -258,7 +274,7 @@ public class ThreadPoolExecutor_source {
                         !wt.isInterrupted())
                     wt.interrupt();//中断该线程
                 try {
-                    beforeExecute(wt, task);
+                    beforeExecute(wt, task);//这是ThreadPoolExecutor提供给子类的扩展方法
                     Throwable thrown = null;
                     try {
                         task.run();//futureTask执行的地方
