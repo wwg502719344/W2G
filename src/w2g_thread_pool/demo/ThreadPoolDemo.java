@@ -15,7 +15,8 @@ public class ThreadPoolDemo {
     /**
      * 方式一
      */
-    /*ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
+    /*
+    ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
             .setNameFormat("demo-pool-%d").build();
     ExecutorService executorService = new ThreadPoolExecutor(5, 10,
             0L, TimeUnit.MILLISECONDS,

@@ -123,8 +123,8 @@ public class ThreadPoolExecutor_source {
         //当workerCountOf(c)的数量大于等于corePoolSize的时候
         if (isRunning(c) && workQueue.offer(command)) {
             int recheck = ctl.get();//重新获取线程池运行状态
-            if (! isRunning(recheck) && remove(command))//如果运行状态不是可运行且移除当前任务
-                reject(command);//关闭当前任务
+            if (! isRunning(recheck) && remove(command))//如果运行状态不是可运行，则移除当前任务
+                 reject(command);//关闭当前任务
             else if (workerCountOf(recheck) == 0)//当线程池中的线程数是0时
                 //如果发现没有worker，则会补充一个null的worker什么意思？为什么这么做
                 //如果为null的话最后会被移除核心线程池，那这个操作到底有什么意义
