@@ -64,6 +64,7 @@ P7:ThreadPoolExecutor基本构成
 P8:线程池状态源码基本变量组成及解析
 P9:ThreadPoolExecutor执行方法
 P10:Worker组成及作用
+P11:源码执行流程
 
 P7:ThreadPoolExecutor继承了AbstractExecutorService类，AbstractExecutorService是executorService的实现类，。。。
 executorService是executor的子接口,executorService创建线程池，在实现类中，通常是接受一个callable对象或是runnable对象，。。。
@@ -94,6 +95,7 @@ run()调用了runWorker(),目的是在该方法中启动线程的执行，执行
 
 
 ***P11***:线程池源码处理提交任务基本流程
+1:线程池执行execute方法，没有返回值
 情况一:当前线程数小于核心线程数，顺利执行
     1:线程池调用execute方法执行任务，线程池中线程数小于核心线程数，调用addWorker方法
     2:addWorker方法的目的是将当前任务包装成Worker对象并启动worker中的线程，在addWorker方法中首先是检测线程池状态和线程池中。。。
@@ -110,9 +112,16 @@ run()调用了runWorker(),目的是在该方法中启动线程的执行，执行
 情况三:核心池数量已满，队列已满，则创建一个非核心线程去执行任务
     1:如果失败则执行拒绝操作
 
+2:线程池执行submit方法，有返回值
+执行流程:线程对象调用submit方法提交任务(任务方法应重写call方法)，调用实现了AbstractExecutorService类的submit方法，该方法。。。
+返回一个FutureTask对象，然后调用execute方法，流程如上，最终在执行runWorker的task.run()时，执行的是futureTask的run方法。。。
+在futureTask的run方法中则会调用重写的call方法
+
 
 P12:建议查看的文章
-1：源码方法注释翻译:
+1：源码方法注释翻译
 https://blog.csdn.net/iromkoear/article/details/66016153
-2:源码解析：
+2:源码解析
 https://blog.csdn.net/xiongyouqiang/article/details/79456030
+3:占小狼博客
+https://www.jianshu.com/p/87bff5cc8d8c
