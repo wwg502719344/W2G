@@ -28,12 +28,12 @@ public class ThreadPoolExecutor_source {
      * executorService是executor的子接口，线程池类
      * executor是超级接口，详情查看Executor_Source类及QA(Q8)
      *
-     * executorService中的方法主要是对线程池任务进行控制管理，该类可以对任务进行执行和关闭等操作
+     * executorService中的方法主要是对线程池中提交的任务进行控制管理，该类可以对任务进行提交和关闭等操作
      * AbstractExecutorService是线程池类的实现类，里面主要executorService方法的实现
-     * ThreadPoolExecutor类内部通过调用线程池实现方法，对开发人员提供使用线程池的API
+     * ThreadPoolExecutor类内部对开发人员提供使用线程池的API,可以调用executorService中的submit等方法将任务进行提交
      *
      * P1-1 AbstractExecutorService是executorService的实现类，实现了相关方法
-     * 核心点:大多数方法通过提交task返回future对象
+     * 核心点:submit方法通过提交task返回future对象,最终则是调用futureTask中的run方法实现
      */
     /*
 
@@ -69,6 +69,11 @@ public class ThreadPoolExecutor_source {
      * 是一个原子整数，利用高低位包装了如下两个概念
      * runState：线程池运行状态，占据高三位，主要有RUNNING,SHUTDOWN,STOP,TIDYING,TERMINATED
      * workerCount：线程池中当前活动的线程数量，占据低29位
+     *
+     * workers是存放工作线程的集合，包含线程池中的所有工作线程，只有在拿到mainLock的时候才能进行访问
+     * Q:搞不清核心线程和普通线程到底有什么区别
+     * A:非核心线程在keepAliveTime之后会关闭
+     * 资料：https://blog.csdn.net/notonlyrush/article/details/78737425
      **/
     /*
     //通过ctl获取runState和workerCount状态
@@ -89,7 +94,7 @@ public class ThreadPoolExecutor_source {
     private static int workerCountOf(int c)  { return c & CAPACITY; }
     private static int ctlOf(int rs, int wc) { return rs | wc; }
 
-    //
+    //当需要操作workers对象的时候，需要获取锁资源
     private final ReentrantLock mainLock = new ReentrantLock();
 
     //工作线程集合，包含池中所有的工作线程,只能在拿着mainLock时才能访问。
@@ -105,23 +110,17 @@ public class ThreadPoolExecutor_source {
      * 该方法接收一个实现了Runnable接口的对象
      * 执行给出的任务在未来的某个时候，这个任务由一个新线程或是线程池中的线程进行执行
      * 如果这个任务不能被正确执行，不管什么原因，都提交给RejectedExecutionHandler去处理
+     *
+     * 在执行任务的时候，主要有以下几种情况
+     * 1，当前线程数量小于核心线程数，此时将会创建新的线程去执行任务
+     * 2，当前线程数量大于核心线程数的时候，将当前任务加入到工作队列中去，并再次检查线程池运行状态，如果当前任务数量为0则创建
+     * 一个线程去处理工作队列中的任务
+     * 3，如果工作队列也已经满了，则创建一个线程去执行该任务
      */
     /*public void execute(Runnable command) {
         if (command == null)
             throw new NullPointerException();
 
-         * 代码逻辑主要是以下4种情况：
-         * 1.如果运行的线程少于核心线程，启动一个新线程处理提交的任务,对addWorker
-         * 的调用以原子方式,对addWorker的调用需要进行runState和workerCount
-         * 的检查，为了防止false的警告在添加线程的时候当不应该添加的时候
-         * 的调用以原子方式检查运行状态和任务数量，以便防止出现false警告当不应该
-         * 添加线程的时候
-         *
-         * 2方法也会启动一个新线程
-         *
-         * 3. 如果我们不能加入任务队列，我们就尝试在添加一个新的线程，如果添加失败了
-         * 我们就应该知道我们已经停止了然后把reject任务
-         *
         int c = ctl.get();
         //判断运行的线程是否小于核心线程数
         if (workerCountOf(c) < corePoolSize) {
@@ -136,11 +135,10 @@ public class ThreadPoolExecutor_source {
             int recheck = ctl.get();//重新获取线程池运行状态
             if (! isRunning(recheck) && remove(command))//如果运行状态不是可运行，则移除当前任务
                  reject(command);//关闭当前任务
-            else if (workerCountOf(recheck) == 0)//当线程池中的线程数是0时
+            else if (workerCountOf(recheck) == 0)//当线程池中的线程数是0时，此时任务已经加入到workerQueue中了
                 //如果发现没有worker，则会补充一个null的worker什么意思？为什么这么做
-                //如果为null的话最后会被移除核心线程池，那这个操作到底有什么意义
                 //Q16
-                //此处的含义应该是加入一个空的线程，目的是去执行队列中的任务
+                //此处的含义应该是加入一个空的线程，目的是消费workerQueue中的任务
                 addWorker(null, false);//P3-1
         }
         //如果队列也已经满了，则创建一个线程去执行任务，如果工作线程数量超过了最大线程数量，则执行拒绝策略
@@ -149,13 +147,12 @@ public class ThreadPoolExecutor_source {
     }*/
 
     /**
-     * P3-1:将
+     * P3-1:构建线程执行firstTask
      * 核心方法,线程池启动线程的地方，实现run方法,主要是分为两个阶段
      * 第一阶段，主要作用是检查，检查线程池运行状态和活动线程数量相关问题
-     *
+     * 第二阶段，创建worker对象，并启动线程执行任务
      */
     /*private boolean addWorker(Runnable firstTask, boolean core) {
-
 
         //第一阶段，主要作用是检查，检查线程池运行状态和活动线程数量是否符合要求，否则返回false
 
@@ -164,11 +161,12 @@ public class ThreadPoolExecutor_source {
             int c = ctl.get();//获取当前线程池状态和线程数量
             int rs = runStateOf(c);//获取线程池运行状态
 
-            // 检查当前线程池状态，如果状态大于SHUTDOWN则直接返回false
+            // 检查当前线程池状态，如果状态大于等于SHUTDOWN(说明线程池已经停止)
+            // 且线程池已关闭且任务为空且工作队列不为空，返回false
             if (rs >= SHUTDOWN &&
                     ! (rs == SHUTDOWN &&
                             firstTask == null &&
-                            ! workQueue.isEmpty()))//如果线程池运行状态是shutdown且执行任务为空且工作队列为空
+                            ! workQueue.isEmpty()))
                 return false;   //返回false
 
             //该循环主要是检测线程池中活动线程数量是否在合理的范围之内，否则返回false
@@ -190,16 +188,12 @@ public class ThreadPoolExecutor_source {
             }
         }
 
-
         //第二阶段：创建Worker对象，并启动线程
-
-
         boolean workerStarted = false;
         boolean workerAdded = false;
         Worker w = null;
         try {
-            //Worker类继承了AQS，相当于一个阻塞队列，入队阻塞，出队唤醒，worker
-            //AQS采用的是CLH同步队列，并不是一般的阻塞队列
+            //Worker类继承了AQS
             //根据你给的task创建worker对象,通过ThreadFactory获取thread的引用
             //Worker的也是Runnable的实现类
             w = new Worker(firstTask);
@@ -261,6 +255,7 @@ public class ThreadPoolExecutor_source {
             //1:如果创建该worker时传递的task不为空(当前worker对应的任务还没有执行)，则去执行task
             //2:如果worker中的task已经执行完了，则去检查是否还有task任务没有执行，如果有则获取workQueue的task并执行
             while (task != null || (task = getTask()) != null) {
+                //Worker继承AQS，目的是想使用独占锁来表示线程是否正在执行任务
                 w.lock();
                 // If pool is stopping, ensure thread is interrupted;
                 // 如果线程池停止了，确保线程被打断
@@ -295,24 +290,13 @@ public class ThreadPoolExecutor_source {
             }
             completedAbruptly = false;
         } finally {
+            //销毁当前线程
             processWorkerExit(w, completedAbruptly);
         }
     }*/
 
 
     /**
-     * Performs blocking or timed wait for a task, depending on
-     * current configuration settings, or returns null if this worker
-     * must exit because of any of:
-     * 1. There are more than maximumPoolSize workers (due to
-     *    a call to setMaximumPoolSize).
-     * 2. The pool is stopped.
-     * 3. The pool is shutdown and the queue is empty.
-     * 4. This worker timed out waiting for a task, and timed-out
-     *    workers are subject to termination (that is,
-     *    {@code allowCoreThreadTimeOut || workerCount > corePoolSize})
-     *    both before and after the timed wait, and if the queue is
-     *    non-empty, this worker is not the last thread in the pool.
      *
      * 执行阻塞或是定时等待任务，根据当前的配置，或者返回null如果这个worker因为如下任意原因必须退出
      * 1.这里有超过最大线程的worker线程
@@ -340,10 +324,12 @@ public class ThreadPoolExecutor_source {
             int wc = workerCountOf(c);//获取工作线程的数量
 
             // Are workers subject to culling?
-            // 当前线程数是否大于核心线程数，是则返回true
+            // 当前线程数是否大于核心线程数，是则返回true或者allowCoreThreadTimeOut被设置为true时，
+            // 在keepAliveTime到了之后，将会销毁非核心线程或是allowCoreThreadTimeOut被设置为true的核心线程
             boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
 
-            //如果工作线程的数量大于最大设定线程数量||(超时&&工作队列是空的)，则
+            //当前线程数大于最大线程数或者(当前线程数大于核心线程数且timedOut过)且(wc > 1 || workQueue.isEmpty())
+            //return将会返回null，程序销毁当前线程
             if ((wc > maximumPoolSize || (timed && timedOut))
                     && (wc > 1 || workQueue.isEmpty())) {
                 if (compareAndDecrementWorkerCount(c))//cas减少任务数量
