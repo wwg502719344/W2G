@@ -193,7 +193,8 @@ public class ThreadPoolExecutor_source {
         boolean workerAdded = false;
         Worker w = null;
         try {
-            //Worker类继承了AQS
+            //Worker继承AQS,目的是使用独占锁来表示线程是否正在执行任务，Worker的线程获取了独占锁就说明它在执行任务,不能被中断
+            //Worker继承AQS,可以方便的实现工作线程的中止操作
             //根据你给的task创建worker对象,通过ThreadFactory获取thread的引用
             //Worker的也是Runnable的实现类
             w = new Worker(firstTask);
@@ -203,22 +204,17 @@ public class ThreadPoolExecutor_source {
                 final ReentrantLock mainLock = this.mainLock;
                 mainLock.lock();
                 try {
-                    // 当加锁后重新检查线程池运行状态
-                    // 当线程工厂失败就回退，或者在获取锁之前状态就shutdown
-                    // Back out on ThreadFactory failure or if
-                    // shut down before lock acquired.
                     int rs = runStateOf(ctl.get());
 
                     //rs < SHUTDOWN表示线程池处于可运行状态
-                    //Q1:不太理解这个if,条件rs == SHUTDOWN && firstTask == null时，不应该继续创建线程了吧
-                    //A1:当
+                    //Q:如果rs==SHUTDOWN且firstTask==null时,t.isAlive()是需要抛出异常的，但rs < SHUTDOWN为什么也要抛错?
+                    //A:workQueue中仍有未执行完的任务，如果此时该线程已启动，则需要抛出异常
                     if (rs < SHUTDOWN ||
                             (rs == SHUTDOWN && firstTask == null)) {
-                        if (t.isAlive()) // t为新创建的线程，为什么存活要抛出异常？(因为此时t还没有启动start操作)
+                        if (t.isAlive()) // t为新创建的线程，在workQueue运行状态下如果已经启动需要抛出异常
                             throw new IllegalThreadStateException();
 
-                        //将创建的线程添加到worker容器中，workers也可移除
-                        //此处可以理解为如果默认的核心线程被创建后加入到线程池的集合中，即便什么都不做，也不会被消除
+                        //将创建的线程添加到线程池的集合中
                         workers.add(w);
                         int s = workers.size();
                         if (s > largestPoolSize)
@@ -243,6 +239,8 @@ public class ThreadPoolExecutor_source {
 
     /**
      * P4:Worker中run方法的实现类
+     * 执行worker中的任务，如果任务执行完成了，则继续执行workQueue中的任务，如果worker中的任务为空，则单独执行队列中的任务
+     * 需要注意的是如果getTask()返回null的话，则直接销毁当前线程(一般只会是非核心线程，如果核心线程做了设置也会进行销毁)
      */
     /*final void runWorker(Worker w) {
         Thread wt = Thread.currentThread();//获取当前线程，即为正在执行的，创建了worker的线程
@@ -257,11 +255,7 @@ public class ThreadPoolExecutor_source {
             while (task != null || (task = getTask()) != null) {
                 //Worker继承AQS，目的是想使用独占锁来表示线程是否正在执行任务
                 w.lock();
-                // If pool is stopping, ensure thread is interrupted;
                 // 如果线程池停止了，确保线程被打断
-                // if not, ensure thread is not interrupted.  This
-                // requires a recheck in second case to deal with
-                // shutdownNow race while clearing interrupt
                 // 如果没有被打断，第二种情况要求在清除中断时去处理shutdownNow方法的竞争
                 if ((runStateAtLeast(ctl.get(), STOP) ||
                         (Thread.interrupted() &&
@@ -297,14 +291,12 @@ public class ThreadPoolExecutor_source {
 
 
     /**
+     * 获取workQueue中的任务，以下几种情况将会返回null，如果返回null则会销毁当前线程
+     * 1.线程池已经停止工作了
+     * 2.队列已经空了
+     * 3.如果当前线程为非核心线程或allowCoreThreadTimeOut，在keepAliveTime内没有获取到任务
      *
-     * 执行阻塞或是定时等待任务，根据当前的配置，或者返回null如果这个worker因为如下任意原因必须退出
-     * 1.这里有超过最大线程的worker线程
-     * 2.线程池已经停止工作了
-     * 3.队列已经空了
-     * 4.这个工作线程等待任务超时
-     * @return task, or null if the worker must exit, in which case
-     *         workerCount is decremented
+     * 核心线程在超时未获取到任务的情况下，将会移除当前任务并执行continue继续循环任务
      */
     /*private Runnable getTask() {
         boolean timedOut = false; // Did the last poll() time out?
@@ -313,9 +305,7 @@ public class ThreadPoolExecutor_source {
             int c = ctl.get();
             int rs = runStateOf(c);//获取当前线程池的运行状态
 
-            // Check if queue empty only if necessary.
-            // 检查队列是否为空仅在必要的时候
-            // 如果线程池当前状态已经停止且队列是空的
+            // 如果线程池当前状态已经停止且队列是空时返回null
             if (rs >= SHUTDOWN && (rs >= STOP || workQueue.isEmpty())) {
                 decrementWorkerCount();//重新设置当前线程池状态，内部通过cas方式实现状态的修改
                 return null;//返回
@@ -323,7 +313,6 @@ public class ThreadPoolExecutor_source {
 
             int wc = workerCountOf(c);//获取工作线程的数量
 
-            // Are workers subject to culling?
             // 当前线程数是否大于核心线程数，是则返回true或者allowCoreThreadTimeOut被设置为true时，
             // 在keepAliveTime到了之后，将会销毁非核心线程或是allowCoreThreadTimeOut被设置为true的核心线程
             boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
@@ -340,10 +329,11 @@ public class ThreadPoolExecutor_source {
             try {
                 //获取并从workQueue中移除该任务
                 //如果false则从队列中获取任务，如果为true则。。。
+                //如果在keepAliveTime内没有获取到任务则移除此任务，r为null，并将timedOut设置为true，用于上面的判断条件
                 Runnable r = timed ?
                         workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
                         workQueue.take();
-                if (r != null)//如果获取的任务不为null则返回该对象，设置timeout为true
+                if (r != null)//如果获取的任务不为null则返回该对象，设置timeout为true，目的是移除当前线程
                     return r;
                 timedOut = true;
             } catch (InterruptedException retry) {

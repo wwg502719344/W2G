@@ -47,9 +47,13 @@ submit()方法中是包含有execute(),但是会直接返回一个futureTask
 2:在submit()中，可以传入两个参数，一个是Runnable对象，一个是callable对象，但是在submit()方法中会调用newTaskFor()返回一个...
 FutureTask对象，在构造FutureTask对象的时候，如果传入的是Runnable类型，也会被转换成Callable类型，此处的目的就是为了实现结果数据...
 的返回,FutureTask补充详见P4-1
-***3:Callable类型的实现，简单点说就是实现了call()(对应类中实现，详见futureTask_demo中实现)，而在futureTask对象调用run()方法的...
+3:在submit方法中，runnbale对象被改造成了callable对象，那就有一个问题，callable对象是需要实现call方法的，
+在源码中通过this.callable=Executors.callable(runnable, result)方法，实际是通过RunnableAdapter进行转换，。。。
+在RunnableAdapter中重写了call方法，内部嵌套了runnable对象的run方法
+***4:Callable类型的实现，简单点说就是实现了call()(对应类中实现，详见futureTask_demo中实现)，而在futureTask对象调用run()方法的...
 时候,实际上在futureTask源码类内部则调用了call()方法，并将结果set()进了futureTask对象中，该对象实际上可以通过get()方法直接...
 获取到实际值结果
+
 
 
 P7:
@@ -93,7 +97,7 @@ P11:关于创建执行线程的情况，作用及流程
 创建一个任务为null的worker，在执行run方法的时候，将会从工作队列中获取待执行任务，获取之前放入工作队列中的任务，取出并执行。。。
 这种线程在keepAliveTime到期后，将会自动销毁
 
-情况三:核心线程满了，工作队列满了，创建一个执行任务的线程进行任务的处理
+情况三:核心线程满了，工作队列满了，创建一个非核心线程直接去执行任务
 
 
 

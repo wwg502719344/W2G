@@ -68,7 +68,7 @@ P11:源码执行流程
 
 P7:ThreadPoolExecutor继承了AbstractExecutorService类，AbstractExecutorService是executorService的实现类，。。。
 executorService是executor的子接口,executorService创建线程池，在实现类中，通常是接受一个callable对象或是runnable对象，。。。
-最后返回一个future对象,而最终future的实现则是由futureTask来实现，futureTask中则会实现一个run方法，此处为一闭环
+runnable会被处理最后返回一个future对象,而最终future的实现则是由futureTask来实现，futureTask中则会实现一个run方法，此处为一闭环
 
 P8:线程池申明了一个特殊变量用来表示线程池中运行线程数量和线程池状态，还有表示当前线程池各个阶段状态的变量，以及获取当前状态的方法，
 内部类Worker，用来执行任务
@@ -123,6 +123,8 @@ P20:建议查看的文章
 https://blog.csdn.net/iromkoear/article/details/66016153
 2:源码解析
 https://blog.csdn.net/xiongyouqiang/article/details/79456030
+https://segmentfault.com/a/1190000013252252
+https://blog.csdn.net/Ch97CKd/article/details/80745137
 3:占小狼博客
 https://www.jianshu.com/p/87bff5cc8d8c
 4:，核心线程和非核心线程的区别对待，keepAliveTime的作用
