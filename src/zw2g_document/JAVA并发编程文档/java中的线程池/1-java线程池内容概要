@@ -121,11 +121,17 @@ run()调用了runWorker(),目的是在该方法中启动线程的执行，执行
 P20:建议查看的文章
 1：源码方法注释翻译
 https://blog.csdn.net/iromkoear/article/details/66016153
+
 2:源码解析
 https://blog.csdn.net/xiongyouqiang/article/details/79456030
 https://segmentfault.com/a/1190000013252252
 https://blog.csdn.net/Ch97CKd/article/details/80745137
+
 3:占小狼博客
 https://www.jianshu.com/p/87bff5cc8d8c
+
 4:，核心线程和非核心线程的区别对待，keepAliveTime的作用
 https://blog.csdn.net/notonlyrush/article/details/78737425
+
+5:如何终止线程池以及Worker继承AQS的目的
+https://www.cnblogs.com/trust-freedom/p/6693601.html
