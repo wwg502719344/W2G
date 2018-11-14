@@ -46,10 +46,16 @@ Q8:在Executor的实现类中，是如何实现executor方法的，和传统的�
 如果加入成功，则会开启线程，那么workers.add(w)本身有什么作用，为什么不能直接开启线程
 
 
-Q13:每一个任务对应一个worker,worker是一个实现了AQS的阻塞队列，那么worker实现AQS的目的是什么，worker是否会加入到workerQueue中
+***Q13:每一个任务对应一个worker,worker是一个实现了AQS的阻塞队列，那么worker实现AQS的目的是什么
+
+
+Q13-0:线程调用interrupt,interrupted和isInterrupted的作用和易通是什么，和worker的关系是什么
 
 
 Q13-1:Set类型的workers又是做什么的，为什么worker会加入到workers当中
+
+
+Q13-2:worker是否会加入到workerQueue中
 
 
 Q14:当运行线程数大于核心线程数时，将该任务加入到workerQueu中，那么实际执行时在哪里呢？
@@ -145,15 +151,27 @@ https://blog.csdn.net/qq_33689414/article/details/72955253
 A12:works是一个set集合，该集合中保存的就是所有的核心线程需要执行的worker，在获取线程池中最大线程数的时候，用了这个集合，在对所有。。。
 线程进行中断操作中也有登场
 
+***A13:Worker对象实现AQS的目的是为了防止当前线程被中断，在初始化Worker的时候，state会被设置成-1，目的是当当前线程池调用。。。
+shutdownNow方法的时候，无法中断当前任务，所以在runWorker方法中，会调用w.unlock()将status设置为0，允许中断
 
-A13:worker对象在实现run方法中，
-第二个问题，通过观察ThreadPoolExecutor源码中的executor方法，可以发现，其实addWorker和workerQueue是不同的两个操作，在第一次判断中
-如果当前运行线程数少于核心线程数，则会直接将command放入addWork中进行启动，而当不满足条件时，则会执行workQueue.offer(command),
-将command加入到workQueue当中
-关于
+
+A13-0:首先，java的中断并不是真的中断线程，而是对该线程进行标记，具体的处理需要用户自己操作
+interrupt的作用是对当前线程进行中断，只能作用在当前线程
+interrupted的作用是返回当前线程的中断状态，并清除中断位
+isInterrupted的作用就是返回当前线程的中断状态，不做任何操作
+https://www.cnblogs.com/w-wfy/p/6414801.html
+worker继承AQS的目的是为了通过锁来控制线程的打断操作逻辑，通过对线程池进行操作，最终是达到对每个线程的操作
+系统对线程池进行关闭的时候，首先会获取线程集，依次取出当中每一个线程，当线程还没有执行任务and xxxx 的时候，将会被标记打断
+
 
 A13-1:workers集合中保存的是线程池的核心线程组，当有新线程加入到线程执行任务的时候，都是从这个集合中获取线程(核心线程存放的地方)
 核心线程被创建后即便什么都不做也可以一直存在，就是因为线程被存放到workers集合当中了
+
+
+A13-2:通过观察ThreadPoolExecutor源码中的executor方法，可以发现，其实addWorker和workerQueue是不同的两个操作，在第一次判断中
+如果当前运行线程数少于核心线程数，则会直接将command放入addWork中进行启动，而当不满足条件时，则会执行workQueue.offer(command),
+将command加入到workQueue当中
+
 
 A14:实际执行是在run方法当中，线程会不断从workqueue获取任务，然后执行相关run方法
 

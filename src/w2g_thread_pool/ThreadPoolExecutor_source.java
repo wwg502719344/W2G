@@ -246,7 +246,9 @@ public class ThreadPoolExecutor_source {
         Thread wt = Thread.currentThread();//获取当前线程，即为正在执行的，创建了worker的线程
         Runnable task = w.firstTask;//获取封装进worker中的task任务
         w.firstTask = null;
-        w.unlock(); // allow interrupts
+        //此处是为了将当前Worker的state置为0，目的是防止线程在调用前被中断
+        //此时调用shutdownnow将会被中断
+        w.unlock(); //
         boolean completedAbruptly = true;
         try {
             //P4-1:getTask()源码解析
@@ -256,7 +258,9 @@ public class ThreadPoolExecutor_source {
                 //Worker继承AQS，目的是想使用独占锁来表示线程是否正在执行任务
                 w.lock();
                 // 如果线程池停止了，确保线程被打断
-                // 如果没有被打断，第二种情况要求在清除中断时去处理shutdownNow方法的竞争
+                // 如果当前线程已经被设置了中断，则先清除中断标志，清除了中断标志后需要重新检查线程池状态，防止重置过程中重新调用。。。
+                // 调用了shutdown方法
+                //最后对线程进行打断
                 if ((runStateAtLeast(ctl.get(), STOP) ||
                         (Thread.interrupted() &&
                                 runStateAtLeast(ctl.get(), STOP))) &&
