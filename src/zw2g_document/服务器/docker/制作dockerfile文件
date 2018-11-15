@@ -1,0 +1,14 @@
+1-制作docker镜像，首先做好相关文件的准备
+    1-1:官网下载tomcat安装包，获取conf目录下的server.xml和tomcat-users.xml这两个文件，对文件进行相应的修改设置
+
+2-制作dockerfile文件，在编写dockerfile文件时需要注意以下几点
+    2-1:FROM tomcat:8.0.46-jre7-alpine代表的是使用他作为基础镜像文件，8.0.46-jre7-alpine是tag
+    2-2:在文件编写中我们需要通过RUN rm命令将原有的server.xml和tomcat-users.xml文件删除；
+    2-3:然后再将我们事先准备好的server.xml文件和tomcat-user.xml文件取代原先的文件
+
+3-执行docker build -t w2gtomcat:0.0.1,执行完毕后，可以查看当前镜像是否被成功创建
+    此处需要主要的是，正确的写法是docker build -t w2gtomcat:0.0.1 .后面需要带上这个.
+
+4-镜像创建成功后，就执行镜像，创建一个tomcat容器
+
+5-将创建好的容器推送到hub.docker.com上
