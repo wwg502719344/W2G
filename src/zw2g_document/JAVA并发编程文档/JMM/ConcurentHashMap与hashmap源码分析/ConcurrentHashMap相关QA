@@ -1,0 +1,6 @@
+Q1:为什么说hashmap是线程不安全的，而ConcurrentHashMap是线程安全的
+
+Q2:hashmap,hashtable,ConcurrentHashMap之间的关系和区别
+
+Q3:根据hash值计算的位置是否是实际key节点的位置
+

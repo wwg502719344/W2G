@@ -1,53 +1,15 @@
 package w2g_ConcurrentHashMap.w2g_concurrentHashMap_demo;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by W2G on 2018/6/12.
+ * Created by W2G on 2018/11/26.
  */
-public class ConcurrentHashMap {
+public class ConcurrentHashMap_Source {
 
-    /**
-     * 创建一个新的，默认大小的空的map
-     */
-    public ConcurrentHashMap() {
-    }
-
-    /**
-     * 创建一个指定长度的map
-     * @param initialCapacity
-     */
-    public ConcurrentHashMap(int initialCapacity) {
-        /*if (initialCapacity < 0)
-            throw new IllegalArgumentException();
-        根据传入的参数初始化大小
-        int cap = ((initialCapacity >= (MAXIMUM_CAPACITY >>> 1)) ?
-                MAXIMUM_CAPACITY :
-                tableSizeFor(initialCapacity + (initialCapacity >>> 1) + 1));
-        this.sizeCtl = cap;*/
-    }
-
-    /**
-     * Creates a new map with the same mappings as the given map.
-     * 创建与给定map相同的map
-     * @param m the map
-     */
-    /*public ConcurrentHashMap(Map<? extends K, ? extends V> m) {
-        this.sizeCtl = DEFAULT_CAPACITY;
-        putAll(m);
-    }*/
-
-
-
-
-
-
-
-
-
-
+    ConcurrentHashMap map=new ConcurrentHashMap();
+    HashMap hashMap=new HashMap();
 
     //////////////////BEGIN////内部类Node////BEGIN////////////////
     /**
@@ -63,7 +25,7 @@ public class ConcurrentHashMap {
      * @param <K>
      * @param <V>
      */
-    static class Node<K,V> implements Map.Entry<K,V> {  //Map.Entry表示一个映射项
+    /*static class Node<K,V> implements Map.Entry<K,V> {  //Map.Entry表示一个映射项
 
         final int hash;
         final K key;
@@ -77,12 +39,14 @@ public class ConcurrentHashMap {
             this.next = next;
         }
 
-        /**
-         * HashMap中Node类的hashCode()方法中的代码为：
-         * Objects.hashCode(key) ^ Objects.hashCode(value)
-         * 而Objects.hashCode(key)最终也是调用了 key.hashCode()，因此，效果一样。写法不一样罢了
-         * @return
-         */
+        */
+    /**
+     * HashMap中Node类的hashCode()方法中的代码为：
+     * Objects.hashCode(key) ^ Objects.hashCode(value)
+     * 而Objects.hashCode(key)最终也是调用了 key.hashCode()，因此，效果一样。写法不一样罢了
+     * @return
+     */
+        /*
         public final int hashCode()   {
             return key.hashCode() ^ val.hashCode();
         }
@@ -104,11 +68,12 @@ public class ConcurrentHashMap {
             throw new UnsupportedOperationException();
         }
 
-        /**
-         * equals方法
-         * @param o
-         * @return
-         */
+        */
+    /**
+     * equals方法
+     * @param o
+     * @return
+     *//*
         public final boolean equals(Object o) {
             Object k, v, u;
             Map.Entry<?,?> e;
@@ -121,13 +86,13 @@ public class ConcurrentHashMap {
             );
         }
 
-        /**
-         * Virtualized support for map.get(); overridden in subclasses.
-         * 辅助get方法，在子类中覆盖
-         * @param h hash值(猜测)
-         * @param k
-         * @return
-         */
+        *//**
+     * Virtualized support for map.get(); overridden in subclasses.
+     * 辅助get方法，在子类中覆盖
+     * @param h hash值(猜测)
+     * @param k
+     * @return
+     *//*
         Node<K,V> find(int h, Object k) {
             Node<K,V> e = this;
             if (k != null) {
@@ -140,7 +105,7 @@ public class ConcurrentHashMap {
             }
             return null;
         }
-    }
+    }*/
     ///////////////////////////内部类Node-END///////////////////////////////
 
 
@@ -166,7 +131,7 @@ public class ConcurrentHashMap {
      * @param <K>
      * @param <V>
      */
-    static final class TreeNode<K,V> extends Node<K,V> {
+    /*static final class TreeNode<K,V> extends Node<K,V> {
         TreeNode<K,V> parent;  // red-black tree links：父节点
         TreeNode<K,V> left;
         TreeNode<K,V> right;
@@ -184,12 +149,12 @@ public class ConcurrentHashMap {
             return findTreeNode(h, k, null);
         }
 
-        /**
-         * Returns the TreeNode (or null if not found) for the given key
-         * 返回给定key值的TreeNode(如果没有找到就返回null)
-         * starting at given root.
-         * 从给定的root节点开始
-         */
+        *//**
+     * Returns the TreeNode (or null if not found) for the given key
+     * 返回给定key值的TreeNode(如果没有找到就返回null)
+     * starting at given root.
+     * 从给定的root节点开始
+     *//*
         final TreeNode<K,V> findTreeNode(int h, Object k, Class<?> kc) {
             if (k != null) {
                 TreeNode<K,V> p = this;
@@ -242,7 +207,7 @@ public class ConcurrentHashMap {
     static int compareComparables(Class<?> kc, Object k, Object x) {
         return (x == null || x.getClass() != kc ? 0 :
                 ((Comparable)k).compareTo(x));
-    }
+    }*/
     ///////////////////////////内部类TreeNode-END///////////////////////////////
 
 
@@ -316,11 +281,17 @@ public class ConcurrentHashMap {
     ///////////////////////////内部类TreeBin-END///////////////////////////////
 
 
+    /**
+     * 存放node元素的数组，大小是2的整数幂
+     */
+    //transient volatile Node<K,V>[] table;
 
-
-
-
-
+    /**
+     * 该变量表示table初始化或是扩容的控制变量
+     * 当该值为负数时，表示正在进行初始化或是扩容，-1表示正在初始化，-N表示有N个线程正在进行扩容操作，
+     * 正数或者0表示尚未进行初始化，表示初始化或是需要扩容的大小
+     */
+    //private transient volatile int sizeCtl;
 
 
 
@@ -337,15 +308,13 @@ public class ConcurrentHashMap {
     public V put(K key, V value) {
         return putVal(key, value, false);
     }
+
     final V putVal(K key, V value, boolean onlyIfAbsent) {
 
-        //如果key或者value为空，抛出异常
-        if (key == null || value == null) throw new NullPointerException();
+        if (key == null || value == null) throw new NullPointerException();//首先保证key/value不为空
 
-        //对hashCode进行再散列，算法为(h ^ (h >>> 16)) & HASH_BITS
-        //计算hash值，2次hash值，用于在指定位置保存查询
-        //hash是key的哈希值经过高16位转低16位的int值
-        int hash = spread(key.hashCode());
+        //计算hash值
+        int hash = spread(key.hashCode());//对hashCode进行再散列，算法为(h ^ (h >>> 16)) & HASH_BITS
 
         int binCount = 0;
 
@@ -358,12 +327,11 @@ public class ConcurrentHashMap {
             //注：tab[i]实质为链表或者红黑树的首节点。
             if (tab == null || (n = tab.length) == 0)
 
-                //给tab进行初始化,
+                //tab进行初始化
                 tab = initTable();
 
             //取出table位置中相关位置的节点赋值给f
-            //这里计算节点在table数组的位置的算法是i = (n - 1) & hash
-            else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+            else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {//tabAt()是用来计算key所在数组的位置
 
                 //如果相关位置为空，则利用cas操作直接存储在指定位置
                 if (casTabAt(tab, i, null,new Node<K,V>(hash, key, value, null)))
@@ -371,7 +339,7 @@ public class ConcurrentHashMap {
             }
 
             //如果tab[i]不为空，且hash值为MOVED(-1)，说明链表正在进行transfer操作
-            //MOVED:（forwarding nodes的hash值）、标示位
+            //不明白
             else if ((fh = f.hash) == MOVED)
                 tab = helpTransfer(tab, f);     ////帮助其扩容
             else {
@@ -448,7 +416,7 @@ public class ConcurrentHashMap {
     /*static final <K,V> java.util.concurrent.ConcurrentHashMap.Node<K,V> tabAt(java.util.concurrent.ConcurrentHashMap.Node<K,V>[] tab, int i) {
         return (java.util.concurrent.ConcurrentHashMap.Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
     }*/
-     /**
+    /**
      * Replaces all linked nodes in bin at given index unless table is
      * 将数组中给定索引位置转换为树
      * too small, in which case resizes instead.
@@ -487,4 +455,5 @@ public class ConcurrentHashMap {
     }*/
 
     /////////////////////////////////PUT方法-END////////////////////////////////////////
+
 }
