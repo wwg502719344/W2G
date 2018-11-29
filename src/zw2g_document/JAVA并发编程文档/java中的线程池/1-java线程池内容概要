@@ -54,6 +54,7 @@ P6-通过的Executors创建线程池
 通过的 Executors 创建的线程池已经为绝大多数的场景做了预配置
 1-Executors.newCachedThreadPool()：无界线程池，可以进行自动线程回收
 2-Executors.newFixedThreadPool(int)：固定线程池大小
+内部封装了一个无界队列，任务会一直存在队列中，不会在创建额外的线程，只有队列满了才会创建额外线程
 3-Executors.newSingleThreadExecutor()：单个后台线程
 
 ==========================================源码内容分析===========================================================

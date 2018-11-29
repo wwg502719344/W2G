@@ -4,3 +4,9 @@ Q2:hashmap,hashtable,ConcurrentHashMap之间的关系和区别
 
 Q3:根据hash值计算的位置是否是实际key节点的位置
 
+Q4:为什么在ConcurrentHashmap中value和next是volatile的，而hashmap中不是
+
+Q5:hashcode和hash之间的关系
+
+A1:
+
