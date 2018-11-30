@@ -210,7 +210,7 @@ public class ConcurrentHashMap_Source {
      * forcing writers (who hold bin lock) to wait for readers (who do
      * not) to complete before tree restructuring operations.
      *
-     * TreeNodes被用在桶的顶部，不保持用户keys或者values
+     * treebin用于封装treenode用的，
      */
 //  static final class TreeBin<K,V> extends Node<K,V> {
         /*
@@ -226,34 +226,46 @@ public class ConcurrentHashMap_Source {
 
     /**
      * Creates bin with initial set of nodes headed by b.
-     * 以b为初始化节点首节点创建bin
+     * 以b为初始化首节点创建bin
+     *
+     * 此处逻辑为
+     * 1:根据table中index位置的链表，生成以b为头节点的TreeNode链表
+     * 2;根据b为头节点，生成一个Treebin，并把树节点的root写入到table的index的内存中去
      */
     /*
       TreeBin(TreeNode<K,V> b) {
-        super(TREEBIN, null, null, null);
+        super(TREEBIN, null, null, null);//初始化树根节点
         //b为首节点
         this.first = b;
         TreeNode<K,V> r = null;
 
+        //此处的(，next)是申明变量next，在方法内部会对next进行赋值，结束方法体后将next赋值给x再进行循环体中的操作
         for (TreeNode<K,V> x = b, next; x != null; x = next) {
-            next = (TreeNode<K,V>)x.next;
+            next = (TreeNode<K,V>)x.next;//获取当前节点的后继节点
             x.left = x.right = null;
+            //如果是首节点，将首节点的值赋给r
             if (r == null) {
                 x.parent = null;
                 x.red = false;
                 r = x;
             }
-            else {
+            else {  //说明不是首节点
+
+                //获取当前节点的key和hash值
                 K k = x.key;
                 int h = x.hash;
                 Class<?> kc = null;
+
+                //注意此处的r为当前节点的前驱节点
                 for (TreeNode<K,V> p = r;;) {
                     int dir, ph;
+                    //获取p节点的key
                     K pk = p.key;
-                    if ((ph = p.hash) > h)
+                    if ((ph = p.hash) > h)   //如果前驱节点的hosh大于后继节点的hash，则赋值dir为-1，否则1
                         dir = -1;
                     else if (ph < h)
                         dir = 1;
+                    //当两者hash值相同时
                     else if ((kc == null &&
                             (kc = comparableClassFor(k)) == null) ||
                             (dir = compareComparables(kc, k, pk)) == 0)
@@ -461,7 +473,7 @@ public class ConcurrentHashMap_Source {
                         }
                     }
                 }
-                //操作5:
+                //操作5:链表结构转树结构(链表长度超过8转树)
                 if (binCount != 0) {//表示节点插入成功
                     //如果链表节点的数量大于8，那么转换链表结构为红黑树结构。
                     if (binCount >= TREEIFY_THRESHOLD)
@@ -482,10 +494,15 @@ public class ConcurrentHashMap_Source {
         return (java.util.concurrent.ConcurrentHashMap.Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
     }*/
 
+
+
     /**
+     * 操作5:将链表转为红黑树结构
      * Replaces all linked nodes in bin at given index unless table is
-     * 将数组中给定索引位置转换为树
      * too small, in which case resizes instead.
+     *
+     * 1:将Node对象封装成TreeNode对象
+     * 2:传递hd，构造红黑树
      */
     /*
     private final void treeifyBin(Node<K,V>[] tab, int index) {
@@ -519,6 +536,7 @@ public class ConcurrentHashMap_Source {
             }
         }
     }*/
+
 
     /////////////////////////////////PUT方法-END////////////////////////////////////////
 

@@ -8,5 +8,8 @@ Q4:为什么在ConcurrentHashmap中value和next是volatile的，而hashmap中不
 
 Q5:hashcode和hash之间的关系
 
+
+
+
 A1:
 
