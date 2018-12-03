@@ -29,7 +29,9 @@
     2-treeNode节点
     TreeNode继承自Node节点，当链表结构转成红黑树结构的时候，node节点被包装成treeNode对象后放入treebin中
     3-treebin
-    以指定的TreeNode为初始化节点创建bin，红黑树结构
+    鞥局指定的头结点TreeNode为初始化节点创建treeBin，构造红黑树结构
 
 4-put操作下相关结构的变换
     在步骤5中，如果链表结构的节点数量超出指定的数量，将会由链表结构转变为树结构，涉及相关节点类如下
+    1-根据tab和index找到tab位置的节点node，为了防止并发出现，此处加锁，重新生成一个以hd为首节点的TreeNode链表
+    2-根据头结点hd构造treeBin结构，并将树结构的root节点写入到index的位置，完成红黑树的构造
