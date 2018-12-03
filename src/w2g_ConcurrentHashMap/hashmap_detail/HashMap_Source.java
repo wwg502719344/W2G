@@ -10,7 +10,16 @@ public class HashMap_Source {
     HashMap map=new HashMap();
 
     /**
+     * 该方法为hashmap中put操作的源码，整体思路分为两个方面
+     * 1-根据新传入的参数判断数组中是否已经存在该key，如果存在，则对value进行覆盖，如果没有则进行添加
+     * 2-对于新节点的添加，需要根据情况判断是加入到链表结构中还是树结构中
      *
+     * 步骤1-2：hash值对应节点为null
+     *
+     * 步骤1：查看数组大小，如果数组是空或则数组长度为0，则初始化数组，并且获取数组长度，此处无论数组是否为空，都可以获取到n值
+     * 步骤2：如果hash值对应到数组位置到节点为null，则初始化节点并加入
+     * 步骤3：数组在hash对应到位置有node节点
+     * 步骤3-1：
      */
     /*
     final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
@@ -19,13 +28,13 @@ public class HashMap_Source {
         //步骤1:查看当前数组是否为空(长度是否为0)，如果判断条件为true，则对tab进行初始化，并对n进行赋值
         if ((tab = table) == null || (n = tab.length) == 0)
             n = (tab = resize()).length;
-        //步骤2:如果在tab位置的节点为null，则初始化一个
+        //步骤2:如果hash值在tab数组对应位置的节点为null，则初始化一个node放在对应的位置，此处的n是数组的长度1¡
         if ((p = tab[i = (n - 1) & hash]) == null)
             tab[i] = newNode(hash, key, value, null);
         //步骤3:数组该位置有数据
         else {
             Node<K,V> e; K k;
-            //步骤3-1:如果在hashmap中发现该节点，则
+            //步骤3-1:首先判断该位置的第一个数据是不是当前节点，通过比较key来进行判断，如果是则赋值给节点e
             if (p.hash == hash &&
                     ((k = p.key) == key || (key != null && key.equals(k))))
                 e = p;
@@ -50,7 +59,7 @@ public class HashMap_Source {
                     p = e;
                 }
             }
-            //此处的e代表的是具有相同key的老节点,由步骤3-1/2可知
+            //此处的e代表的是已经存在相同key的老节点,由步骤3-1/2可知
             if (e != null) { // existing mapping for key
                 V oldValue = e.value;
                 if (!onlyIfAbsent || oldValue == null)
