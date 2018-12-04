@@ -84,8 +84,14 @@ public class HashMap_Source {
     }*/
 
     /**
-     * hashmap扩容操作
-     * 首先进行新阈值和数组容量的扩充
+     * hashmap扩容操作，主要做了两件事
+     * 1，首先进行新阈值和数组容量的扩充
+     * 2，其次是进行数据的迁移
+     *
+     * 对于数据迁移，无非就是三种数据结构的转移
+     * 数组下标单节点，这种情况直接把节点放入到新数组指定的下标下
+     * 数组下标红黑树结构，没研究
+     * 数组下标链表结构
      */
     /*
     final Node<K,V>[] resize() {
@@ -128,19 +134,24 @@ public class HashMap_Source {
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
         table = newTab;
         //步骤二:数据迁移
-        if (oldTab != null) {
+        if (oldTab != null) {   //扩容操作
             for (int j = 0; j < oldCap; ++j) {
                 Node<K,V> e;
                 if ((e = oldTab[j]) != null) {
                     oldTab[j] = null;
+                    //情景1：如果该数组下标只有单个节点，则直接迁移该节点
                     if (e.next == null)
                         newTab[e.hash & (newCap - 1)] = e;
+                    //情景2：此处是红黑树类型的迁移
                     else if (e instanceof TreeNode)
                         ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
-                    else { // preserve order
+                    else { // 此处是处理链表的结构
+
                         Node<K,V> loHead = null, loTail = null;
                         Node<K,V> hiHead = null, hiTail = null;
                         Node<K,V> next;
+
+
                         do {
                             next = e.next;
                             if ((e.hash & oldCap) == 0) {
