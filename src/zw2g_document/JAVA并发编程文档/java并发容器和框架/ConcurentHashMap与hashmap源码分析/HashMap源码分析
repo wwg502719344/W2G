@@ -1,0 +1,7 @@
+1-hashmap如何通过hash找到对应的数组元素
+在进行put方法的时候，通过hash(key)，计算出key值对应的hash值
+(key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16)
+hashCode()是一个本地方法，用来在散列存储结构中确定对象的存储地址的
+在hashmap中，通过tab[i = (n - 1) & hash]方式可以计算出数组下标的位置
+其中(e.hash &; (oldCap-1)) 得到的是下标位置
+
