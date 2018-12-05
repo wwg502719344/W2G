@@ -10,6 +10,17 @@ import java.util.HashMap;
  * 在hashmap的结构中，采用了node的结构来对数据进行保存，Node由hash，value，key，next组成，构成了链表的基本结构
  * 在链表转为红黑树的过程中，node节点会被改造成treeNode，treeNode将会被放入到treeBin结构当中
  *
+ * hashmap在多线程情况下出现的问题
+ *
+ * 1-数据不一致
+ * 假如有两个线程A,B进行put操作，其中A线程计算了要插入的位置，但这时候B线程获取执行权，然后将数据插入到hashmap找那个
+ * 这时A线程在进行插入，就会覆盖B线程插入的数据，造成数据的丢失
+ *
+ * 2-扩容过程中出现的死循环问题
+ * 对于1.8以前的hashmap在进行扩容的过程可能会导致死循环的问题
+ * 其原因在扩容过程中链表可能会形成环链
+ * 在1.8中是通过将数据填入新数组中完成数据的赋值，不存在环链的问题
+ *
  *
  */
 public class HashMap_Source {
@@ -77,6 +88,7 @@ public class HashMap_Source {
         }
         ++modCount;
         //如果新插入的值超过了数组的阈(yu)值，则对数组进行扩容
+        //此处暴露线程不安全的问题
         if (++size > threshold)
             resize();
         afterNodeInsertion(evict);
@@ -92,6 +104,29 @@ public class HashMap_Source {
      * 数组下标单节点，这种情况直接把节点放入到新数组指定的下标下
      * 数组下标红黑树结构，没研究
      * 数组下标链表结构
+     *
+     * (e.hash & oldCap)作用
+     * 元素的在数组中的位置是否需要移动
+     * 示例1:
+     * e.hash=10 0000 1010
+     * oldCap=16 0001 0000
+     * &; =00000 0000比较高位的第一位 0
+     * 结论:元素位置在扩容后数组中的位置没有发生改变
+     * 示例2:
+     * e.hash=17 0001 0001
+     * oldCap=16 0001 0000
+     * &; =10001 0000比较高位的第一位 1
+     * 结论:元素位置在扩容后数组中的位置发生了改变,新的下标位置是原下标位置+原数组长度
+     * https://m.aliyun.com/jiaocheng/778224.html
+     *
+     * 链表赋值
+     * 对于扩容后的hashmap赋值操作，需要注意的是，对于链表结构分为两个部分进行操作
+     * 在赋值钱准备4个node对象节点，用于保存之前数组和扩容后的数组
+     * 对于不需要移动位置的链表节点，按照之前链表的顺序排列，对于node中的个属性和之前的存放相同，然后将之存入数组
+     * 对于加入到扩容后位置的节点，则拼接成一个新的链表，加入到数组扩容结构后面
+     *
+     *
+     *
      */
     /*
     final Node<K,V>[] resize() {
@@ -151,10 +186,11 @@ public class HashMap_Source {
                         Node<K,V> hiHead = null, hiTail = null;
                         Node<K,V> next;
 
-
+                        //链表赋值
                         do {
                             next = e.next;
                             if ((e.hash & oldCap) == 0) {
+                                //如果原元素位置没有发生改变
                                 if (loTail == null)
                                     loHead = e;
                                 else
