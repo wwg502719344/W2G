@@ -46,10 +46,12 @@ public class HashMap_Source {
     final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
         Node<K,V>[] tab; Node<K,V> p; int n, i;
-        //步骤1:查看当前数组是否为空(长度是否为0)，如果判断条件为true，则对tab进行初始化，并对n进行赋值
+        //步骤1:查看当前数组是否为空(长度是否为0)，如果判断条件为true，则对tab进行初始化
+        //n为数组长度赋值
         if ((tab = table) == null || (n = tab.length) == 0)
             n = (tab = resize()).length;
-        //步骤2:如果hash值在tab数组对应位置的节点为null，则初始化一个node放在对应的位置，此处的n是数组的长度1¡
+        //步骤2:如果hash值在tab数组对应位置的节点为null，则初始化一个node放在对应的位置
+        //i = (n - 1) & hash可得出hash对应的数组下标
         if ((p = tab[i = (n - 1) & hash]) == null)
             tab[i] = newNode(hash, key, value, null);
         //步骤3:数组该位置有数据
@@ -65,10 +67,9 @@ public class HashMap_Source {
             else {
                 //步骤3-3:此处说明数据是链表结构
                 for (int binCount = 0; ; ++binCount) {
-                    //如果该链表节点没有传入的节点则创建一个节点添加到链表的尾部
-                    //如果链表长度大于指定长度，则转为红黑树结构
-                    if ((e = p.next) == null) {
+                    if ((e = p.next) == null) {//当前节点是链表节点的尾节点
                         p.next = newNode(hash, key, value, null);
+                        //如果链表长度大于指定长度，则转为红黑树结构
                         if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
                             treeifyBin(tab, hash);
                         break;
@@ -103,9 +104,9 @@ public class HashMap_Source {
      * 1，首先进行新阈值和数组容量的扩充
      * 2，其次是进行数据的迁移
      *
-     * 对于数据迁移，无非就是三种数据结构的转移
-     * 数组下标单节点，这种情况直接把节点放入到新数组指定的下标下
-     * 数组下标红黑树结构，没研究
+     * 对于数据迁移，就是对三种数据结构的转移
+     * 数组下标单节点
+     * 数组下标红黑树结构
      * 数组下标链表结构
      *
      * (e.hash & oldCap)作用
@@ -124,9 +125,11 @@ public class HashMap_Source {
      *
      * 链表赋值
      * 对于扩容后的hashmap赋值操作，需要注意的是，对于链表结构分为两个部分进行操作
-     * 在赋值钱准备4个node对象节点，用于保存之前数组和扩容后的数组
-     * 对于不需要移动位置的链表节点，按照之前链表的顺序排列，对于node中的个属性和之前的存放相同，然后将之存入数组
-     * 对于加入到扩容后位置的节点，则拼接成一个新的链表，加入到数组扩容结构后面
+     * 在赋值前准备4个node对象节点，
+     * loHead,loTail用于保存扩容前链表的首尾节点，此链表结构不需要变换链表位置和结构
+     * hiHead，hiHead用于保存扩容后新增加的链表节点
+     * 对于不需要移动位置的链表节点，按照之前链表的顺序排列，按照之前的顺序重新排列一遍，然后将首节点元素保存进数组的下标位置
+     * 对于加入到扩容后位置的节点，与上同理，首节点存放如扩容后的下标节点位置
      *
      *
      *
@@ -134,19 +137,18 @@ public class HashMap_Source {
     /*
     final Node<K,V>[] resize() {
         Node<K,V>[] oldTab = table;
-        //获取原始数组的长度
-        int oldCap = (oldTab == null) ? 0 : oldTab.length;
+        int oldCap = (oldTab == null) ? 0 : oldTab.length;//原始数组的长度
         int oldThr = threshold;//阈值
         int newCap, newThr = 0;
-        //步骤一:获取扩容后的阈值和数组容量，创建新的数组
-        //情景一:当数组长度大于0时，意味着这是一次扩容行为
+        //步骤一:获取扩容/初始化后新数组的阈值和长度
+        //情景一:数组扩容操作
         if (oldCap > 0) {
             //如果原始数组的长度超过最大，则将阈值设为最大，并不在继续扩容了，并返回数
             if (oldCap >= MAXIMUM_CAPACITY) {
                 threshold = Integer.MAX_VALUE;
                 return oldTab;
             }
-            //如果原始数组大于初始化大小且扩大一倍小于最大容量，则原始数组扩大一倍
+            //如果原始数组大于初始化大小且扩大一倍小于最大容量，则原始数组阈值扩大1倍
             else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
                     oldCap >= DEFAULT_INITIAL_CAPACITY)
                 newThr = oldThr << 1; // double threshold
@@ -171,6 +173,7 @@ public class HashMap_Source {
         @SuppressWarnings({"rawtypes","unchecked"})
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
         table = newTab;
+        //初始化操作到这里就结束了，下面是数组扩容操作的数据迁移过程
         //步骤二:数据迁移
         if (oldTab != null) {   //扩容操作
             for (int j = 0; j < oldCap; ++j) {
