@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by W2G on 2018/11/26.
+ * 在创建构造方法的时候，并不会初始化ConcurrentHashMap中的数组，但是会初始化相关一些参数变量
+ *
  */
 public class ConcurrentHashMap_Source {
 
@@ -43,67 +45,9 @@ public class ConcurrentHashMap_Source {
         public final int hashCode()   {
             return key.hashCode() ^ val.hashCode();
         }
-
-
-        // 不允许修改value值，HashMap允许
-        @Override
-        public V setValue(V value) {
-            throw new UnsupportedOperationException();
-        }
-
         */
-    /**
-     * equals方法
-     * @param o
-     * @return
-     *//*
-        public final boolean equals(Object o) {
-            Object k, v, u;
-            Map.Entry<?,?> e;
-            return (
-                (o instanceof Map.Entry) &&     //传递的对象是Map.Entry类型
-                (k = (e = (Map.Entry<?,?>)o).getKey()) != null &&       //o强转Entry后key值不为空
-                (v = e.getValue()) != null &&       //o强转Entry后value不为空
-                (k == key || k.equals(key)) &&      //
-                (v == (u = val) || v.equals(u))     //
-            );
-        }
-*/
-     /**
-     * Virtualized support for map.get(); overridden in subclasses.
-     * 辅助get方法，在子类中覆盖
-     * @param h hash值(猜测)
-     * @param k
-     * @return
-     *//*
-        Node<K,V> find(int h, Object k) {
-            Node<K,V> e = this;
-            if (k != null) {
-                do {
-                    K ek;
-                    if (e.hash == h &&
-                            ((ek = e.key) == k || (ek != null && k.equals(ek))))
-                        return e;
-                } while ((e = e.next) != null); //如果还有后继节点则继续进行比较
-            }
-            return null;
-        }
-    }*/
+
     ///////////////////////////内部类Node-END///////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     ///////////////////////////内部类TreeNode-BEGIN///////////////////////////////
@@ -130,11 +74,8 @@ public class ConcurrentHashMap_Source {
         }
 
 
-        Node<K,V> find(int h, Object k) {
-            return findTreeNode(h, k, null);
-        }
-
-        *//**
+        */
+     /**
      * Returns the TreeNode (or null if not found) for the given key
      * starting at given root.
      * 返回给定key值的TreeNode,没有找到就返回null,从给定的root节点开始
@@ -170,37 +111,8 @@ public class ConcurrentHashMap_Source {
         }
     }
 
-    static Class<?> comparableClassFor(Object x) {
-        if (x instanceof Comparable) {
-            Class<?> c; Type[] ts, as; Type t; ParameterizedType p;
-            if ((c = x.getClass()) == String.class) // bypass checks
-                return c;
-            if ((ts = c.getGenericInterfaces()) != null) {
-                for (int i = 0; i < ts.length; ++i) {
-                    if (((t = ts[i]) instanceof ParameterizedType) &&
-                            ((p = (ParameterizedType)t).getRawType() ==
-                                    Comparable.class) &&
-                            (as = p.getActualTypeArguments()) != null &&
-                            as.length == 1 && as[0] == c) // type arg is c
-                        return c;
-                }
-            }
-        }
-        return null;
-    }
-
-    static int compareComparables(Class<?> kc, Object k, Object x) {
-        return (x == null || x.getClass() != kc ? 0 :
-                ((Comparable)k).compareTo(x));
-    }*/
+    */
     ///////////////////////////内部类TreeNode-END///////////////////////////////
-
-
-
-
-
-
-
 
     ///////////////////////////内部类TreeBin-BEGIN///////////////////////////////
     /**
@@ -288,18 +200,9 @@ public class ConcurrentHashMap_Source {
       }*/
 //   }
 
-
-
     ///////////////////////////内部类TreeBin-END///////////////////////////////
 
-
-
-
-
-
-
     ///////////////////////////内部类ForwardingNode-BEGIN///////////////////////////////
-
     /**
      * A node inserted at head of bins during transfer operations.
      * 当进行transfer扩容操作的时候将节点加入到bin的头位置
@@ -313,37 +216,9 @@ public class ConcurrentHashMap_Source {
         }
         */
 
-        /*
-        Node<K,V> find(int h, Object k) {
-            // loop to avoid arbitrarily deep recursion on forwarding nodes
-            outer: for (Node<K,V>[] tab = nextTable;;) {
-                Node<K,V> e; int n;
-                if (k == null || tab == null || (n = tab.length) == 0 ||
-                        (e = tabAt(tab, (n - 1) & h)) == null)
-                    return null;
-                for (;;) {
-                    int eh; K ek;
-                    if ((eh = e.hash) == h &&
-                            ((ek = e.key) == k || (ek != null && k.equals(ek))))
-                        return e;
-                    if (eh < 0) {
-                        if (e instanceof ForwardingNode) {
-                            tab = ((ForwardingNode<K,V>)e).nextTable;
-                            continue outer;
-                        }
-                        else
-                            return e.find(h, k);
-                    }
-                    if ((e = e.next) == null)
-                        return null;
-                }
-            }
-        }
-        */
+
 //  }
     ///////////////////////////内部类ForwardingNode-END///////////////////////////////
-
-
 
 
 
@@ -365,11 +240,6 @@ public class ConcurrentHashMap_Source {
 
 
 
-
-
-
-
-
     /////////////////////////////////PUT方法-BEGIN////////////////////////////////////////
 
     /**
@@ -384,7 +254,6 @@ public class ConcurrentHashMap_Source {
      * 步骤4-1:如果该节点是链表节点，则判断该节点是否有相同key值，有则更新，无则新增
      * 步骤4-2:如果首节点是树节点，则新增一个节点
      * 步骤5:检查，如果链表结构中节点数量多于8个，则将链表结构转变为树结构
-     *
      */
     /*
     final V putVal(K key, V value, boolean onlyIfAbsent) {
@@ -396,7 +265,7 @@ public class ConcurrentHashMap_Source {
 
         int binCount = 0;
 
-        //死循环，直到插入成功
+        //直到插入成功，否则不断进行循环插入操作
         for (Node<K,V>[] tab = table;;) {
             Node<K,V> f; int n, i, fh;
 
@@ -495,49 +364,34 @@ public class ConcurrentHashMap_Source {
     }*/
 
 
-
     /**
-     * 操作5:将链表转为红黑树结构
-     * Replaces all linked nodes in bin at given index unless table is
-     * too small, in which case resizes instead.
-     *
-     * 1:将Node对象封装成TreeNode对象
-     * 2:传递hd，构造红黑树
+     * 初始化tab数组
      */
     /*
-    private final void treeifyBin(Node<K,V>[] tab, int index) {
-        Node<K,V> b; int n, sc;
-        //数组不能为空
-        if (tab != null) {
-            //如果数组的长度小于指定的长度，执行扩容操作
-            if ((n = tab.length) < MIN_TREEIFY_CAPACITY)
-                tryPresize(n << 1);
-            //如果指定索引位置的节点不为空
-            else if ((b = tabAt(tab, index)) != null && b.hash >= 0) {
-                synchronized (b) {
-                    //如果b是指定位置的节点
-                    if (tabAt(tab, index) == b) {
-                        TreeNode<K,V> hd = null, tl = null;
-                        for (Node<K,V> e = b; e != null; e = e.next) {
-                            //创建p的treeNode节点
-                            TreeNode<K,V> p =
-                                    new TreeNode<K,V>(e.hash, e.key, e.val,
-                                            null, null);
-
-                            if ((p.prev = tl) == null)
-                                hd = p;
-                            else
-                                tl.next = p;
-                            tl = p;
-                        }
-                        setTabAt(tab, index, new TreeBin<K,V>(hd));
+    private final Node<K,V>[] initTable() {
+        Node<K,V>[] tab; int sc;
+        //初始化数组
+        while ((tab = table) == null || tab.length == 0) {
+            if ((sc = sizeCtl) < 0)
+                Thread.yield(); // lost initialization race; just spin
+            else if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {
+                try {
+                    if ((tab = table) == null || tab.length == 0) {
+                        int n = (sc > 0) ? sc : DEFAULT_CAPACITY;
+                        @SuppressWarnings("unchecked")
+                        Node<K,V>[] nt = (Node<K,V>[])new Node<?,?>[n];
+                        table = tab = nt;
+                        sc = n - (n >>> 2);
                     }
+                } finally {
+                    sizeCtl = sc;
                 }
+                break;
             }
         }
-    }*/
-
-
+        return tab;
+    }
+    */
     /////////////////////////////////PUT方法-END////////////////////////////////////////
 
 }
