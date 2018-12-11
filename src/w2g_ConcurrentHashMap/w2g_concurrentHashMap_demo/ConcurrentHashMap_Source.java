@@ -254,6 +254,11 @@ public class ConcurrentHashMap_Source {
      * 步骤4-1:如果该节点是链表节点，则判断该节点是否有相同key值，有则更新，无则新增
      * 步骤4-2:如果首节点是树节点，则新增一个节点
      * 步骤5:检查，如果链表结构中节点数量多于8个，则将链表结构转变为树结构
+     *
+     *
+     * 在进行操作的过程中三个问题:数组初始化，数组的扩容，数据迁移
+     * 数组初始化:当数组为空时，需要进行数组的初始化操作 tab = initTable();
+     * 数组的扩容:
      */
     /*
     final V putVal(K key, V value, boolean onlyIfAbsent) {
@@ -274,11 +279,11 @@ public class ConcurrentHashMap_Source {
             //注：tab[i]实质为链表或者红黑树的首节点。
             if (tab == null || (n = tab.length) == 0)
 
-                //tab进行初始化
+                //核心点一：tab进行初始化
                 tab = initTable();
 
             //操作2:当前hash指向的tab位置为null
-            //取出table位置中相关位置的节点赋值给f
+            //f为指定数组下标位置的节点，该节点可能为null
             else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {//tabAt()是用来计算key所在数组tab[i]的位置
 
                 //如果相关位置为空，则利用cas操作直接存储在指定位置
@@ -366,19 +371,25 @@ public class ConcurrentHashMap_Source {
 
     /**
      * 初始化tab数组
+     * 通常在创建concurrentHashMap的时候调用默认的构造方法，默认的构造方法不会进行初始化赋值
+     * 创建数组对象和大小，初始化sizeCtl
      */
     /*
     private final Node<K,V>[] initTable() {
         Node<K,V>[] tab; int sc;
         //初始化数组
         while ((tab = table) == null || tab.length == 0) {
+            //表示正在进行扩容或是初始化操作,这时候将线程挂起，只需要一个线程进行初始化操作
             if ((sc = sizeCtl) < 0)
                 Thread.yield(); // lost initialization race; just spin
+            //通过cas的方式将sizeCtl改为-1，代表抢到了锁
             else if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {
                 try {
+                    //
                     if ((tab = table) == null || tab.length == 0) {
                         int n = (sc > 0) ? sc : DEFAULT_CAPACITY;
                         @SuppressWarnings("unchecked")
+                        //创建数组对象
                         Node<K,V>[] nt = (Node<K,V>[])new Node<?,?>[n];
                         table = tab = nt;
                         sc = n - (n >>> 2);
@@ -392,6 +403,7 @@ public class ConcurrentHashMap_Source {
         return tab;
     }
     */
+
     /////////////////////////////////PUT方法-END////////////////////////////////////////
 
 }
