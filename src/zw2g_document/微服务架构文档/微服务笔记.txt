@@ -3,6 +3,9 @@
 2-搭框架在导入所需包时需要注意，按照项目所需的顺序搭建
     1-springboot构建基础jar包
     2-搭建连接数据库所需包和启动类
-        1-mysql连接
-        2-数据库连接池
-        3-mybatis连接
+        1-mysql连接,2-数据库连接池
+        3-mybatis连接,4-通用mapper插件
+        在进行数据查询时报错
+        tk.mybatis.mapper.MapperException: 无法获取实体类com.wwg.entity.UserInfo对应的表名!
+        关于这个问题我在网上查了下，不同的人有不同的解决方法，我的则是通过修改版本号来解决的
+        https://blog.csdn.net/u013024120/article/details/79036102
