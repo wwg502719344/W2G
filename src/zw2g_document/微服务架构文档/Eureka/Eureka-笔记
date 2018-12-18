@@ -16,3 +16,16 @@ eureka-服务发现机制
 3服务检测:定期检测微服务，不存在则进行清理
 
 
+Eureka Server和Eureka Client的作用
+1Eureka Server提供服务发现能力，微服务在启动的时候会将名称，ip，端口等信息注册到Eureka Server上，服务发现组件会保存他们
+2Eureka Client是一个java客户端，用于简化和Eureka Server的交互
+3默认情况下，Eureka Server也是Eureka Client,多个Eureka Server之间通过通过彼此复制实现注册表信息的同步
+4Eureka Client会缓存注册表中的数据信息
+
+
+总结
+Eureka通过心跳，客户端缓存等机制，提高了系统的可用性
+
+
+
+Eureka的高可用
