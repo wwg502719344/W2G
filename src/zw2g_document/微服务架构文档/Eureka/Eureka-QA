@@ -2,3 +2,14 @@ Q1:导入eureka中maven包，但是启动类却无法导入@EnableEurekaServer
 A1:jar包已经下载到私服了，但是没有下载到本地，故只需要将jar包导入到本地即可，具体操作为直接根据ide的提示导入
 
 Q2:eureka-client与eureka-server有什么区别
+
+
+Q3:springboot2.0以上版本和springcloud兼容性问题
+A3:当springboot版本为2.0以上且springcloud为C版时，导入eureka依赖jar包报错，显示jar包缺失，当我们补上依赖包版本号后，不在报jar缺失，
+但是在打包过程中，抛出异常java.lang.NoSuchMethodError，错误的原因是springboot版本和springcloud版本产生了冲突，当我们把。。。
+springclpud换成了F版后打包不再抛异常
+出现这个问题毫无疑问是springboot和springcloud版本不兼容导致的
+错误提示:
+java.lang.NoSuchMethodError: org.springframework.boot.builder.SpringApplicationBuilder.<init>([Ljava/lang/Object;)V
+第一行信息，似乎提示一个莫名其妙的无此方法错误。Spring boot框架很多组件都是基于依赖注入（DI），有些错误在编译时可能无法被检测出来，
+只有在运行时才暴露出来。既然提示无此方法，那么肯定是某个组件（包）有问题：要么未被注入；要么版本版本不对。
