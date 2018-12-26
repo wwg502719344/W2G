@@ -1,4 +1,4 @@
-笔记模块：
+===========================================笔记模块=====================================================
 实现容错的原因
     当微服务所依赖的服务不可用时，大量的请求，大量的并发不做任何处理的等待，会耗尽系统的资源，拖垮自身的服务
 
@@ -12,6 +12,10 @@
     1:为网络请求设置超时
     2:使用断路器模式
 
+断路器原理
+    断路器关闭->请求失败率达到一定的阈值->断路器打开(不会在请求依赖的服务)->一段时间，断路器半开(允许少量的请求)
+    ->请求失败，断路器继续打开->成功，断路器关闭
+
 Hystrix
     实现超时机制和断路器模式的工具
     1:包裹请求-用到了命令模式
@@ -21,12 +25,69 @@ Hystrix
     5:回退机制-当请求失败，超时，被拒绝的时候，执行回退逻辑
     6:自我修复
 
+===========================================笔记模块=====================================================
+
+
+
+
+===========================================开发模块=====================================================
+1：首先进行资源的依赖
+
+2：在启动类添加注解@EnableHystrix，启动断路器相关服务
+
+3：在消费者控制器方法中添加注解
+@HystrixCommand(fallbackMethod = "findByIdsBack")，并添加findByIdsBack方法
+当提供者服务不可用时，将会回退执行findByIdsBack方法
+Q:这里有个很严重的问题，就是我在首次请求消费服务方法的时候，不论提供者服务方法是否正常，都会直接进入回退方法，但是第二次
+在请求的话，就会顺利调用提供者的相关方法
+A:
+
+
+4：hystrix配合actuator,显示hystrix状态
+此处根据文档上描述，连接断路器的状态也暴露在呼叫应用程序的/health端点中，但是我在测试 过程中无法查看到hystrix的状态
+具体原因不知
+
+
+5：hystrix结合feign,feign包裹hystrix，实现feign进行负载调用失败时候的回退
+
+5-1：实现feign包裹hystrix的yml配置
+feign.hystrix.enabled=true
+完成feign对hystrix的支持，之前没有添加，一直报错
+Load balancer does not have available server for client:xxxxxx
+
+5-2：实现回退逻辑
+在StoreClient接口中，添加注解
+fallback = HystrixClientFallback.class)，指定回退的类，
+编写HystrixClientFallback类，该类实现回退接口StoreClient的方法
+在该类中实现StoreClient的回退方法
+
+5-3：打印回退日志
+fallback会实现回退方法，但如果我们希望知道回退的原因，可以通过在@FeignClient中使用属性fallbackFactory来实现
+fallbackFactory = HystrixClientFallbackFactory.class)
+同样，我们需要创建HystrixClientFallbackFactory，该类实现接口FallbackFactory<HystrixClient>
+将回退方法写在实现类create中
+实现方法如下:
+@Override
+public HystrixClient create(Throwable cause) {
+    return new HystrixClient() {
+        @Override
+        public Hello iFailSometimes() {
+            return new Hello("fallback; reason was: " + cause.getMessage());
+        }
+    };
+}
+在特定的情况下cause可能为null，此处为feign的bug，没事的时候可以研究下
+
+
+6
+===========================================开发模块=====================================================
 
 
 
 
 
 
+===========================================问题模块=====================================================
 问题模块：
 
 问题1：
@@ -73,5 +134,5 @@ https://www.cnblogs.com/java-zhao/p/5813439.html
 插件名称。http://localhost:8100/actuator/routes即可，类似的还有
 
 
-
+===========================================问题模块=====================================================
 

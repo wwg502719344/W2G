@@ -20,7 +20,7 @@ Q：自定义feign配置文件相关原理配置
 1-3创建feign接口，该接口指向服务提供者
 @FeignClient(name="new-user")
 @RequestMapping(value = "/test",method = RequestMethod.GET)
-上面注解为服务者请求地址
+上面注解为服务提供者请求地址
 feign接口的调用通过消费者进行调用
 
 
@@ -31,6 +31,8 @@ feign接口的调用通过消费者进行调用
 configuration = FooConfiguration.class
 2-3可以使用feign注解来替代springmvc注解
 @RequestLine("GET /test")
+public UserInfo findById(@Param("id") int id);
+此处需注意，因为我们使用的是@RequestLine注解，所以此处我们在传参的时候需要使用@Param,之前使用springmvc的方式，导致一直无法识别
 
 
 3-POST请求包含多个参数，通过实体进行传参
