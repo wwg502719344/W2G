@@ -79,7 +79,28 @@ public HystrixClient create(Throwable cause) {
 在特定的情况下cause可能为null，此处为feign的bug，没事的时候可以研究下
 
 
-6
+6-hystrix的监控
+
+6-1:通过/actuator/hystrix.stream对hystrix进行数据监控
+hystrix提供了访问接口的实施监控，包括请求数，请求时间，请求接口名称等
+查看访问情况调用
+http://localhost:8200/actuator/hystrix.stream
+如果没有访问接口，调用该方法无法获取任何数据且消耗cpu资源
+开启监控的需要在yml文件中进行配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+注:@EnableCircuitBreaker注解，启动断路器
+官方文档对该注解介绍很少，我加了一次，可能所作功能有限，并没有看出具体作用
+一些博客介绍开启断路器作用，但我使用@HystrixCommon不是也能开启断路器吗
+
+6-2：通过Dashboard对Hystrix进行图形化监控
+Q:当我添加jar包的时候，在maven的依赖列表中显示version是unknow，这个问题出现了多次了，我自己的maven私服访问是没有问题
+的，出现的原因暂时不清楚
+A:解决的方案是添加上依赖jar的version，可以通过搜索maven 资源名 的方式找到version
 ===========================================开发模块=====================================================
 
 
