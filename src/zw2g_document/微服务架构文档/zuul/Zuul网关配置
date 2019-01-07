@@ -1,15 +1,88 @@
-笔记：
+===========================================笔记===============================================
     zuul的高可用
         1：zuul客户端注册到eureka上，客户端从eureka列表上拉取Zuul Servers，通过ribbon负载均衡实现高可用
 
         2：zuul未注册在eureka上，可通过nginx负载分发相关的zuul上
+===========================================笔记===============================================
 
 
 
 
+===========================================开发记录============================================
+1-创建zuul项目，通过zuul进行路由管理，代理微服务，客户端只需要设置好请求路径即可访问相关微服务接口
+2-添加相关依赖，启动项添加启动zuul注解
+3-在zuul中添加配置文件进行路由配置
+3-1域名映射
+通过zuul可以使得我们通过访问网关的方式访问相关的微服务，比如
+http://localhost:8400/new-movie/userBack/1
+我们访问网关的IP:端口，后面跟上具体微服务的serverid+相关方法，实际上，我们可以将serverid进行路径映射
+zuul:
+  routes:
+    new-movie: /movie/**
+或
+zuul:
+  routes:
+    user-route:
+      service-id: new-movie
+      path: /user/**
 
-问题-解决方案
-QUESTION:
+通过这种方式，我们就成功将new-movie映射到movie路径下了
+http://localhost:8400/movie/userBack/1
+
+可以指定需要访问的微服务或是需要忽略的微服务
+zuul:
+  routes:
+    user-route:
+      service-id: new-movie
+      path: /feignsFallBack/**
+但如果使用了这种方式进行路由配置，则会导致ribbon/hystrix无法工作
+
+4-如果需要指定path，url，根据官方文档描述会破坏ribbon/hystrix的特性，但我自己在测试的过程中发现被hystrixCommand包裹的
+方法还是可以进行fallback处理，此处留有疑问
+
+
+首先需要注意的是我们是将服务提供者的serverid配置在yml中，并且配置连接的端口，而不是服务的消费者
+在将此处改正后，我发现任然无法触发服务降级，后台并报错
+com.netflix.client.ClientException: Load balancer does not have available server for client
+没有可用的负载均衡提供，于是我对书中的代码做了改动
+ribbon:
+  eureka:
+    enabled: ture
+再次启动，请求降级
+
+
+5-基于zuul实现过滤器功能
+5-1自定义网关过滤器，需要自定义类实现zuulFilter
+5-2网关类的写法可以参照cloud官方文档的写法
+5-3在启动类中注入自定义过滤类
+Q5-1:在每一个网关类中都会写好过滤类型，是否意味着一个自定义过滤类只能实现一种过滤类型
+A5-1:每一个自定义网关类只能对应一种fileType，在官方文档上，针对不同的过滤类型给出了不同的demo
+
+Q5-2:在一个自定义过滤类中，可以根据请求不同微服务进行特定过滤吗，还是说只能进行统一的过滤
+A5-2:，基于代码对请求路径的判断，代码参考
+@Override
+public Object run() {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    HttpServletRequest request = ctx.getRequest();
+    if (request.getParameter("foo") != null) {
+        // put the serviceId in `RequestContext`
+        ctx.put(SERVICE_ID_KEY, request.getParameter("foo"));
+    }
+    return null;
+}
+此处需要注意的是，foo是一个传递的参数，并不是我之前想的直接从路径地址中获取请求的 微服务，这种方式也是官方不推荐的
+
+6-基于zuul实现回退功能
+6-1回退类需要实现FallbackProvider接口，此处需要注意的是官网给出的demo是zuulFallbackProvider，但在F版中，已经没有这个接口了
+6-2具体实现按照官方文档的方式抒写就可以了，最后访问，如果服务已经挂掉了，就会返回指定的信息
+Q6-1:在回退类中，是否可以指定多个回退类，一个类只能指定一个微服务进行回退，太低效了
+A6-1:可以，方式同上
+===========================================开发记录============================================
+
+
+
+
+==============================================Q===============================================
 Q1:当在启动类中配置@EnableZuulServer时，访问数据就是一片空白
 
 Q2:实际场景下，一个用户请求可能需要调用多个微服务，一个请求如何通过网关调用多个微服务
@@ -27,6 +100,14 @@ A2:通过Zuul聚合微服务，用户发送一个请求给zuul，由zuul请求�
 A3:1群友回复:模块调用的方式，先调用其中一个信息，在调用另一张表的信息，最后进行数据合并，设计初衷，
 业务独立，相互调用
 
-Q4:
+Q5:在通过zuul网关访问实现了hystrix的降级接口，报错
+com.netflix.zuul.exception.ZuulException: Hystrix Readed time out
+出现此情况原因是zuul调用等待超时
+在yml配置文件中加入
+zuul:
+  host:
+      connect-timeout-millis: 10000
+      socket-timeout-millis: 60000
+把等待时间设置得长一点就可以了
 
 
