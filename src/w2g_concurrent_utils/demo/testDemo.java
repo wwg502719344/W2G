@@ -5,6 +5,6 @@ package w2g_concurrent_utils.demo;
  */
 public class testDemo {
     public static void main(String[] args){
-        System.out.print(30000>>>1);
+        System.out.print(-2>>>1);
     }
 }

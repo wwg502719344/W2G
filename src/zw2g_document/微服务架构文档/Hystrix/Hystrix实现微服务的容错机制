@@ -1,4 +1,4 @@
-笔记模块：
+===========================================笔记模块=====================================================
 实现容错的原因
     当微服务所依赖的服务不可用时，大量的请求，大量的并发不做任何处理的等待，会耗尽系统的资源，拖垮自身的服务
 
@@ -12,6 +12,10 @@
     1:为网络请求设置超时
     2:使用断路器模式
 
+断路器原理
+    断路器关闭->请求失败率达到一定的阈值->断路器打开(不会在请求依赖的服务)->一段时间，断路器半开(允许少量的请求)
+    ->请求失败，断路器继续打开->成功，断路器关闭
+
 Hystrix
     实现超时机制和断路器模式的工具
     1:包裹请求-用到了命令模式
@@ -22,27 +26,134 @@ Hystrix
     6:自我修复
 
 
+===========================================笔记模块=====================================================
+
+
+
+
+===========================================开发模块=====================================================
+1：首先进行资源的依赖
+
+2：在启动类添加注解@EnableHystrix，启动断路器相关服务
+
+3：在消费者控制器方法中添加注解
+@HystrixCommand(fallbackMethod = "findByIdsBack")，并添加findByIdsBack方法
+当提供者服务不可用时，将会回退执行findByIdsBack方法
+Q:这里有个很严重的问题，就是我在首次请求消费服务方法的时候，不论提供者服务方法是否正常，都会直接进入回退方法，但是第二次
+在请求的话，就会顺利调用提供者的相关方法
+A:
+
+
+4：hystrix配合actuator,显示hystrix状态
+此处根据文档上描述，连接断路器的状态也暴露在呼叫应用程序的/health端点中，但是我在测试 过程中无法查看到hystrix的状态
+具体原因不知
+
+
+5：hystrix结合feign,feign包裹hystrix，实现feign进行负载调用失败时候的回退
+
+5-1：实现feign包裹hystrix的yml配置
+feign.hystrix.enabled=true
+完成feign对hystrix的支持，之前没有添加，一直报错
+Load balancer does not have available server for client:xxxxxx
+
+5-2：实现回退逻辑
+在StoreClient接口中，添加注解
+fallback = HystrixClientFallback.class)，指定回退的类，
+编写HystrixClientFallback类，该类实现回退接口StoreClient的方法
+在该类中实现StoreClient的回退方法
+
+5-3：打印回退日志
+fallback会实现回退方法，但如果我们希望知道回退的原因，可以通过在@FeignClient中使用属性fallbackFactory来实现
+fallbackFactory = HystrixClientFallbackFactory.class)
+同样，我们需要创建HystrixClientFallbackFactory，该类实现接口FallbackFactory<HystrixClient>
+将回退方法写在实现类create中
+实现方法如下:
+@Override
+public HystrixClient create(Throwable cause) {
+    return new HystrixClient() {
+        @Override
+        public Hello iFailSometimes() {
+            return new Hello("fallback; reason was: " + cause.getMessage());
+        }
+    };
+}
+在特定的情况下cause可能为null，此处为feign的bug，没事的时候可以研究下
+
+
+6-hystrix的监控
+
+6-1:通过/actuator/hystrix.stream对hystrix进行数据监控
+hystrix提供了访问接口的实施监控，包括请求数，请求时间，请求接口名称等
+查看访问情况调用
+http://localhost:8200/actuator/hystrix.stream
+如果没有访问接口，调用该方法无法获取任何数据且消耗cpu资源
+开启监控的需要在yml文件中进行配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+注:@EnableCircuitBreaker注解，启动断路器
+官方文档对该注解介绍很少，我加了一次，可能所作功能有限，并没有看出具体作用
+一些博客介绍开启断路器作用，但我使用@HystrixCommon不是也能开启断路器吗
+
+
+6-2：通过Dashboard对Hystrix进行图形化监控
+6-2-1：添加相关依赖
+6-2-2：在启动类中添加启动Dashboard的注解
+@EnableHystrixDashboard
+6-2-3：访问端点/hystrix即可查看
+6-2-4：此处在填写监控地址的时候需要注意，如果我们是用actuator，那么在hystrix.stream前腰加上路径actuator，文档上有提示
+如果没有添加actuator，则会报错
+Unable to connect to Command Metric Stream.
+
+Q1:当我添加jar包的时候，在maven的依赖列表中显示version是unknow，这个问题出现了多次了，我自己的maven私服访问是没有问题
+的，出现的原因暂时不清楚
+A1:解决的方案是添加上依赖jar的version，可以通过搜索maven 资源名 的方式找到version
+
+Q2:在Feign中使用断路器，hystrixDashboard无法对接口进行监控
+A2:需要在配置文件中打开断路器 feign.hystrix.enabled=true
+
+M:在获取相关资料最原始出处，往往是在github，在wiki中有详细介绍，springcloud中相关组件的github建议先上springcloud的
+中文网站，进入相关组件的模块，里面有组件在github的传送门，springcloud都帮我们把这些组件集成好了，用起来是非常方便的
+
+
+7使用Turbine监控多个微服务(非代码实际测试)
+7-1:创建一个Turbine项目，该项目的作用是找到其他注册在Eureka Server上的微服务，并聚合这两个微服务的监控数据
+7-2:项目创建完成，添加依赖，启动项添加注解，配置yml文件(配置监控的微服务)
+
+turbine:
+  aggregator:
+    clusterConfig: default   # 指定聚合哪些集群，多个使用","分割，默认为default。可使用http://.../turbine.stream?cluster={clusterConfig之一}访问
+  appConfig: service-hi,service-lucy  ### 配置Eureka中的serviceId列表，表明监控哪些服务
+  clusterNameExpression: new String("default")
+
+clusterNameExpression指定集群名称，默认表达式appName；此时：turbine.aggregator.clusterConfig需要配置想要监控的应用名称
+当clusterNameExpression: default时，turbine.aggregator.clusterConfig可以不写，因为默认就是default(监控所有)
+当clusterNameExpression: metadata['cluster']时，假设想要监控的应用配置了eureka.instance.metadata-map.cluster: ABC，则需要配置，同时turbine.aggregator.clusterConfig: ABC
+--总结
+clusterNameExpression是集群名称，如果自定义，则需要配置需要监控的应用的名称
+如果是default，则默认监听所有应用
+===========================================开发模块=====================================================
 
 
 
 
 
+
+===========================================问题模块=====================================================
 问题模块：
 
-问题1：
-    通过UserFeignClient进行降级处理的时候，如果掐断user服务，理论上应该出现降级情况，服务应该主动去触发fallbackFactory
+Q1:通过UserFeignClient进行降级处理的时候，如果掐断user服务，理论上应该出现降级情况，服务应该主动去触发fallbackFactory
 指定的降级类，但是实际情况确实返回connect timed out
-解决方案:
-    未开启Hystrix导致降级失败，需要在yml文件中添加feign.hystrix.enabled=true开启hystrix服务。ps(多看官方文档)
+A1:未开启Hystrix导致降级失败，需要在yml文件中添加feign.hystrix.enabled=true开启hystrix服务。ps(多看官方文档)
 
 
 
-问题2：
-    项目添加Hystrix监控，理论上在访问接口后访问ip:端口号/hystrix.stream即可查看Hystrix相关参数，但是在添加了
+Q2:项目添加Hystrix监控，理论上在访问接口后访问ip:端口号/hystrix.stream即可查看Hystrix相关参数，但是在添加了
 相关maven，包括在启动文件上添加@EnableHystrixDashboard后依然无效，访问ip:端口号/hystrix.stream提示404
-
-解决方案：
-    提示404，猜测可能是服务没有启动成功导致，在网上查了下，发现缺少 @Configuration 的配置类去启动，然后添加
+A2:提示404，猜测可能是服务没有启动成功导致，在网上查了下，发现缺少 @Configuration 的配置类去启动，然后添加
 HystrixConfig 配置类，注入servlet，在此访问，即可访问到相关监控数据
 添加HystrixConfig 配置类是因为springboot的默认路径不是 "/hystrix.stream"，只要在自己的项目里配置上下面的servlet就可以了，
 相关查阅资料：
@@ -51,27 +162,21 @@ https://www.cnblogs.com/java-zhao/p/5813439.html
 
 
 
-问题3：
-    监控图形化界面显示Unable to connect to Command Metric Stream.
-解决方案：
-    http://ip:端口/hystrix.stream,之前写的是接口名称
+Q3:监控图形化界面显示Unable to connect to Command Metric Stream.
+A3:http://ip:端口/hystrix.stream,之前写的是接口名称
 
 
 
-问题4：
-    Linux安装了rabbitmq，访问主页guest无法登陆
-解决方案：
-    原因是因为现在的版本只允许guest在localhost模式下登陆，通过ip的方式无法登陆，可以通过创建一个新用户，然后
+Q4:Linux安装了rabbitmq，访问主页guest无法登陆
+A4:原因是因为现在的版本只允许guest在localhost模式下登陆，通过ip的方式无法登陆，可以通过创建一个新用户，然后
 给这个用户最高权限，就可以顺利登陆了
 
 
 
-问题5:
-    配置了actuator，却无法访问到相应的结果
-解决方案:
-    这种问题一般缺少2点，1是yml没有配置开启，2是springboot2.0以上访问相应插件的内容需要在访问路径上添加
+Q5:配置了actuator，却无法访问到相应的结果
+A5:这种问题一般缺少2点，1是yml没有配置开启，2是springboot2.0以上访问相应插件的内容需要在访问路径上添加
 插件名称。http://localhost:8100/actuator/routes即可，类似的还有
 
 
-
+===========================================问题模块=====================================================
 
