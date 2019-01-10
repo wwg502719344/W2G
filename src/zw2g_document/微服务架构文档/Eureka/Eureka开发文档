@@ -1,0 +1,66 @@
+-----------------------------------1-Eureka 健康检测---------------------------------------
+
+1-1:Eureka Server导入maven依赖
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>
+
+1-2:Eureka Server启动类添加注解，标注该服务为Eureka Server端
+@EnableEurekaServer
+
+1-3:为服务提供者添加依赖和启动注解，标注该服务为Eureka Client
+@EnableDiscoveryClient
+
+1-4创建HealthIndicator
+这是一个简单的检测器类，会进行服务状态检测
+进行服务状态监测。此时，通过重写 health() 方法来实现健康检查。
+重写health方法，并将微服务状态写入Health对象中去，供健康检查器检测并发送至eureka
+
+1-5:创建健康检查处理器MyHealthCheckHandler
+该类实现了HealthCheckHandler，获取Health对象中当前微服务健康状态
+将服务提供者的健康状态传递给Eureka服务器,
+Eureka server通过心跳机制对client客户端的状态进行检测，
+心跳机制会主动检测自定义健康检查处理器(也就是本类)，大概30秒会自动检测一次，然后返回状态
+-----------------------------------1-Eureka 健康检测---------------------------------------
+
+
+
+
+
+-----------------------------------2-Eureka 实现高可用------------------------------------
+
+2-1:创建eureka server,添加依赖，在启动类中添加注解标注该类是eureka server
+2-2:添加yml配置信息
+此处需要注意，我在一开始是通过配置3个yml文件的方式来做eureka的高可用，在不同的yml中配置不同的端口和启动名称
+，然后在通过命令--spring.profiles.active=peer2来启动不同的配置，但是我在启动的时候发现配置的都是无效的，
+实际上新创建的yml并没有生效，而且新创建的yml文件图标也没有变成绿色的叶子，后来我就通过三段式的方式解决了这个
+问题，但是三个yml不行的问题我并没有解决
+spring:
+  application:
+    name: new-eureka
+---
+spring:
+  profiles: peer1
+server:
+  port: 8761
+eureka:
+  instance:
+    hostname: peer1
+  client:
+    service-url:
+      defaultZone: http://localhost:8762/eureka/  #指定eureka服务器的地址
+---
+spring:
+  profiles: peer2
+server:
+  port: 8762
+eureka:
+  instance:
+    hostname: peer2
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/  #指定eureka服务器的地址
+
+
+-----------------------------------2-Eureka 实现高可用------------------------------------

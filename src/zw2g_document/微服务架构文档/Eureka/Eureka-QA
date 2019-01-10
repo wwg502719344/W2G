@@ -13,3 +13,7 @@ springclpud换成了F版后打包不再抛异常
 java.lang.NoSuchMethodError: org.springframework.boot.builder.SpringApplicationBuilder.<init>([Ljava/lang/Object;)V
 第一行信息，似乎提示一个莫名其妙的无此方法错误。Spring boot框架很多组件都是基于依赖注入（DI），有些错误在编译时可能无法被检测出来，
 只有在运行时才暴露出来。既然提示无此方法，那么肯定是某个组件（包）有问题：要么未被注入；要么版本版本不对。
+
+
+Q4:配置文件中spring.profiles.active什么意思
+A4:springboot中可以根据不同配置文件进行不同参数的启动，通过profiles可以指定启动服务的yml文件
