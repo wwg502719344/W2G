@@ -62,5 +62,32 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/  #指定eureka服务器的地址
 
+2-3:启动，发现8761和8762两个端口可以正常访问，且已经互相注册
+
+2-4:启动服务消费者和服务提供者，指定注册8761服务器
+eureka:
+  client:
+    healthcheck:
+      enabled: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/ #指定服务注册中心地址
+
+2-4-1:在访问8761和8762端口查看eureka server
+结果:发现eureka server已经进行了互相注册，两者都可以互相查询到，且在8762中可以查询到注册到8761上的微服务
+结论:说明eureka server这种互相配置的方式可以实现微服务注册的相互复制，即使微服务的注册地址是在8761上，当时在8762上
+依然可以查询到注册的微服务
+
+2-4-2:停下8761服务器，访问服务消费者
+结果:服务访问正常，且该服务一直可以进行访问
+结论:首先微服务实现了Eureka client，他会缓存Eureka Server中的注册信息，所以即使Server挂掉了依旧可以进行访问
+在一定延迟后，8762会注销来自8761的服务，此处需要关闭服务保护机制，否则在注册中心会一直看到那个已经挂掉的服务
+M:关于服务保护机制
+1-client挂掉，如果服务保护机制开启了，那么client将不会被移除，但是如果client挂掉了，后续又有新的client被注册，且
+失败了，那么之前失效的client将会被一移除
+2-server挂掉，假设有两个server，server1挂掉后，server2并不会注销sesrver1的信息，但是当服务过多时，则会注销server1
+极其下面附属的服务，client1变成了孤立的client，他只能请求缓存中的服务，所以正确的做法应该是在client中将其配置在所有的
+发现组件当中
+https://blog.csdn.net/tianyaleixiaowu/article/details/78184793
+
 
 -----------------------------------2-Eureka 实现高可用------------------------------------
