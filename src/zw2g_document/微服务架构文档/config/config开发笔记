@@ -1,0 +1,11 @@
+1-构建config server
+    1-1引入相关maven依赖
+    1-2添加启动项注解，编写yml文件(此处唉添加注解的时候死活加不上，后来有莫名其妙的好了，谢特)
+    1-3通过端点方式访问git上的配置文件
+    http://localhost:8400/{application}-{profile}.properties
+
+
+2-构建config client，获取config server的相关配置
+    2-1引入相关maven依赖
+    2-2创建bootstrap.yml文件，配置获取config server的相关参数
+
