@@ -8,4 +8,29 @@
 2-构建config client，获取config server的相关配置
     2-1引入相关maven依赖
     2-2创建bootstrap.yml文件，配置获取config server的相关参数
+    #以下内容配置在bootstrap.yml中，陪在application中则会报错
+    #以下内容配置在bootstrap.yml中，陪在application中则会报错
+    #此处配置的内容皆是对应config server中指定的git文件的存储地址
+    #spring.application.name对应{application}
+    #spring.cloud.config.url对应config server的访问ip:端口
+    #spring.cloud.config.profile对应{profile}
+    #spring.cloud.config.label对应git分支
+    spring:
+      application:
+        name: cloud
+      cloud:
+        config:
+          #默认是8888，并且会覆盖application.yml文件的配置,此处不添加uri，启动日志中会去找8888
+          uri: http://localhost:8400
+          profile: dev
+          label: master
 
+    2-3创建访问方法，获取指定文件内容
+    @Value("${profile}")
+
+    M1:maven打包过程报错，提示非法的参数格式，并指出是@Value的错误，
+    实际期待结果:启动不报错，且访问可以获取git指定配置文件的内容
+    -出现问题后，首先我是将路径补全，补全后启动不再报错，但是在执行后是读取的profile的具体的值
+    -后来我将注解重新改成peofile，又不报错了，而且再次访问，结果并不是profile的值
+    M2:启动服务报错，出现此错误的原因是在依赖的maven包中，我们需要将
+    spring-boot-starter替换成spring-boot-starter-web
