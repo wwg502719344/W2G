@@ -60,3 +60,63 @@
     参考资料(内附Spring Boot 2.0官方文档之 Actuator)
     https://blog.csdn.net/qq_27101653/article/details/80816036
 
+
+4- 实现config bus自动刷新git配置文件,
+   目标:模拟多台config-client，通过请求其中一台服务的配置刷新，达到所有服务器对配置文件的刷新读取
+
+4-1安装rabbitmq
+
+   我使用的是docker安装mq，非常简单，具体方式如下，
+   docker基本命令
+   https://www.cnblogs.com/hackyo/p/9318252.html
+
+   M1:此处建议启动mq的时候创建账号，因为guest只支持本地访问
+   所以我创建了一个账号user，密码123456的账号
+   M2:我在启动服务后，一直无法在网页访问mq，原因是我服务器没有设置安全组，将5672和15672的端口添加进安全组
+   过一段时间，访问成功
+
+4-2引入轻量级消息代理连接分布式消息节点，用来传播配置文件的更改，这里我们用的是rabbitmq
+   4-2-1:添加bus相关依赖
+   <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+   </dependency>
+
+   4-2-2:在bootstrap配置文件中添加mq配置信息，我自己是在application配置文件中添加，因为我是配置多端点的，所以配置信息我写了两边
+   spring:
+     rabbitmq:
+         host: 服务器IP
+         port: 5672
+         username:
+         password:
+
+4-3添加新端点，即新的微服务，此处用端口进行模拟，分别用两个端口启动微服务，达到启用两个微服务的效果
+   spring:
+     profiles: peer1
+   server:
+     port: 8401
+   ---
+   spring:
+     profiles: peer2
+   server:
+     port: 8402
+
+   启动参数修改
+   --spring.profiles.active=peer1
+
+4-4:此时启动多个服务，我们修改配置文件并向其中一个服务发送更新请求
+   http://localhost:8401/actuator/bus-refresh
+   此处需要格外注意的就是自从speingboot升至2.0后，actuator做了大量的修改，此时我们需要在配置文件中开放端口才能
+   进行访问，否则会报404错误
+   management:
+     endpoint:
+       refresh:
+         enabled: true
+     endpoints:
+       web:
+         exposure:
+           include: refresh,health,info,bus-refresh
+
+   此时我们访问另一台服务器，发现配置文件已经更新了
+   http://localhost:8402/profile
+
