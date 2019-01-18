@@ -76,6 +76,7 @@ A7:bootstrap.xml优先加载于xxx.yml，原因是xxx.yml加载于spring cloud�
 
 A8:访问路径，IP:PORT/actuator/health
 参看资料:
+
 https://github.com/spring-projects/spring-boot/issues/13238
 
 
