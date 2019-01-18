@@ -120,3 +120,8 @@
    此时我们访问另一台服务器，发现配置文件已经更新了
    http://localhost:8402/profile
 
+
+5:将config注册到服务发现组件当中
+   5-1:添加eurekaClient依赖，在启动类添加注解将config server设置为Eureka Client，在application添加
+   注册配置，这里需要注意的是，对于config client微服务，需要在配置文件中进行额外配置，选择从服务发现组件中
+   去寻找config server的地址
