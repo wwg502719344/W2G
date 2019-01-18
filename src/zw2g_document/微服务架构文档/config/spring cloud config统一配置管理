@@ -1,8 +1,3 @@
-
-问题模块
-
-QUESTION
-
 Q1:配置config-server/config-client文件时，相关git的参数需要配置在bootstrap.yml中而不是配置在
 application.yml中，为什么
 

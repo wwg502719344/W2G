@@ -85,8 +85,12 @@ M:关于服务保护机制
 1-client挂掉，如果服务保护机制开启了，那么client将不会被移除，但是如果client挂掉了，后续又有新的client被注册，且
 失败了，那么之前失效的client将会被一移除
 2-server挂掉，假设有两个server，server1挂掉后，server2并不会注销sesrver1的信息，但是当服务过多时，则会注销server1
-极其下面附属的服务，client1变成了孤立的client，他只能请求缓存中的服务，所以正确的做法应该是在client中将其配置在所有的
+及其下面附属的服务，client1变成了孤立的client，他只能请求缓存中的服务，所以正确的做法应该是在client中将其配置在所有的
 发现组件当中
+3-如果没有关闭服务保护机制，server页面则会显示
+EMERGENCY! EUREKA MAY BE INCORRECTLY CLAIMING INSTANCES ARE UP WHEN THEY'RE NOT.
+RENEWALS ARE LESSER THAN THRESHOLD AND HENCE THE INSTANCES ARE NOT BEING EXPIRED
+JUST TO BE SAFE.
 https://blog.csdn.net/tianyaleixiaowu/article/details/78184793
 
 
