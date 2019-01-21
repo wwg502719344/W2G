@@ -123,5 +123,10 @@
 
 5:将config注册到服务发现组件当中
    5-1:添加eurekaClient依赖，在启动类添加注解将config server设置为Eureka Client，在application添加
-   注册配置，这里需要注意的是，对于config client微服务，需要在配置文件中进行额外配置，选择从服务发现组件中
+   注册配置，这里需要注意的是，对于config client微服务，需要在bootstrap文件中配置eureka,从服务发现组件中
    去寻找config server的地址
+   ***M1***:在配置完成后，对config client进行打包，打包启动的时候会去加载bootstrap配置文件，如果
+   会去加载默认端口8888的配置服务，但是我的配置是8400，故
+   配置加载失败，此处应该是从eureka中读取config server的地址进行加载，但是并没有，这里我的配置基本也没有错，
+   不清楚失败的原因，下面是配置文件读取的地址
+   Fetching config from server at : http://localhost:8888
