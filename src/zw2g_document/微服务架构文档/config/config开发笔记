@@ -130,3 +130,12 @@
    配置加载失败，此处应该是从eureka中读取config server的地址进行加载，但是并没有，这里我的配置基本也没有错，
    不清楚失败的原因，下面是配置文件读取的地址
    Fetching config from server at : http://localhost:8888
+
+   ***S1***:
+   初次解决方案：
+   操作一:将当前config client/server的pom文件进行修改，改成低于2.0版本的，此时启动依旧报错
+   操作二:将demo的config client指向我的server,可以启动成功，说明是我的config client出现了问题
+   操作三:将我的client指向 demo的conofig server，启动失败，证明是我的config client有问题
+   操作四:改造config client，配置，代码完全一样，依旧无法启动成功，原因不明。。。
+   操作五；拷贝demo项目至自己的文件下，改造成2.0以上版本，可以进行访问
+
