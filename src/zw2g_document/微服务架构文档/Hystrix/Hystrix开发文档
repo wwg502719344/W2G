@@ -1,57 +1,57 @@
-===========================================笔记模块=====================================================
-实现容错的原因
-    当微服务所依赖的服务不可用时，大量的请求，大量的并发不做任何处理的等待，会耗尽系统的资源，拖垮自身的服务
-
-雪崩效应
-    微服务架构通常包含了多个服务层，微服务之间通过网络进行通信，从而支撑起整个应用系统
-    当发生基础服务故障的时候，可能会导致生产者A的消费者B无法调用，从而导致需要调用消费者B的消费者C和D都无法
-调用，导致不可用逐渐放大
-
-如何容错
-    防止产生雪崩效应的手段就是要有一个强大的容错机制
-    1:为网络请求设置超时
-    2:使用断路器模式
-
-断路器原理
-    断路器关闭->请求失败率达到一定的阈值->断路器打开(不会在请求依赖的服务)->一段时间，断路器半开(允许少量的请求)
-    ->请求失败，断路器继续打开->成功，断路器关闭
-
-Hystrix
-    实现超时机制和断路器模式的工具
-    1:包裹请求-用到了命令模式
-    2:跳闸机制-当错误率达到了一定的程度，Hystrix会自动或者手动停止请求该服务一段时间
-    3:资源隔离-Hystix为每个依赖都维护了一个线程池，当请求数量达到线程池数量，就会立即拒绝请求
-    4:监控
-    5:回退机制-当请求失败，超时，被拒绝的时候，执行回退逻辑
-    6:自我修复
+1：添加相关服务的依赖
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
+    <version>1.4.4.RELEASE</version>
+</dependency>
 
 
-===========================================笔记模块=====================================================
-
-
-
-
-===========================================开发模块=====================================================
-1：首先进行资源的依赖
 
 2：在启动类添加注解@EnableHystrix，启动断路器相关服务
+
+
 
 3：在消费者控制器方法中添加注解
 @HystrixCommand(fallbackMethod = "findByIdsBack")，并添加findByIdsBack方法
 当提供者服务不可用时，将会回退执行findByIdsBack方法
-Q:这里有个很严重的问题，就是我在首次请求消费服务方法的时候，不论提供者服务方法是否正常，都会直接进入回退方法，但是第二次
+在@HystrixCommand中，可以对线程的降级操作进行属性配置，也可以设置hystrix的隔离策略(线程隔离或是信号隔离)
+官方demo地址:
+https://github.com/Netflix/Hystrix/tree/master/hystrix-contrib/hystrix-javanica#configuration
+@HystrixCommand(commandProperties = {
+        @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "500")
+    },
+            threadPoolProperties = {
+                    @HystrixProperty(name = "coreSize", value = "30"),
+                    @HystrixProperty(name = "maxQueueSize", value = "101"),
+                    @HystrixProperty(name = "keepAliveTimeMinutes", value = "2"),
+                    @HystrixProperty(name = "queueSizeRejectionThreshold", value = "15"),
+                    @HystrixProperty(name = "metrics.rollingStats.numBuckets", value = "12"),
+                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "1440")
+    })
+public User getUserById(String id) {
+    return userResource.getUserById(id);
+}
+Q:这里有个问题，就是我在首次请求消费服务方法的时候，不论提供者服务方法是否正常，都会直接进入回退方法，但是第二次
 在请求的话，就会顺利调用提供者的相关方法
+S:添加了ribbon的超时请求和hystrix的超时请求，依然在首次请求是直接进入HystrixCommand包裹的方法中
 A:
+结尾:当请求超时，断路器打开，微服务挂掉，都会进入回退方法，但是，进入回退方法并不代表断路器被打开了
+断路器被打开的条件是:当请求发生错误的比重超出断路器的阈值，则会打开断路器
+
 
 
 4：hystrix配合actuator,显示hystrix状态
 此处根据文档上描述，连接断路器的状态也暴露在呼叫应用程序的/health端点中，但是我在测试 过程中无法查看到hystrix的状态
 具体原因不知
+M:在官方的health描述中，显示应用的健康状态(当使用一个未认证连接访问时，只显示status，但一个已认证连接访问时
+，则会显示全部信息)
+此处我猜测 显示出hystrix健康状态的原因应该就是因为我的请求并不是被认证的
+
 
 
 5：hystrix结合feign,feign包裹hystrix，实现feign进行负载调用失败时候的回退
 
-5-1：实现feign包裹hystrix的yml配置
+5-1：配置文件中打开feign包裹hystrix的配置
 feign.hystrix.enabled=true
 完成feign对hystrix的支持，之前没有添加，一直报错
 Load balancer does not have available server for client:xxxxxx
@@ -83,7 +83,7 @@ public HystrixClient create(Throwable cause) {
 6-hystrix的监控
 
 6-1:通过/actuator/hystrix.stream对hystrix进行数据监控
-hystrix提供了访问接口的实施监控，包括请求数，请求时间，请求接口名称等
+hystrix提供了访问接口的实时监控，包括请求数，请求时间，请求接口名称等
 查看访问情况调用
 http://localhost:8200/actuator/hystrix.stream
 如果没有访问接口，调用该方法无法获取任何数据且消耗cpu资源
@@ -95,8 +95,7 @@ management:
         include: '*'
 
 注:@EnableCircuitBreaker注解，启动断路器
-官方文档对该注解介绍很少，我加了一次，可能所作功能有限，并没有看出具体作用
-一些博客介绍开启断路器作用，但我使用@HystrixCommon不是也能开启断路器吗
+
 
 
 6-2：通过Dashboard对Hystrix进行图形化监控
@@ -135,48 +134,3 @@ clusterNameExpression指定集群名称，默认表达式appName；此时：turb
 --总结
 clusterNameExpression是集群名称，如果自定义，则需要配置需要监控的应用的名称
 如果是default，则默认监听所有应用
-===========================================开发模块=====================================================
-
-
-
-
-
-
-===========================================问题模块=====================================================
-问题模块：
-
-Q1:通过UserFeignClient进行降级处理的时候，如果掐断user服务，理论上应该出现降级情况，服务应该主动去触发fallbackFactory
-指定的降级类，但是实际情况确实返回connect timed out
-A1:未开启Hystrix导致降级失败，需要在yml文件中添加feign.hystrix.enabled=true开启hystrix服务。ps(多看官方文档)
-
-
-
-Q2:项目添加Hystrix监控，理论上在访问接口后访问ip:端口号/hystrix.stream即可查看Hystrix相关参数，但是在添加了
-相关maven，包括在启动文件上添加@EnableHystrixDashboard后依然无效，访问ip:端口号/hystrix.stream提示404
-A2:提示404，猜测可能是服务没有启动成功导致，在网上查了下，发现缺少 @Configuration 的配置类去启动，然后添加
-HystrixConfig 配置类，注入servlet，在此访问，即可访问到相关监控数据
-添加HystrixConfig 配置类是因为springboot的默认路径不是 "/hystrix.stream"，只要在自己的项目里配置上下面的servlet就可以了，
-相关查阅资料：
-https://www.cnblogs.com/wangdaijun/p/8891220.html
-https://www.cnblogs.com/java-zhao/p/5813439.html
-
-
-
-Q3:监控图形化界面显示Unable to connect to Command Metric Stream.
-A3:http://ip:端口/hystrix.stream,之前写的是接口名称
-
-
-
-Q4:Linux安装了rabbitmq，访问主页guest无法登陆
-A4:原因是因为现在的版本只允许guest在localhost模式下登陆，通过ip的方式无法登陆，可以通过创建一个新用户，然后
-给这个用户最高权限，就可以顺利登陆了
-
-
-
-Q5:配置了actuator，却无法访问到相应的结果
-A5:这种问题一般缺少2点，1是yml没有配置开启，2是springboot2.0以上访问相应插件的内容需要在访问路径上添加
-插件名称。http://localhost:8100/actuator/routes即可，类似的还有
-
-
-===========================================问题模块=====================================================
-

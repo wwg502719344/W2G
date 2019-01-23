@@ -1,0 +1,10 @@
+1-为服务消费者添加ribbon依赖
+                                                                      <!--ribbon负载均衡-->
+                                                                      <dependency>
+                                                                          <groupId>org.springframework.cloud</groupId>
+                                                                          <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+                                                                      </dependency>
+
+                                                                      2-整合负载均衡的能力
+                                                                          2-1:为restTemplate整合注解，
+                                                                          2-2:使用cloud commons提供的与服务治理相关的接口DiscoveryClient、LoadBalancerClient

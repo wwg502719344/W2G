@@ -1,0 +1,38 @@
+1-为服务消费者添加ribbon依赖
+<!--ribbon负载均衡-->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+</dependency>
+
+2-整合负载均衡的能力,使用以下接口可将请求进行负载均衡的转发
+    2-1:为restTemplate整合注解
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
+    }
+
+    2-2:添加与服务治理相关的接口DiscoveryClient、LoadBalancerClient
+
+3-创建自定义规则的ribbon配置文件
+    3-1:创建ribbon基础配置类，在该类中定义负载均衡的策略
+    @Configuration
+    public class RibbonConfiguration {
+
+        public IRule ribbonRule(){
+            return new RandomRule();
+        }
+    }
+    3-2:创建一个空的配置类，将ribbon基础配置类装载到指定的微服务当中
+    @Configuration
+    @RibbonClient(name = "new-user",configuration = RibbonConfiguration.class)
+    public class TestConfiguration {
+    }
+
+
+4-采用yml的方式对指定的微服务进行负载均衡的策略，这种是最好的
+users:
+  ribbon:
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.WeightedResponseTimeRule

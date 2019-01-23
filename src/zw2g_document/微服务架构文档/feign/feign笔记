@@ -8,9 +8,18 @@ feign是模板化的http客户端，通过feign可以更加优雅的调用http A
 feign接口通过注解@FeignClient(name="new-user")完成对提供者服务的调用
 通过注解configuration = FooConfiguration.class完成对自定义feign配置文件的调用
 
+自定义feign配置文件的作用:
+feign的默认配置类定义了feign使用的编码器，解码器还有所使用的契约，比如
+feign原生默认的契约允许使用springmvcConfiguration,所以我们可以使用mvc注解，我们自定义feign配置文件
+则可以通过设置契约，使用feign自带注解
+
+
 Q：@FeignClient访问eureka server上的服务提供者时，是否可以实现ribbon的负载均衡
-Q：自定义feign配置文件相关原理配置
+Q：通过在配置文件中添加ribbon负载均衡类，可以达到对请求微服务的负载均衡
 =========================================feign笔记====================================================
+
+
+
 
 ==========================================开发记录=====================================================
 
@@ -33,7 +42,13 @@ configuration = FooConfiguration.class
 @RequestLine("GET /test")
 public UserInfo findById(@Param("id") int id);
 此处需注意，因为我们使用的是@RequestLine注解，所以此处我们在传参的时候需要使用@Param,之前使用springmvc的方式，导致一直无法识别
-
+2-4当我们在项目中添加了ribbon后，请求报错
+feign.RetryableException: Read timed out executing GET
+原因是http请求报错超时，feign的调用分两层，ribbon的调用和hystrix的调用
+此处我们需要设置ribbon的请求超时
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
 
 3-POST请求包含多个参数，通过实体进行传参
 和GET请求相比，实际是换汤不换药
@@ -41,6 +56,8 @@ public UserInfo findById(@Param("id") int id);
 3-2修改消费者控制器方法类型，将请求类型变为@PostMapping，传参修改为实体
 3-3修改提供者接受方法，同上
 ==========================================开发记录=====================================================
+
+
 
 
 =========================================出现的问题====================================================
