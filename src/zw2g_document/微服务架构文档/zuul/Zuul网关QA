@@ -1,0 +1,27 @@
+Q1:当在启动类中配置@EnableZuulServer时，访问数据就是一片空白
+
+Q2:实际场景下，一个用户请求可能需要调用多个微服务，一个请求如何通过网关调用多个微服务
+
+Q3:每个微服务都有自己独立的数据库，如何保证数据的关联，同步
+
+Q4:微服务下数据一致性问题
+ANSWER:
+A1:把@EnableZuulServer改成@EnableZuulProxy，@EnableZuulProxy是EnableZuulServer时的超集，包含所有的过滤
+EnableZuulServer会返回一个空白zuul
+
+A2:通过Zuul聚合微服务，用户发送一个请求给zuul，由zuul请求用户相关微服务，并把数据封装返回给客户端
+详细查看Zuul聚合微服务相关笔记
+
+A3:1群友回复:模块调用的方式，先调用其中一个信息，在调用另一张表的信息，最后进行数据合并，设计初衷，
+业务独立，相互调用
+
+Q5:在通过zuul网关访问实现了hystrix的降级接口，报错
+com.netflix.zuul.exception.ZuulException: Hystrix Readed time out
+出现此情况原因是zuul调用等待超时
+在yml配置文件中加入
+zuul:
+  host:
+      connect-timeout-millis: 10000
+      socket-timeout-millis: 60000
+把等待时间设置得长一点就可以了
+

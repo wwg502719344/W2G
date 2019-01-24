@@ -27,5 +27,12 @@ A4:原因是因为现在的版本只允许guest在localhost模式下登陆，通
 
 
 Q5:配置了actuator，却无法访问到相应的结果
-A5:这种问题一般缺少2点，1是yml没有配置开启，2是springboot2.0以上访问相应插件的内容需要在访问路径上添加
+A5:这种问题一般缺少2点
+1是yml没有配置开启端口访问(或者说没有添加actuator相关依赖)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+2是springboot2.0以上访问相应插件的内容需要在访问路径上添加
 插件名称。http://localhost:8100/actuator/routes即可，类似的还有

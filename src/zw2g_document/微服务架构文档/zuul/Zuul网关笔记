@@ -1,0 +1,34 @@
+1-zuul基础概念
+1-1:什么是zuul
+zuul作为微服务系统的网关，统一接受来自客户端对服务的请求，zuul旨在实现动态路由，监控以及安全
+
+1-2:使用zuul的好处
+避免客户端过于复杂的写法，针对不同服务进行不同的请求
+避免跨域请求带来的问题
+可以将所有微服务封装在一个内网环境中，减小客户端与微服务的交互
+使用zuul更加易于监控
+
+1-3:zuul在微服务中的具体作用
+zuul对外提供统一的api请求地址，并且可以处理一些不涉及到业务的操作，比如权限过滤等，主要负载服务路由，负载均衡
+等作用
+
+
+2:zuul进行路由控制
+通过在yml文件中进行具体路由跳转逻辑，可以通过请求访问的url具体跳转到指点的微服务上
+zuul.routes是一个路径集合，包含了很多路径，可以进行自定义设置，用于指定路由(如果微服务过多，不会很乱吗)
+配置微服务和路径的映射
+zuul:
+  host:
+    connect-timeout-millis: 10000
+    socket-timeout-millis: 60000
+  routes:
+    user-route:
+      service-id: new-movie
+      path: /movie/**
+也可以通过actuator进行路由映射的查看
+http://localhost:8400/actuator/routes
+
+3:zuul过滤器
+zuul有四种过滤器，作用于请求前
+
+
