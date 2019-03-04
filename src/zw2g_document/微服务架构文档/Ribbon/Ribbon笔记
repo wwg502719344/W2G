@@ -1,10 +1,24 @@
 1-为服务消费者添加ribbon依赖
-                                                                      <!--ribbon负载均衡-->
-                                                                      <dependency>
-                                                                          <groupId>org.springframework.cloud</groupId>
-                                                                          <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
-                                                                      </dependency>
+ <!--ribbon负载均衡-->
+ <dependency>
+     <groupId>org.springframework.cloud</groupId>
+     <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+ </dependency>
 
-                                                                      2-整合负载均衡的能力
-                                                                          2-1:为restTemplate整合注解，
-                                                                          2-2:使用cloud commons提供的与服务治理相关的接口DiscoveryClient、LoadBalancerClient
+1-2:在使用ribbon进行负载均衡的时候需要注意，被转发的服务在对eureka进行注册的时候，需要保证
+注册到eureka服务端的spring.application.name是相同的，否则就相当于两个微服务
+
+2-整合负载均衡的能力
+    2-1:Spring cloud 中服务之间通过restful方式调用有两种方式
+        - restTemplate+Ribbon
+        - feign(该方式使用更为优雅，内部封装了ribbon)
+
+    2-2:ribbon的负载均衡和zuul的负载均衡之间的异同
+        zuul针对的是外部请求，是外部请求之间的负载均衡
+        ribbon针对的是服务内部的调用(eureka上注册的服务)，属于服务之间的负载均衡
+
+    2-3:使用cloud commons提供的与服务治理相关的接口DiscoveryClient、LoadBalancerClient
+        1:在restTemplate+Ribbon的负载方式中，restTemplate被添加了注解@LoadBalanced
+        意味着现在就可以实现负载均衡的处理了
+        2:创建配置类，实现自定义负载均衡策略，通过@RibbonClient引入自定义配置的负载均衡类，
+        在控制器中就可以通过负载均衡的客户端获取服务器的相关信息。
