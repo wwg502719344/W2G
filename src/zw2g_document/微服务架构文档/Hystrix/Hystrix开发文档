@@ -134,3 +134,13 @@ clusterNameExpression指定集群名称，默认表达式appName；此时：turb
 --总结
 clusterNameExpression是集群名称，如果自定义，则需要配置需要监控的应用的名称
 如果是default，则默认监听所有应用
+
+
+
+8-feign与ribbon作为负载均衡的使用与关系
+feign也具备负载均衡的作用，feign内部已经融合了ribbon服务，通过feign调用服务提供者，会将请求分发至
+具有相同application-name的提供者服务上
+feign通过调用接口的方式进行请求，通过@FeignClient(name="new-user")进行服务的调用
+
+
+9-feign和hystrix的使用和关系
