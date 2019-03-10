@@ -14,8 +14,6 @@
         return new RestTemplate();
     }
 
-    2-2:添加与服务治理相关的接口DiscoveryClient、LoadBalancerClient
-
 3-创建自定义规则的ribbon配置文件
     3-1:创建ribbon基础配置类，在该类中定义负载均衡的策略
     @Configuration
