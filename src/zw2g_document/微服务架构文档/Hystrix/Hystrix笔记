@@ -39,6 +39,7 @@ Hystrix
 
 2~3:Hystrix熔断器执行机制
 https://www.jianshu.com/p/d978126bc1af
+Hystrix为每个commandKey维护了一个熔断器，为了避免并发操作导致的不安全性，使用ConcurrentHashMap集合进行保存
 
 2:Hystrix实现熔断原理
     Hystrix熔断器有三个状态，OPEN,CLOSE,HALF-OPEN,当触发熔断的时候，熔断器状态变为OPEN,过一段时间Hystrix

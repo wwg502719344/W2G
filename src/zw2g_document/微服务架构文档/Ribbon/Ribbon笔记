@@ -22,3 +22,9 @@
         意味着现在就可以实现负载均衡的处理了
         2:创建配置类，实现自定义负载均衡策略，通过@RibbonClient引入自定义配置的负载均衡类，
         在控制器中就可以通过负载均衡的客户端获取服务器的相关信息。
+
+
+3ribbon与feign的关系
+feign也具备负载均衡的作用，feign内部已经融合了ribbon服务，通过feign调用服务提供者，会将请求分发至
+具有相同application-name的提供者服务上
+feign通过调用接口的方式进行请求，通过@FeignClient(name="new-user")进行服务的调用
