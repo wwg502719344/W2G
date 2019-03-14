@@ -25,7 +25,8 @@ zuul:
     user-route:
       service-id: new-movie
       path: /feignsFallBack/**
-但如果使用了这种方式进行路由配置，则会导致ribbon/hystrix无法工作
+但如果使用了这种方式进行路由配置，则会导致ribbon/hystrix无法工作,但仅仅只是无法使用HystrixCommand,正常
+下应该是使用feign进行容灾等操作
 
 3-2:通过端点监控查看zuul地址到微服务的路径映射
 注意此处需要添加actuator相关依赖，并在yml文件中开放访问端点，然后对路径进行请求查看映射
