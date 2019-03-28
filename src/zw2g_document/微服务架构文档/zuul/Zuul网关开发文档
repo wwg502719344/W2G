@@ -19,6 +19,7 @@ zuul:
 通过这种方式，我们就成功将new-movie映射到movie路径下了
 http://localhost:8400/movie/userBack/1
 
+
 可以指定需要访问的微服务或是需要忽略的微服务
 zuul:
   routes:
@@ -27,6 +28,14 @@ zuul:
       path: /feignsFallBack/**
 但如果使用了这种方式进行路由配置，则会导致ribbon/hystrix无法工作,但仅仅只是无法使用HystrixCommand,正常
 下应该是使用feign进行容灾等操作
+
+测试情景
+M1:服务全部开启，通过zuul路径访问控制器服务,方法无hystrixCommand注解,使用FeignClient集成hystrix熔断
+可以成功访问数据，但是请求前两次进入回退方法当中，具有一定的失败率
+M2:服务全开启，采用HystrixCommand包裹请求
+可以成功请求到数据
+M3:关闭user服务，访问被HystrixCommand包裹的接口
+进入回退方法
 
 3-2:通过端点监控查看zuul地址到微服务的路径映射
 注意此处需要添加actuator相关依赖，并在yml文件中开放访问端点，然后对路径进行请求查看映射
@@ -49,6 +58,8 @@ ribbon:
 5-基于zuul实现过滤器功能
 5-1自定义网关过滤器，需要自定义类实现zuulFilter
 5-2网关类的写法可以参照cloud官方文档的写法
+详细见zuul项目下的MyFallbackProvider类
+
 5-3在启动类中注入自定义过滤类
 Q5-1:在每一个网关类中都会写好过滤类型，是否意味着一个自定义过滤类只能实现一种过滤类型
 A5-1:每一个自定义网关类只能对应一种fileType，在官方文档上，针对不同的过滤类型给出了不同的demo
