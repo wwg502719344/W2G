@@ -1,25 +1,39 @@
 1-构建config server
     1-1引入相关maven依赖
+
     1-2添加启动项注解，编写yml文件(此处添加注解@EnableConfigServer的时候无法加上，后来突然就好了，原因未知)
+
     1-3通过端点方式访问git上的配置文件(此处需要注意的是application与profile通过-进行连接)
     http://localhost:8400/{application}-{profile}.properties
-    1-4通过上文的方式进行映射访问git地址的配置文件，但是有一些配置文件没有用-进行连接，这时候通过上面的方法就无法进行访问了
+
+    1-4:关于配置文件的命名方式:
+    此处需要注意的是，我们在对配置文件的命名中因尽量规范，建议使用
+    {application}-{profile}.{properties|yml}，这种方式，方便我们对配置文件进行访问
+    配置文件的命名还需要注意的是，谁用这个配置文件，那么这个配置文件就命名为该服务(config-client)
+    @Value时需要指定具体配置文件中的路径名称，因为如果在config-client中配置了多个profile，那么
+    找到指定的配置信息需要路径是唯一的
+    @Value("${dev.profile}")
+    这里找的就是cloud-dev.yml中dev.profile的信息
+
+    1-5:通过上文的方式进行映射访问git地址的配置文件，但是有一些配置文件没有用-进行连接，这时候通过上面的方法就无法进行访问了
     解决方案
     http://localhost:8400/{application}-{application}.properties
-    http://localhost:8400/cloud-任意值(不可为空).properties,即可访问cloud.properties中的内容
+    http://localhost:8400/配置文件名称.properties,即可访问cloud.properties中的内容，但是
+    需要注意的是，如果配置文件名称中没有-，那么在访问的时候会直接找默认配置
+
 
 
 2-构建config client，获取config server的相关配置
     2-1引入相关maven依赖
     2-2创建bootstrap.yml文件，配置获取config server的相关参数
-    #bootstrap.yml的加载顺序要优先于application.yml文件，因为在项目启动的时候，会主动去拉取8888的服务，此处需要通过配置
+    bootstrap.yml的加载顺序要优先于application.yml文件，因为在项目启动的时候，会主动去拉取8888的服务，此处需要通过配置
     --文件进行覆盖,否则在打包的时候@Value也会报错，显示非法加载应用程序失败，因为此处需要优先加载uri地址内容
     --因为bootstrap.yml会优先加载，所以会先去github配置中心获取信息
-    #此处配置的内容皆是对应config server中指定的git文件的存储地址
-    #spring.application.name对应{application}
-    #spring.cloud.config.url对应config server的访问ip:端口
-    #spring.cloud.config.profile对应{profile}
-    #spring.cloud.config.label对应git分支
+    此处配置的内容皆是对应config server中指定的git文件的存储地址
+    spring.application.name对应{application}
+    spring.cloud.config.url对应config server的访问ip:端口
+    spring.cloud.config.profile对应{profile}
+    spring.cloud.config.label对应git分支
     spring:
       application:
         name: cloud
@@ -32,6 +46,8 @@
 
     2-3创建访问方法，获取指定文件内容
     @Value("${profile}")
+    除此之外，还有其余方式可以访问
+    https://www.cnblogs.com/zuowj/p/10432445.html#s-1.4
 
     M1:maven打包过程报错，提示非法的参数格式，并指出是@Value的错误，
     实际期待结果:启动不报错，且访问可以获取git指定配置文件的内容
@@ -63,6 +79,7 @@
 
 4- 实现config bus自动刷新git配置文件,
    目标:模拟多台config-client，通过请求其中一台服务的配置刷新，达到所有服务器对配置文件的刷新读取
+   该方式需要结合github hooks+bus+mq，则可以实现配置修改实时刷新项目获取配置文件(有待研究hooks)
 
 4-1安装rabbitmq
 
