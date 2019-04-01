@@ -80,3 +80,21 @@ Caused by: java.lang.IllegalStateException: Service id not legal hostname (new_u
 解决方案：出现该情况是因为请求头会发送一个原始http请求到客户端，请求头是服务器基于http协议传递资料到客户端的方式，我们一般是通过json
 格式进行传参，所以请求头的格式应该换成header('Content-type: application/json')即可解决该问题
 =========================================出现的问题====================================================
+
+
+==================================feign结合ribbon结合hystrix==================================
+8-feign与ribbon作为负载均衡的使用与关系
+feign也具备负载均衡的作用，feign内部已经融合了ribbon服务，通过feign调用服务提供者，会将请求分发至
+具有相同application-name的提供者服务上
+feign通过调用接口的方式进行请求，通过@FeignClient(name="new-user")进行服务的调用
+
+
+9-feign和hystrix的使用和关系
+feign内部已经包含了hystrix的功能，需要通过配置文件启动hystrix功能，在feignClient注解中通过配置
+注解fallback，引入服务调用失败后的回退类
+此处需要注意的是注解feignClient包含了hystrix回退以及监控功能，但是之前我比较困惑的是在Hystrix中，
+针对并发大小设计了信号量隔离与线程池隔离，在单独使用hystrix的时候，通过在注解hystrixCommand中进行配置。
+在feignClient注解中并没有进行该项配置，我在网上看到了一片文章，对于线程池的配置是在配置文件中进行配置，
+实际生产环境是什么，有待学习了解
+https://www.cnblogs.com/liugx/p/9426560.html
+
