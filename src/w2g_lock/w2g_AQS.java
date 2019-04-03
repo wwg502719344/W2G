@@ -211,7 +211,8 @@ public class w2g_AQS {
                     }
                 }
                 //shouldParkAfterFailedAcquire(p, node)方法清除当前节点之前waitStatus>0的节点(已经标注被取消的节点)。。。
-                //并返回false，返回false意味着当前节点无法被挂起，继续进行自旋操作直到可以被挂起或者成为首节点
+                //并返回false，返回false意味着当前节点无法被挂起，因为当前节点的前驱节点是被取消的节点
+                需要当前节点的前驱节点需要重新指向队列中的有效节点
                 //如果返回true，则直接被挂起
                 //parkAndCheckInterrupt方法的作用是挂起当前线程，此时从自旋中退出
                 if (shouldParkAfterFailedAcquire(p, node) &&
