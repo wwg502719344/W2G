@@ -6,6 +6,7 @@ package w2g_lock;
  */
 public class w2g_reentrantLock {
 
+    //ReentrantLockent r=new ReentrantLockent();
     //非公平性获取同步状态实现
     /**
      * 执行非公平的tryLock，tryAcquire由子类来实现
