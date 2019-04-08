@@ -53,6 +53,8 @@
     实际期待结果:启动不报错，且访问可以获取git指定配置文件的内容
     -出现问题后，首先我是将路径补全，补全后启动不再报错，但是在执行后是读取的profile的具体的值
     -后来我将注解重新改成profile，又不报错了，而且再次访问，结果并不是profile的值
+    M1-A:出现这种情况的原因我认为是出在bootstrap配置文件的配置里，如果我们设置的profile不是
+    git仓库中对应profile名，那么就会默认寻找application.properties文件
 
     M2:启动服务报错，出现此错误的原因是在依赖的maven包中，我们需要将
     spring-boot-starter替换成spring-boot-starter-web
@@ -77,12 +79,16 @@
     https://blog.csdn.net/qq_27101653/article/details/80816036
 
 
-4- 实现config bus自动刷新git配置文件,
+4- 实现config bus自动刷新git配置文件
+   场景:对于config-client服务来说，如果git仓库的配置文件被修改了，微服务并不会第一时间感应到配置
+   的修改，所以我们需要通过一个中间方(WebHook)，在感知到配置文件被修改后，向configserver发送刷新
+   配置请求，使得config-client可以及时的获取到修改后的配置(此处给我的感觉有点像git+jenkins,当
+   代码提交后，jenkins会自动进行打包和发版)
    目标:模拟多台config-client，通过请求其中一台服务的配置刷新，达到所有服务器对配置文件的刷新读取
    该方式需要结合github hooks+bus+mq，则可以实现配置修改实时刷新项目获取配置文件(有待研究hooks)
 
 4-1安装rabbitmq
-
+   目的:获取
    我使用的是docker安装mq，非常简单，具体方式如下，
    docker基本命令
    https://www.cnblogs.com/hackyo/p/9318252.html
@@ -147,6 +153,9 @@
    配置加载失败，此处应该是从eureka中读取config server的地址进行加载，但是并没有，这里我的配置基本也没有错，
    不清楚失败的原因，下面是配置文件读取的地址
    Fetching config from server at : http://localhost:8888
+   5-2:
+   ***M1解决方案***当我将bootstrap.yml改成bootstrap.properties，再次启动，成功拉取到8400端口
+   我猜想可能是由于yml文件并没有被识别并提前启动导致的
 
    ***S1***:
    初次解决方案：
@@ -155,4 +164,14 @@
    操作三:将我的client指向 demo的conofig server，启动失败，证明是我的config client有问题
    操作四:改造config client，配置，代码完全一样，依旧无法启动成功，原因不明。。。
    操作五；拷贝demo项目至自己的文件下，改造成2.0以上版本，可以进行访问
+
+
+6通过configserver进行自动刷新配置
+   6-1:实现configServer发送总线刷新请求，实现config-client实时获取git配置文件信息
+   6-1-1:pom文件中添加mq，actuator依赖包
+   6-1-2:yml中添加mq，actuator相关配置
+   6-1-3:git配置修改，手动请求config-server项目刷新总线接口
+   http://localhost:8400/actuator/bus-refresh
+   6-1-4:config-client获取git配置，实现实时获取git仓库配置文件信息
+   http://localhost:8402/profile
 

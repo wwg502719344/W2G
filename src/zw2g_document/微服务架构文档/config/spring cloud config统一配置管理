@@ -35,6 +35,9 @@ Q10:java客户端连接rabbitmq失败，端口号也是没问题的，但是报�
 Q11:cloud配置 bus 动态更改配置文件，访问config-server刷新最新配置，使的每个client都可以动态的
 读取到最新更改的配置文件，但是实际操作中client无法刷新最新配置，还是只能读取启动时候的配置
 
+Q12:config client无法通过eureka方式访问到指定的config server，但是可以通过设置uri的方式进行
+访问，每次连接都会去找8888端口
+
 ANSWER
 
 A1:bootstrap.yml加载于application.yml之前，并且会对application.yml进行覆盖,bootstrap.yml
@@ -48,7 +51,13 @@ https://www.cnblogs.com/EasonJim/p/7589546.html
 https://stackoverflow.com/questions/32997352/what-is-the-difference-between-putting-a-property-on-application-yml-or-bootstra
 
 
-A2:通过git方式存储配置文件，访问路径一般是IP:PORT/配置文件名称/profile/分支的方式
+A2:通过git方式存储配置文件，访问路径一般是
+IP:PORT/application-profile.yml的方式
+此处application为微服务名称
+profile为配置环境的名称，
+在配置文件内部，也应当遵循一定的规律，比如我个人，profile为dev下的配置文件，都会使用dev当做开头
+dev.profile=dev-2.1
+更多访问方式参考官方文档
 
 
 A3:dev显示的是yml配置文件中配置的profile，通过放在访问路径中来对配置文件进行访问，访问路径
@@ -96,3 +105,10 @@ A11:在最新版本的boot中，首先刷新最新全体配置的请求方式不
 /actuator/bus-refresh，其次，之前在配置文件中配置的暴露的访问端口写的是*，但是这里要改成
 bus-refresh，以上两点修改完毕，就可以使用config server的方式刷新所有配置文件了，具体参考
 官方文档(阅读文档解决)
+
+
+A11:出现8888端口一般需要将配置文件放入bootstrap文件下就可以解决，但我之前使用bootstrap.yml
+并不能去加载，后来我把后缀名改成properties居然神奇的可以了。。。
+但是理论上来说，我们是需要将配置文件放在bootstrap文件中的，因为服务在启动的过程需要加载配置文件
+的时候，由于application的优先级比较低，还没有被加载，这时候系统会默认去8888端口取配置文件，所以
+需要使用bootstrap文件中进行文件的配置
