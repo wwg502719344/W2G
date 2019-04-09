@@ -187,6 +187,8 @@ public class w2g_AQS {
      *
      *
      * 共享获取同步状态，在获取同步状态当时候也会唤醒后继节点一起获取同步状态
+     * 只要获取到了同步状态，那么他就是首节点，之前获取同步状态的首节点在执行完成后释放同步状态
+     * 虽然释放了同步状态，但此时该线程可能已经不是首节点
      * @param arg
      */
     /*
@@ -285,6 +287,10 @@ public class w2g_AQS {
      * P3:释放节点
      * 调用tryReleaseShared修改state状态
      * 调用doReleaseShared释放锁并唤醒后继节点
+     *
+     * 共享模式下的同步状态的释放需要注意，当前获取同步状态的线程可能已经不是首节点了，
+     * 释放同步状态后，将会唤起首节点的后继节点，首节点状态如果被更改为0，为了确保节点可以顺利
+     * 传播(setHeadAndPropagate)，将会把首节点的状态设为PROPAGATE
      */
     /*
     public final boolean releaseShared(int arg) {
@@ -304,6 +310,7 @@ public class w2g_AQS {
      * Q0:如果获取资源的线程并没有构造成首节点，那么调用doReleaseShared方法的head是什么
      * Q1:首节点当状态是在什么时候被设置的
      * Q2:首节点被设置可传播后，在什么地方起作用
+     * http://www.cnblogs.com/micrari/p/6937995.html
      */
     /*
     private void doReleaseShared() {
@@ -317,6 +324,10 @@ public class w2g_AQS {
                     unparkSuccessor(h); //P3-1:唤醒当前节点的下一个可用节点
                 }
                 //将waitStatus设置为可传播
+                此处将节点状态设置为PROPAGATE，实际上是完善和增强共享锁的唤醒机制
+                当线程并发的执行该方法时，此时头结点的状态可能已经被修改为0，
+                但是为了保证setHeadAndPropagate可以执行下去，此处需要将头结点的状态
+                更改为可传播状态
                 else if (ws == 0 &&
                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
                     continue;                // loop on failed CAS

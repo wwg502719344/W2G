@@ -56,7 +56,8 @@
         2如果waitStatus是0，则将waitStatus改为PROPAGATE
 
 
-
+关于共享锁状态PROPAGATE的必要性
+http://www.cnblogs.com/micrari/p/6937995.html
 
 
 
