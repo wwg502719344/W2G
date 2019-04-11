@@ -17,7 +17,7 @@
 
     1-5:通过上文的方式进行映射访问git地址的配置文件，但是有一些配置文件没有用-进行连接，这时候通过上面的方法就无法进行访问了
     解决方案
-    http://localhost:8400/{application}-{application}.properties
+    http://localhost:8400/{application}-{profile}.properties
     http://localhost:8400/配置文件名称.properties,即可访问cloud.properties中的内容，但是
     需要注意的是，如果配置文件名称中没有-，那么在访问的时候会直接找默认配置
 
