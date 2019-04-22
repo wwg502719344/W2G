@@ -5,6 +5,21 @@ Q2:实际场景下，一个用户请求可能需要调用多个微服务，一�
 Q3:每个微服务都有自己独立的数据库，如何保证数据的关联，同步
 
 Q4:微服务下数据一致性问题
+
+Q5:针对4中zuul过滤器，是否需要创建4个过滤类，还是一个过滤类中可以包含4种过滤类型
+
+Q6:该过滤器是pre类型的过滤器，那么在pre类型的过滤器当中，如何实现为每一个微服务进行认证拦截操作
+
+Q7:在通过zuul网关访问实现了hystrix的降级接口，报错
+com.netflix.zuul.exception.ZuulException: Hystrix Readed time out
+
+Q8:通过自定义方式实现访问路由的配置，之前是通过path->service-id的方式
+
+
+
+
+
+
 ANSWER:
 A1:把@EnableZuulServer改成@EnableZuulProxy，@EnableZuulProxy是EnableZuulServer时的超集，包含所有的过滤
 EnableZuulServer会返回一个空白zuul
@@ -15,9 +30,12 @@ A2:通过Zuul聚合微服务，用户发送一个请求给zuul，由zuul请求�
 A3:1群友回复:模块调用的方式，先调用其中一个信息，在调用另一张表的信息，最后进行数据合并，设计初衷，
 业务独立，相互调用
 
-Q5:在通过zuul网关访问实现了hystrix的降级接口，报错
-com.netflix.zuul.exception.ZuulException: Hystrix Readed time out
-出现此情况原因是zuul调用等待超时
+A5:创建4种过滤类，一种过滤类型对应一个业务处理逻辑
+
+A6:在run方法中执行业务逻辑，run方法是过滤类中处理过滤逻辑的地方，可以通过在启动类中将过滤类注入的方式
+或是添加注解@Componen，在项目启动的时候，自动注入到spring的IOC容器当中
+
+A7:出现此情况原因是zuul调用等待超时
 在yml配置文件中加入
 zuul:
   host:
@@ -25,3 +43,8 @@ zuul:
       socket-timeout-millis: 60000
 把等待时间设置得长一点就可以了
 
+A8:之前通过path->service-id的方式来配置zuul路由，当微服务多了之后，
+每次都得改zuul网关的配置文件而且还得重启项目，这样是非常麻烦的，可以
+通过动态配置实现这种配置，github实现动态路由文档
+https://github.com/lexburner/zuul-gateway-demo
+详见Zuul网关开发文档

@@ -15,8 +15,8 @@ zuul对外提供统一的api请求地址，并且可以处理一些不涉及到�
 
 
 2:zuul进行路由控制
-通过在yml文件中进行具体路由跳转逻辑，可以通过请求访问的url具体跳转到指点的微服务上
-zuul.routes是一个路径集合，包含了很多路径，可以进行自定义设置，用于指定路由(如果微服务过多，不会很乱吗)
+1-通过在yml文件中进行具体路由跳转逻辑，可以通过请求访问的url具体跳转到指点的微服务上(url的配置方式比较死)
+2-zuul.routes是一个路径集合，包含了很多路径，可以进行自定义设置，用于指定路由(如果微服务过多，不会很乱吗)
 配置微服务和路径的映射
 zuul:
   host:
@@ -26,10 +26,35 @@ zuul:
     user-route:
       service-id: new-movie
       path: /movie/**
+
+通过service-id的方式对请求路径进行控制，在高可用的情况下，可以不用在去配置zuul服务的url，
+通常情况下都是使用这种方式进行zuul网关路由的配置
+
 也可以通过actuator进行路由映射的查看
 http://localhost:8400/actuator/routes
 
+
 3:zuul过滤器
-zuul有四种过滤器，作用于请求前
+zuul有四种过滤器，作用于请求时候的四个时候
+
+3-1:自定义网关过滤类继承ZuulFilter，实现网关鉴权等作用，run方法实现过滤逻辑
+
+3-2:实现FallbackProvider的实现类是为zuul提供的熔断回退类，当api不可用时，提供熔断降级处理，
+zuul网关内部默认集成了Hystrix、Ribbon，在F版中需实现FallbackProvider类，
+F版以前不是FallbackProvider
 
 
+
+4:动态路由解析
+在传统的zuul路由解析中，我们需要将路由配死在yml文件中，但这样的缺点很明显，随着项目的增加，我们
+几乎每次添加一个路由都需要在配置文件中添加新的配置并且进行重启，通过动态路由配置，可以灵活的对配置
+进行管理
+4-1:通过自定义类继承SimpleRouteLocator实现RefreshableRouteLocator的方式灵活来管理路由
+，路由存放在DB中，当新增或是修改DB中数据的时候，调用RefreshRouteService.refreshRoute刷新
+配置，则可以读取到新的配置，无需重启项目
+
+
+
+笔记参考文档
+https://www.cnblogs.com/zuowj/p/10645189.html#s-2.7 //全面解析zuul的使用和调用
+https://github.com/lexburner/zuul-gateway-demo      //github上解析动态路由
