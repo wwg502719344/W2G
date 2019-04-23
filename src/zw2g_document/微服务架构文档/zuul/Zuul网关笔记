@@ -49,12 +49,28 @@ F版以前不是FallbackProvider
 在传统的zuul路由解析中，我们需要将路由配死在yml文件中，但这样的缺点很明显，随着项目的增加，我们
 几乎每次添加一个路由都需要在配置文件中添加新的配置并且进行重启，通过动态路由配置，可以灵活的对配置
 进行管理
-4-1:通过自定义类继承SimpleRouteLocator实现RefreshableRouteLocator的方式灵活来管理路由
-，路由存放在DB中，当新增或是修改DB中数据的时候，调用RefreshRouteService.refreshRoute刷新
+4-1:通过自定义类继承SimpleRouteLocator实现RefreshableRouteLocator的方式灵活来管理路由，
+路由存放在DB中，当新增或是修改DB中数据的时候，调用RefreshRouteService.refreshRoute刷新
 配置，则可以读取到新的配置，无需重启项目
 
+核心1:读取数据库配置路由地址并跳转,在simpleroutelocator类中，通过zuulProperties获取配置文件
+核心修改:locateRoutes()，具体就是在这儿定位路由信息的，我们之后从数据库加载路由信息，主要也是从这儿改写
+...该方法的主要作用就是加载配置文件，获取路由的对应关系
+核心实现:getRoutes()方法中，根据locateRoutes()获取的map类型的路由定位器，
+...最终把定位的Routes以list的方式提供出去，这个list实际就是对应匹配的路由列表
+逻辑实现:getMatchingRoute()方法，可以根据实际路径匹配并返回getRoutes()中具体的Route来进行业务逻辑的操作
+
+核心2:实现配置的实时刷新，这里需要提到另外一个类DiscoveryClientRouteLocator，它具备实时刷新的作用
+原理:zuul中提供了路由刷新监听器的功能(onApplicationEvent())，在这个方法中如果事件是
+...RoutesRefreshedEvent，下一次匹配到路径时，如果发现为脏，则会去刷新路由信息
+方法:使用ApplicationEventPublisher，该类的作用是发布事件，也就是把某个事件告诉所有与这个事件相关的监听器
+具体的刷新流程其实就是从数据库重新加载了一遍，具体的处理逻辑，还需要去解读源码才能明白
 
 
 笔记参考文档
 https://www.cnblogs.com/zuowj/p/10645189.html#s-2.7 //全面解析zuul的使用和调用
 https://github.com/lexburner/zuul-gateway-demo      //github上解析动态路由
+
+
+
+
