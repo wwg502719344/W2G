@@ -1,3 +1,6 @@
+0:通篇阅读
+https://www.cnblogs.com/zuowj/p/10645189.html#s-2.8
+
 1-zuul基础概念
 1-1:什么是zuul
 zuul作为微服务系统的网关，统一接受来自客户端对服务的请求，zuul旨在实现动态路由，监控以及安全

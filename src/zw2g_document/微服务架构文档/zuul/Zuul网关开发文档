@@ -1,3 +1,6 @@
+0:通篇阅读
+https://www.cnblogs.com/zuowj/p/10645189.html#s-2.8
+
 1-创建zuul项目，通过zuul进行路由管理，代理微服务，客户端只需要设置好请求路径即可访问相关微服务接口
 2-添加相关依赖，启动项添加启动zuul注解
 @EnableZuulProxy
@@ -18,7 +21,8 @@ zuul:
 
 通过这种方式，我们就成功将new-movie映射到movie路径下了
 http://localhost:8400/movie/userBack/1
-
+实际上如果不进行path->service-id的配置，也是可以直接进行访问的
+http://localhost:8400/new-movie/userBack/1
 
 可以指定需要访问的微服务或是需要忽略的微服务
 zuul:
@@ -87,7 +91,7 @@ A6-1:可以，方式同上
 
 
 7-实现动态配置路由跳转
-    7-1:通过db的方式实现动态路由((牛逼)
+    7-1:通过db的方式实现动态路由(牛逼)
     7-1-1:添加相关注解，因为使用了数据库，所以此处需要添加数据库查询相关的maven
     <dependency>
     	<groupId>com.alexkasko.springjdbc</groupId>
@@ -123,3 +127,22 @@ A6-1:可以，方式同上
         RoutesRefreshedEvent routesRefreshedEvent = new RoutesRefreshedEvent(routeLocator);
         publisher.publishEvent(routesRefreshedEvent);
     }
+
+    7-1-4:
+    //查看可用路由，看我们配置的路由有没有被加载
+    http://localhost:8400/actuator/routes
+    //根据我们配置的路由进行访问
+    http://localhost:8400/user/test
+    //刷新路由配置(本质是访问实时刷新的方法，这里我改成api方便进行访问)
+    http://localhost:8400/refreshRoute
+
+
+    7-2:通过配置文件进行动态路由(待研究)
+        ...
+
+
+8:Zuul 实现限流：https://www.cnblogs.com/tiancai/p/9623063.html
+    ...
+
+9:Zuul 超时、重试、并发参数设置：https://blog.csdn.net/xx326664162/article/details/83625104
+    ...
