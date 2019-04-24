@@ -14,6 +14,7 @@ zuul对外提供统一的api请求地址，并且可以处理一些不涉及到�
 等作用
 
 
+
 2:zuul进行路由控制
 1-通过在yml文件中进行具体路由跳转逻辑，可以通过请求访问的url具体跳转到指点的微服务上(url的配置方式比较死)
 2-zuul.routes是一个路径集合，包含了很多路径，可以进行自定义设置，用于指定路由(如果微服务过多，不会很乱吗)
@@ -32,6 +33,7 @@ zuul:
 
 也可以通过actuator进行路由映射的查看
 http://localhost:8400/actuator/routes
+
 
 
 3:zuul过滤器
@@ -66,11 +68,12 @@ F版以前不是FallbackProvider
 方法:使用ApplicationEventPublisher，该类的作用是发布事件，也就是把某个事件告诉所有与这个事件相关的监听器
 具体的刷新流程其实就是从数据库重新加载了一遍，具体的处理逻辑，还需要去解读源码才能明白
 
-
 笔记参考文档
 https://www.cnblogs.com/zuowj/p/10645189.html#s-2.7 //全面解析zuul的使用和调用
 https://github.com/lexburner/zuul-gateway-demo      //github上解析动态路由
 
+
+5:服务之间通过zuul网关调用
 
 
 
