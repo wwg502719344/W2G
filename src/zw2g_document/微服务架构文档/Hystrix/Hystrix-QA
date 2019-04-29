@@ -36,3 +36,17 @@ management:
         include: '*'
 2是springboot2.0以上访问相应插件的内容需要在访问路径上添加
 插件名称。http://localhost:8100/actuator/routes即可，类似的还有
+
+
+Q6:通过feign集成hystrix如何设置隔离策略
+A6:通过在配置文件中对feign相关属性进行设置
+feign:
+  hystrix:
+    enabled: true #启用hystrix
+    command:
+      default:
+        execution:
+          isolation:
+            strategy: #默认是THREAD,这里演示改成了信号量隔离模式
+              semaphore:
+                maxConcurrentRequests: 3

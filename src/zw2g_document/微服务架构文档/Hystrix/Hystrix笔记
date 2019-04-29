@@ -53,3 +53,5 @@ Hystrix为每个commandKey维护了一个熔断器，为了避免并发操作导
 
 4:Feign通过配置文件可开启熔断器
     feign.hystrix.enabled=true
+
+
