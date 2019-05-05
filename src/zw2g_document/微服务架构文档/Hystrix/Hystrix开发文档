@@ -150,3 +150,27 @@ feign内部已经包含了hystrix的功能，需要通过配置文件启动hystr
 @FeignClient(fallback = HystrixClientFallback.class)
 
 
+10-hystrix请求缓存
+
+  @GetMapping("/getCache1")
+  public Integer getCache1() {
+    HystrixRequestContext.initializeContext();//初始化请求上下文
+    Integer a=cacheService.getRandomInteger(1);
+    System.out.println("第一次获取缓存值为"+a);
+    Integer a1=cacheService.getRandomInteger(1);
+    System.out.println("第二次获取缓存值为"+a1);
+    Integer a2=cacheService.getRandomInteger(1);
+    System.out.println("第三次获取缓存值为"+a2);
+    return a;
+  }
+
+  @CacheResult
+  @HystrixCommand(commandKey = "commandKey2")
+  public Integer getRandomInteger(@CacheKey int id) {
+      Integer a1=storeClient.getRandomInteger();
+      return a1;
+  }
+
+
+11-请求合并
+详见相关代码
