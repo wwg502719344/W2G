@@ -173,4 +173,20 @@ feign内部已经包含了hystrix的功能，需要通过配置文件启动hystr
 
 
 11-请求合并
-详见相关代码
+详见相关代码(非注解方式)
+注解方式:
+    @HystrixCollapser(batchMethod = "findAllByAnnotation",collapserProperties = {@HystrixProperty(name = "timerDelayInMilliseconds",value = "100")})
+    public Future<UserInfo> findOneByAnnotation(Integer id){
+        //你会发现根本不会进入这个方法体
+        System.out.println("findOne方法执行了，ids= "+id);
+        return null;
+    }
+
+    @HystrixCommand
+    public List<UserInfo> findAllByAnnotation(List<Integer> ids){
+        System.out.println("findAll方法执行了，ids= "+ids);
+        UserInfo[] users = restTemplate.getForObject("http://localhost:8100/users?ids={1}", UserInfo[].class, StringUtils.join(ids, ","));
+        return Arrays.asList(users);
+    }
+
+通过调用相关service即可实现
