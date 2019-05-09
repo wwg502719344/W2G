@@ -81,6 +81,7 @@ M1:开发过程中发现请求失败，原因是feign注解无法使用@RequestP
 
 
 
+
 hystrix基础相关博客
 https://www.cnblogs.com/zuowj/p/10418932.html
 hystrix请求缓存相关博客

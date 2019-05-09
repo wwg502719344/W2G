@@ -174,6 +174,89 @@ feign内部已经包含了hystrix的功能，需要通过配置文件启动hystr
 
 11-请求合并
 详见相关代码(非注解方式)
+11-1创建请求合并类和批量处理类,通过这两个类分别获取指定时间内的请求并进行批量处理，处理完后会
+将处理结果返回对应的requesst体中
+请求合并:该类的主要作用是设置收集请求的时间，并获取一段时间内的请求，然后获取请求的相关参数，调用
+批量处理类，合并类继承HystrixCollapser类，创建构造方法，设置合并器的时间，多久合并一次请求
+/**
+ * 构造方法，主要是用来设置合并器的时间，多长时间合并一次请求
+ * @param cacheService 调用的服务
+ * @param userId 单次需要传递的业务id
+ */
+public UserCollapseCommand(CacheServiceImpl cacheService, Integer userId){
+    super(Setter.withCollapserKey(HystrixCollapserKey.Factory.asKey("userCollapseCommand")).
+            andCollapserPropertiesDefaults(HystrixCollapserProperties.Setter().withTimerDelayInMilliseconds(100)));
+    this.service = cacheService;
+    this.userId = userId;
+}
+
+通过收集器 获取业务参数，请求批量执行程序
+/**
+ * 获取传入的业务参数集合，调用执行方法执行批量请求
+ * @param collapsedRequests
+ * @return
+ */
+@Override
+protected HystrixCommand<List<UserInfo>> createCommand(Collection<CollapsedRequest<UserInfo, Integer>> collapsedRequests) {
+    System.out.println("HystrixCommand========>");
+    //按请求数声名UserId的集合
+    List<Integer> userIds = new ArrayList<>(collapsedRequests.size());
+    //通过请求将100毫秒中的请求参数取出来装进集合中
+    userIds.addAll(collapsedRequests.stream().map(CollapsedRequest::getArgument).collect(Collectors.toList()));
+    //返回UserBatchCommand对象，自动执行UserBatchCommand的run方法
+    HystrixCommand<List<UserInfo>> a=new UserBatchCommand(service, userIds);
+
+    return a;
+}
+
+重写方法mapResponseToRequests，获取请求结果，并根据对应的requesrt请求将请求结果返回到对应
+的request中
+
+
+请求批量处理类:该类主要是调用处理批量的方法
+public class UserBatchCommand extends HystrixCommand<List<UserInfo>> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserBatchCommand.class);
+
+    private CacheServiceImpl service;
+
+    private List<Integer> ids;
+
+    public UserBatchCommand(CacheServiceImpl cacheService, List<Integer> ids){
+        super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("ExampleGroup")).
+                andCommandKey(HystrixCommandKey.Factory.asKey("GetValueForKey")));
+        this.service =cacheService ;
+        this.ids = ids;
+    }
+
+    /**
+     * 调用批量处理的方法
+     * @return
+     */
+    @Override
+    protected List<UserInfo> run() {
+        List<UserInfo> users = service.findAll(ids);
+        System.out.println(users);
+        return users;
+    }
+
+    /**
+     * Fallback回调方法，如果没有会报错
+     */
+    @Override
+    protected List<UserInfo> getFallback(){
+        System.out.println("UserBatchCommand的run方法，调用失败");
+        return null;
+    }
+}
+
+通过该方法，我们就可以获取一定时间内的请求，进行批量处理，有效的降低服务器处理压力，提高
+服务器的吞吐量
+
+
+
+2-
+
 注解方式:
     @HystrixCollapser(batchMethod = "findAllByAnnotation",collapserProperties = {@HystrixProperty(name = "timerDelayInMilliseconds",value = "100")})
     public Future<UserInfo> findOneByAnnotation(Integer id){
