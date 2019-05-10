@@ -1,0 +1,26 @@
+内存分析
+cpu飙射，内存飙升处理办法
+
+一:分析线程状态
+1首先查看服务器内存占用情况
+命令 top
+2查看内存异常的pid内部线程占用情况
+命令 top -Hp pid
+3收集java进程快照，分析进程中个线程的情况
+命令 jstack 22296 > 12.txt
+4将刚才pid中内存或cpu占用最高的pid转换为16进制，在刚才生成的txt中进行查找，这里需要注意的是
+在生成的线程快照中，线程的id都是16进制的，所以我们需要进行转换
+命令 printf "%x\n" 22593->查看pid16进制的参数
+打开txt文档进行查找
+
+二:生成dump文件进行内存分析
+
+1生成java进程的内存快照
+命令 jmap -dump:format=b,file=tomcat6666.hprof 22296
+2通过MAT进行内存分析
+
+
+MAT独立版下载地址:https://www.eclipse.org/mat/downloads.php
+内存分析相关博客:
+https://www.jianshu.com/p/738b4f3bc44b
+https://mp.weixin.qq.com/s?__biz=MzU2NjIzNDk5NQ==&mid=2247485969&idx=1&sn=7913218658b030d56a03c453a3ffe3f4&chksm=fcaed00dcbd9591ba7b4112d834cf1ffa30eeb03ebc6fe018883370d81ee09c8db62da3324f4&mpshare=1&scene=1&srcid=0510cA3IxGhbX2Ycq0g9YtLx&key=275ea42e4205f37bb91e3e13f9eaa403b689e4c47d420dd1987c6ac649b71f82fccf882fe27610bfaf580a32f841b5233dc1d460efa668937b970c2b9cfaad83f38b1029b116359df1bc91cd7453edd2&ascene=1&uin=MTkyMDIyMzc0Mg%3D%3D&devicetype=Windows+10&version=62060739&lang=zh_CN&pass_ticket=L4PIOCnXCr9Lx3QZd%2FMUpUUZ70swnrn2vDyKwsBR7wI5hv2PtC4JLlyV06UkAmFX
