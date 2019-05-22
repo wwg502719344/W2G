@@ -41,8 +41,7 @@ WATCH:监视一个(或多个) key ，如果在事务执行之前这个(或这些
   }
 
 public  boolean transMethod(int amtToSubtract) throws InterruptedException {
-    int balance;  // 余额
-    int debt;  // 负债
+    int balance;
     boolean isfalse=false;
     newJedis.set("title", "100");
     newJedis.set("title2", "0");
