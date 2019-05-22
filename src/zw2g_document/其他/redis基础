@@ -1,0 +1,156 @@
+redis事务实现
+  spring事务的弊端:
+    在spring事务中，通过注解的方式为方法添加事务，但是往往事务的执行是统一的，也就是说，我们的查询新增
+    都是在同一个事务中进行，事务结束后，对数据库的操作才会统一写进数据库当中，那么在并发的环境下，
+    我们根本无法得知数据库的数据是否已提前被修改掉，因为事务没有被提交，所以无法感知到代码是否被执行，
+    为何要使用redis事务:
+    在上面所阐述的弊端中，我们可以通过redis事务来解决，即当redis中的数据被修改后，我们可以立刻感知到
+    数据被修改，从而使redis事务失效，即所有redis执行命令将不会执行
+    redis事务的弊端:
+    无法进行事务的回滚操作，如果事务执行失败，我们需要对事务进行回滚操作
+
+redis执行命令
+MULTI:开启事务，事务块内的多条命令会按照先后顺序被放进一个队列当中，最后由 EXEC 命令原子性(atomic)地执行。
+EXEC:执行事务，假如某个(或某些) key 正处于 WATCH 命令的监视之下，且事务块中有和这个(或这些) key 相关的命令，
+那么 EXEC 命令只在这个(或这些) key 没有被其他命令所改动的情况下执行并生效，否则该事务被打断(abort)。
+WATCH:监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，那么事务将被打断。
+
+  /**
+   * 测试redis事务
+   */
+  @Override
+  public void testTransaction(){
+      boolean resultValue = false;
+      try {
+          resultValue = transMethod(10);
+          if (resultValue==true){
+              News news=new News();
+              news.setTitle("tt");
+              newsMapper.insert(news);
+              newJedis.set("title", "300");
+          }
+      } catch (InterruptedException e) {
+          e.printStackTrace();
+      }
+      System.out.println("result is " + resultValue);
+
+      int title = Integer.parseInt(newJedis.get("title"));
+      int title2 = Integer.parseInt(newJedis.get("title2"));
+
+      System.out.printf("title: %d, title2: %d\n", title, title2);
+  }
+
+public  boolean transMethod(int amtToSubtract) throws InterruptedException {
+    int balance;  // 余额
+    int debt;  // 负债
+    boolean isfalse=false;
+    newJedis.set("title", "100");
+    newJedis.set("title2", "0");
+
+    newJedis.watch("title", "title2");
+
+    balance = Integer.parseInt(newJedis.get("title"));
+
+    //if (balance < amtToSubtract) {
+    //    newJedis.unwatch();  // 放弃所有被监控的键
+    //    System.out.println("Insufficient balance");
+    //    return false;
+    //}
+
+
+
+  Transaction transaction = newJedis.multi();
+  // 扣钱
+  //transaction.set("title","200");//此处注掉，list为0，如果在此期间balance被修改，则事务失效
+  //Thread.sleep(5000);  // 在外部修改 title 或者 title2
+  System.out.println("stop");//此处方便我打断点对redis数据进行修改来验证事务
+  // list为null说明事务执行失败
+  List<Object> list = transaction.exec();
+
+  if (list!=null){//如果事务执行成功
+      isfalse=true;
+  }
+  return isfalse;
+  }
+
+
+
+redis实现分布式锁
+在单体项目中，我们可以通过synchronize或者lock实现锁功能，但是针对分布式系统来说，我们则需要通过分布式锁来实现共享数据的一致性
+
+redis分布式锁基本作用
+在分布式系统中，常常需要协调他们的动作。如果不同的系统或是同一个系统的不同主机之间共享了一个或一组资源，那么访问这些资源的时候，
+往往需要互斥来防止彼此干扰来保证一致性，这个时候，便需要使用到分布式锁来保证不同客户端的请求可以互斥的访问共享资源
+
+分布式锁在线程并发访问的控制
+但是需要特别注意的是，分布式锁和控制请求的并发访问并不能完全一概而论，也就是说，分布式锁本身只是保证多个访问请求只有一个可以正确
+获取锁资源，并不会考虑其他没有获取锁资源的请求会怎么样，比如之前的推送模块，多个tomcat都有并发推送 相同消息，
+可以通过分布式锁实现只允许一个请求进行推送,但我们在实际开发的时候，可以让没有获取到锁的线程再次访问请求，
+
+单节点redis的方法
+在多个线程并发的访问某个共享资源的时候，通过redis命令将key值写入redis中，如果返回true，则说明获取锁成功，如果返回false，
+则说明获取锁失败，从而保证获取锁的互斥性
+
+redis分布式锁的执行命令
+SET keyname keyvalue NX PX 30000
+keyname是进行业务标识的
+keyvalue是唯一值，用于解锁,可以通过UUID.randomUUID()的方式获取
+NX:在key存在的时候，将key的值作为设置为value，不存在则不做任何操作，成功返回1，不成功返回0
+PX 3000:过期毫秒数，标识自动过期时间，防止死锁
+
+并发访问类
+通过cyclicBarrier保证线程可以同时并发的访问redis锁，如果只有一个线程可以获取到锁，说明分布式锁可以保证
+分布式并发环境下的锁获取
+
+
+
+
+redis多节点情况下的分布式锁处理
+在单点redis的情况下，如果发生宕机，将会导致分布式锁的失效，这种情况是灾难性的，所以正常情况下，我们需要进行redis的主从配置，
+但是如果配置了redis的主从复制就会发生，master节点宕机的时候，线程A并没有将锁的key值写入slave，这就导致分布式锁违反了互斥性，
+在这种情况下，我们可以使用redlock进行分布式锁的处理
+
+redlock基本理念
+配置多个redis的master节点，彼此之间并不进行复制操作或其他协调操作，通过客户端在这些redis节点上进行同样的获取和销毁锁的操作，
+保证如果某个redis宕机，也不会影响到锁的获取，具体执行步骤如下
+1获取当前系统时间
+2为每个客户端对redis的请求设置超时时限，目的是防止redis已挂掉的情况下，客户端还在等待连接
+3redis的最终失效时间应减去获取redis的延迟时间，目的是保证redis失效的同步性
+4如果获取锁失败(没有在一半的redis上获取锁成功)，则需要将之前获取的锁全部解锁，防止下次在获取的时候无法获取
+
+redisson对redlock的封装,相关代码如下
+
+相关maven
+    <dependency>
+        <groupId>org.redisson</groupId>
+        <artifactId>redisson</artifactId>
+        <version>3.3.2</version>
+    </dependency>
+
+获取锁代码
+    Config config = new Config();
+    config.useSentinelServers().addSentinelAddress("127.0.0.1:6369","127.0.0.1:6379", "127.0.0.1:6389")
+            .setMasterName("masterName")
+            .setPassword("password").setDatabase(0);
+    RedissonClient redissonClient = Redisson.create(config);
+    // 还可以getFairLock(), getReadWriteLock()
+    RLock redLock = redissonClient.getLock("REDLOCK_KEY");
+    boolean isLock;
+    try {
+        isLock = redLock.tryLock();
+        // 500ms拿不到锁, 就认为获取锁失败。10000ms即10s是锁失效时间。
+        isLock = redLock.tryLock(500, 10000, TimeUnit.MILLISECONDS);
+        if (isLock) {
+            //TODO if get lock success, do something;
+        }
+    } catch (Exception e) {
+    } finally {
+        // 无论如何, 最后都要解锁
+        redLock.unlock();
+    }
+
+
+多节点实现redis分布式锁
+https://mp.weixin.qq.com/s?__biz=MzU2NjIzNDk5NQ==&mid=2247485960&idx=1&sn=9d2fc991f4e7057a44a8c67a8e885cdd&chksm=fcaed014cbd959020f9841482527e552e53af1cbada9064dd47cb4c25af37f539cd8dbabed8d&scene=0&xtrack=1&key=e8a88acc138eabf4b438b5af1940c70916688ef4834a49bfaef24adb1483997a1feeb235f30b06c0b77a59d88794ba3b0d0148822f51ca454c6cc063fed4789dd3d6c124ed2059b8f723a876b9f56e96&ascene=1&uin=MTkyMDIyMzc0Mg%3D%3D&devicetype=Windows+10&version=62060739&lang=zh_CN&pass_ticket=eK7xM4rLn8yHwOZ7%2FcrBEM281oiebbbYOl%2FyQz7autXj%2F1qPS3xQwGjcmAytkKZk
+redis全面解析
+https://blog.csdn.net/hcmony/article/details/80694560
