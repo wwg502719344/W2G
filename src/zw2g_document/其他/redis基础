@@ -149,7 +149,7 @@ redisson对redlock的封装,相关代码如下
     }
 
 
-多节点实现redis分布式锁
+多节点实现redis分布式锁:
 https://mp.weixin.qq.com/s?__biz=MzU2NjIzNDk5NQ==&mid=2247485960&idx=1&sn=9d2fc991f4e7057a44a8c67a8e885cdd&chksm=fcaed014cbd959020f9841482527e552e53af1cbada9064dd47cb4c25af37f539cd8dbabed8d&scene=0&xtrack=1&key=e8a88acc138eabf4b438b5af1940c70916688ef4834a49bfaef24adb1483997a1feeb235f30b06c0b77a59d88794ba3b0d0148822f51ca454c6cc063fed4789dd3d6c124ed2059b8f723a876b9f56e96&ascene=1&uin=MTkyMDIyMzc0Mg%3D%3D&devicetype=Windows+10&version=62060739&lang=zh_CN&pass_ticket=eK7xM4rLn8yHwOZ7%2FcrBEM281oiebbbYOl%2FyQz7autXj%2F1qPS3xQwGjcmAytkKZk
 redis全面解析
 https://blog.csdn.net/hcmony/article/details/80694560
