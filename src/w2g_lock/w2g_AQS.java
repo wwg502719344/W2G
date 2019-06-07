@@ -1,5 +1,7 @@
 package w2g_lock;
 
+import org.redisson.Redisson;
+
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.Lock;
 
@@ -26,6 +28,8 @@ import java.util.concurrent.locks.Lock;
 public class w2g_AQS {
 
     AbstractQueuedSynchronizer a=null;
+
+    Redisson redisson = Redisson.create();
 
 
     /**

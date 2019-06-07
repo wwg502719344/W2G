@@ -71,6 +71,11 @@ F版以前不是FallbackProvider
 方法:使用ApplicationEventPublisher，该类的作用是发布事件，也就是把某个事件告诉所有与这个事件相关的监听器
 具体的刷新流程其实就是从数据库重新加载了一遍，具体的处理逻辑，还需要去解读源码才能明白
 
+总结:
+通过重写locateRoutes()方法，从数据库中获取相应的路由之间的映射关系，在通过监听的方式进行路由的刷新，重新获取
+新的路由关系
+
+
 笔记参考文档
 https://www.cnblogs.com/zuowj/p/10645189.html#s-2.7 //全面解析zuul的使用和调用
 https://github.com/lexburner/zuul-gateway-demo      //github上解析动态路由
