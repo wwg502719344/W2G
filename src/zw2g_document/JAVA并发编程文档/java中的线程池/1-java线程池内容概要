@@ -120,6 +120,10 @@ run()调用了runWorker(),目的是在该方法中启动线程的执行，执行
 
 
 P20:建议查看的文章
+
+0:线程基本知识概要，设计所有线程必须掌握的基础知识，建议通读
+https://mp.weixin.qq.com/s/mA59X7bOotyWwvf2V6zMIA
+
 1：源码方法注释翻译
 https://blog.csdn.net/iromkoear/article/details/66016153
 
@@ -136,3 +140,4 @@ https://blog.csdn.net/notonlyrush/article/details/78737425
 
 5:如何终止线程池以及Worker继承AQS的目的
 https://www.cnblogs.com/trust-freedom/p/6693601.html
+
