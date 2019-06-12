@@ -59,10 +59,15 @@ F版以前不是FallbackProvider
 配置，则可以读取到新的配置，无需重启项目
 
 核心1:读取数据库配置路由地址并跳转,在simpleroutelocator类中，通过zuulProperties获取配置文件
-核心修改:locateRoutes()，具体就是在这儿定位路由信息的，我们之后从数据库加载路由信息，主要也是从这儿改写
+核心修改:
+    locateRoutes()，具体就是在这儿定位路由信息的，我们之后从数据库加载路由信息，主要也是从这儿改写
 ...该方法的主要作用就是加载配置文件，获取路由的对应关系
-核心实现:getRoutes()方法中，根据locateRoutes()获取的map类型的路由定位器，
-...最终把定位的Routes以list的方式提供出去，这个list实际就是对应匹配的路由列表
+
+核心实现:
+    getRoutes()方法中，根据locateRoutes()获取的map类型的路由定位器，
+...通过simpleroutelocator类中的getRoutes方法，把定位的Routes以list的方式提供出去，这个list就是
+之前配置文件中的配置路由，加载进内存当中进行路由的跳转，我们通过重写这个方法，从数据库中获取到新的路由地址
+，并将这个路由地址以list的方式加载进内存中。
 逻辑实现:getMatchingRoute()方法，可以根据实际路径匹配并返回getRoutes()中具体的Route来进行业务逻辑的操作
 
 核心2:实现配置的实时刷新，这里需要提到另外一个类DiscoveryClientRouteLocator，它具备实时刷新的作用
