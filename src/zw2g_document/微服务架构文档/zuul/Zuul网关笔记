@@ -37,7 +37,24 @@ zuul:
 也可以通过actuator进行路由映射的查看
 http://localhost:8400/actuator/routes
 
+2-1:zuul实现eureka的负载均衡
+通过http://localhost:8400/actuator/routes可以查看到zuul的可用路径，此处可以发现在高可用环境下是有多个
+服务可用的
+zuul内部使用ribbon作为负载均衡器
 
+2-2:zuul的架构，两种zuul架构实现
+2-2-1:在将zuul服务添加进eureka中的情况下
+优点:zuul可以默认对eureka下的服务进行负载，比较方便
+缺点:zuul加入到rureka中，也就变向的要求所有服务都加入到eureka中，这样才能对该服务进行负载和访问
+2-2-2:zuul+nginx进行负载
+优点:避免了服务的侵入性，通过访问zuul，由zuul发出请求访问nginx达到负载均衡的作用，使用该方法需要实现
+服务的动态加载
+缺点:丧失了zuul+eureka方式的便捷性，在实现了动态路由的情况下也需要将所有高可用都配置一遍，同时意味着
+随着项目的增多，需要不断的添加nginx的配置
+
+2-3:zuul发送请求访问微服务和zuul请求nginx在请求微服务的异同
+zuul获取请求的路径，像这个路径发出请求，nginx可以接收到zuul发送的请求并实现路由跳转，
+个人感觉这样一点都不好用，反而增加了nginx配置的复杂程度
 
 3:zuul过滤器
 zuul有四种过滤器，作用于请求时候的四个时候
