@@ -25,7 +25,7 @@
 
 2-构建config client，获取config server的相关配置
     2-1引入相关maven依赖
-    2-2创建bootstrap.yml文件，配置获取config server的相关参数
+    2-2创建bootstrap.properties文件，配置获取config server的相关参数
     bootstrap.yml的加载顺序要优先于application.yml文件，因为在项目启动的时候，会主动去拉取8888的服务，此处需要通过配置
     --文件进行覆盖,否则在打包的时候@Value也会报错，显示非法加载应用程序失败，因为此处需要优先加载uri地址内容
     --因为bootstrap.yml会优先加载，所以会先去github配置中心获取信息
@@ -55,6 +55,10 @@
     -后来我将注解重新改成profile，又不报错了，而且再次访问，结果并不是profile的值
     M1-A:出现这种情况的原因我认为是出在bootstrap配置文件的配置里，如果我们设置的profile不是
     git仓库中对应profile名，那么就会默认寻找application.properties文件
+
+    *M1-B:我们在启动项目的时候config-client会从config-server拉取配置信息，但是我之前使用bootstrap.yml
+    会从8888端口下拉取配置信息，故是拉取不到@Value("${profile}")的，我将bootstrap.yml改成properties
+    后缀，就可以顺利拉取到相关配置信息
 
     M2:启动服务报错，出现此错误的原因是在依赖的maven包中，我们需要将
     spring-boot-starter替换成spring-boot-starter-web
@@ -175,3 +179,7 @@
    6-1-4:config-client获取git配置，实现实时获取git仓库配置文件信息
    http://localhost:8402/profile
 
+
+7mq起到的作用，以及bootstrap文件和application文件的作用和区别
+   1-bootstrap是一种引导性的配置文件，先于application文件的加载，常用语一些配置文件的加载
+   2-
