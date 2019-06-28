@@ -46,7 +46,7 @@ http://localhost:8400/actuator/routes
 2-2:zuul的架构，两种zuul架构实现
 2-2-1:在将zuul服务添加进eureka中的情况下
 优点:zuul可以默认对eureka下的服务进行负载，比较方便
-缺点:zuul加入到rureka中，也就变向的要求所有服务都加入到eureka中，这样才能对该服务进行负载和访问
+缺点:zuul加入到eureka中，也就变向的要求所有服务都加入到eureka中，这样才能对该服务进行负载和访问
 2-2-2:zuul+nginx进行负载
 优点:避免了服务的侵入性，通过访问zuul，由zuul发出请求访问nginx达到负载均衡的作用，使用该方法需要实现
 服务的动态加载
