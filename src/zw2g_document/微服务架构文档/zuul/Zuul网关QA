@@ -1,17 +1,24 @@
 Q1:当在启动类中配置@EnableZuulServer时，访问数据就是一片空白
 
+
 Q2:实际场景下，一个用户请求可能需要调用多个微服务，一个请求如何通过网关调用多个微服务
+
 
 Q3:每个微服务都有自己独立的数据库，如何保证数据的关联，同步
 
+
 Q4:微服务下数据一致性问题
+
 
 Q5:针对4中zuul过滤器，是否需要创建4个过滤类，还是一个过滤类中可以包含4种过滤类型
 
+
 Q6:该过滤器是pre类型的过滤器，那么在pre类型的过滤器当中，如何实现为每一个微服务进行认证拦截操作
+
 
 Q7:在通过zuul网关访问实现了hystrix的降级接口，报错
 com.netflix.zuul.exception.ZuulException: Hystrix Readed time out
+
 
 Q8:通过自定义方式实现访问路由的配置，之前是通过path->service-id的方式
 
@@ -22,18 +29,35 @@ Q8:通过自定义方式实现访问路由的配置，之前是通过path->servi
 
 ANSWER:
 A1:把@EnableZuulServer改成@EnableZuulProxy，@EnableZuulProxy是EnableZuulServer时的超集，包含所有的过滤
-EnableZuulServer会返回一个空白zuul
+EnableZuulServer会返回一个空白zuul,@EnableZuulProxy适用于配合hystrix和ribbon一起使用，
+在@EnableZuulServer的过滤器中只支持请求转发，但是EnableZuulProxy支持ribbon，hystrix和serverId的方式
+参考资料:
+https://www.cnblogs.com/lexiaofei/p/7098702.html
+
+
 
 A2:通过Zuul聚合微服务，用户发送一个请求给zuul，由zuul请求用户相关微服务，并把数据封装返回给客户端
 详细查看Zuul聚合微服务相关笔记
 
-A3:1群友回复:模块调用的方式，先调用其中一个信息，在调用另一张表的信息，最后进行数据合并，设计初衷，
+
+
+A3-1:1群友回复:模块调用的方式，先调用其中一个信息，在调用另一张表的信息，最后进行数据合并，设计初衷，
 业务独立，相互调用
+A3-2:数据库和不同的微服务之间并没有绝对的联系，不是说一个微服务就一定要有一个独立的数据库，如果有些微服务有
+独立的数据库，则参考A3-1
+
+
+A4:如果是考虑到了并发数据的一致性，此处我们可以采用redis分布式锁的思想来解决这个问题
+
 
 A5:创建4种过滤类，一种过滤类型对应一个业务处理逻辑
 
+
+
 A6:在run方法中执行业务逻辑，run方法是过滤类中处理过滤逻辑的地方，可以通过在启动类中将过滤类注入的方式
 或是添加注解@Componen，在项目启动的时候，自动注入到spring的IOC容器当中
+
+
 
 A7:出现此情况原因是zuul调用等待超时
 在yml配置文件中加入
@@ -42,6 +66,8 @@ zuul:
       connect-timeout-millis: 10000
       socket-timeout-millis: 60000
 把等待时间设置得长一点就可以了
+
+
 
 A8:之前通过path->service-id的方式来配置zuul路由，当微服务多了之后，
 每次都得改zuul网关的配置文件而且还得重启项目，这样是非常麻烦的，可以
