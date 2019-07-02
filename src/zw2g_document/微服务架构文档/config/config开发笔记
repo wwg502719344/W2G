@@ -26,9 +26,12 @@
 2-构建config client，获取config server的相关配置
     2-1引入相关maven依赖
     2-2创建bootstrap.properties文件，配置获取config server的相关参数
-    bootstrap.yml的加载顺序要优先于application.yml文件，因为在项目启动的时候，会主动去拉取8888的服务，此处需要通过配置
-    --文件进行覆盖,否则在打包的时候@Value也会报错，显示非法加载应用程序失败，因为此处需要优先加载uri地址内容
-    --因为bootstrap.yml会优先加载，所以会先去github配置中心获取信息
+    --bootstrap.yml的加载顺序要优先于application.yml文件，应用于早期配置文件的加载或者
+    --可以配置application.yml中所需要的参数
+
+    在项目启动的时候，config-client(配置客户端)会主动去拉取config-server的服务，默认是8888端口
+    --此处需要通过配置指定的configserver来拉取指定的配置项目，否则会拉8888
+
     此处配置的内容皆是对应config server中指定的git文件的存储地址
     spring.application.name对应{application}
     spring.cloud.config.url对应config server的访问ip:端口
