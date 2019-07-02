@@ -27,8 +27,16 @@ hashmap线程不安全的两种原因
 原数组此时为空，线程1在P1中的e及next重新指向了线程2扩展后的数组，此时使用头插式继续，将会
 导致环链的形成
 
+
+3.多线程下的值丢失
+主要是因为在扩容过程中新数据插入到不同的数组位置中，导致next的缺失，最终没有把next指向之前指向
+自己的那个节点，导致next为空，丢失数据
+
+
 参考资料
 1-JAVA HASHMAP的死循环
 https://coolshell.cn/articles/9606.html
 2-为什么HashMap线程不安全
 https://www.jianshu.com/p/e2f75c8cce01
+3-hashmap死循环完美解析
+https://www.jianshu.com/p/61a829fa4e49
