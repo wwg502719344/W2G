@@ -43,7 +43,8 @@ ANSWER
 A1:bootstrap.yml加载于application.yml之前，并且会对application.yml进行覆盖,bootstrap.yml
 由父 Spring ApplicationContext进行加载，父 Spring ApplicationContext加载于application.yml
 之前，spring cloud有个启动上下文，这个启动上下文就是用来加载远端服务的，又因为client需要加载
-远端服务，所以需要配置在bootstrap.yml中
+远端服务，所以需要配置在bootstrap.yml中,如果我们配置在了application中，是无法加载远程服务的，最后会
+默认拉取8888端口下的服务
 
 参考资料:
 https://www.cnblogs.com/fengli9998/p/8534821.html
@@ -107,8 +108,9 @@ bus-refresh，以上两点修改完毕，就可以使用config server的方式�
 官方文档(阅读文档解决)
 
 
-A11:出现8888端口一般需要将配置文件放入bootstrap文件下就可以解决，但我之前使用bootstrap.yml
+A12:出现8888端口一般需要将配置文件放入bootstrap文件下就可以解决，但我之前使用bootstrap.yml
 并不能去加载，后来我把后缀名改成properties居然神奇的可以了。。。
 但是理论上来说，我们是需要将配置文件放在bootstrap文件中的，因为服务在启动的过程需要加载配置文件
-的时候，由于application的优先级比较低，还没有被加载，这时候系统会默认去8888端口取配置文件，所以
-需要使用bootstrap文件中进行文件的配置
+上下文，而远程文件的加载就是在这个配置上下文中，由于application的优先级比较低，还没有被加载，
+这时候系统由于找不到config server的配置文件地址，则会默认去8888端口取配置文件，
+所以需要使用bootstrap文件中进行文件的配置
