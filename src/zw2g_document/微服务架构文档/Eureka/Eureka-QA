@@ -2,6 +2,7 @@ Q1:导入eureka中maven包，但是启动类却无法导入@EnableEurekaServer
 A1:jar包已经下载到私服了，但是没有下载到本地，故只需要将jar包导入到本地即可，具体操作为直接根据ide的提示导入
 
 Q2:eureka-client与eureka-server有什么区别
+A2:server是eureka的服务端，client是客户端，客户端会在启动的时候吧信息注册到服务端上
 
 
 Q3:springboot2.0以上版本和springcloud兼容性问题

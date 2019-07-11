@@ -19,7 +19,7 @@ feign原生默认的契约允许使用springmvcConfiguration,所以我们可以�
 
 
 Q：@FeignClient访问eureka server上的服务提供者时，是否可以实现ribbon的负载均衡
-Q：通过在配置文件中添加ribbon负载均衡类，可以达到对请求微服务的负载均衡
+A：Feign集成了Ribbon技术，所以也支持负载均衡
 =========================================feign笔记====================================================
 
 
@@ -29,7 +29,7 @@ Q：通过在配置文件中添加ribbon负载均衡类，可以达到对请求�
 
 1-整合使用feign进行传参
 1-1添加feign相关依赖
-1-2为启动文件添加@EnableFeignClients，启用feign配置
+1-2为启动文件添加@EnableFeignClients，扫描feign配置
 1-3创建feign接口，该接口指向服务提供者
 @FeignClient(name="new-user")
 @RequestMapping(value = "/test",method = RequestMethod.GET)
