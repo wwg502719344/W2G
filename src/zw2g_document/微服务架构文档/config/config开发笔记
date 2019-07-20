@@ -12,7 +12,7 @@
     配置文件的命名还需要注意的是，谁用这个配置文件，那么这个配置文件就命名为该服务(config-client)
     @Value时需要指定具体配置文件中的路径名称，因为如果在config-client中配置了多个profile，那么
     找到指定的配置信息需要路径是唯一的
-    @Value("${dev.profile}")
+    @Value("${xxx}")
     这里找的就是cloud-dev.yml中dev.profile的信息
 
     1-5:通过上文的方式进行映射访问git地址的配置文件，但是有一些配置文件没有用-进行连接，这时候通过上面的方法就无法进行访问了
@@ -184,5 +184,8 @@
 
 
 7mq起到的作用，以及bootstrap文件和application文件的作用和区别
-   1-bootstrap是一种引导性的配置文件，先于application文件的加载，常用语一些配置文件的加载
-   2-
+   1-bootstrap是一种引导性的配置文件，先于application文件的加载，常用于一些配置文件的加载
+   bootstrap.yml 可以理解成系统级别的一些参数配置，这些参数一般是不会变动
+   bootstrap.yml被父类applicationContext加载
+   2-application主要用于 Spring Boot 项目的自动化配置。
+   比如说数据库的连接，各种服务的连接等
