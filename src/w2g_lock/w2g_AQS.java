@@ -4,6 +4,7 @@ import org.redisson.Redisson;
 
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by W2G on 2018/3/29.
@@ -31,6 +32,7 @@ public class w2g_AQS {
 
     Redisson redisson = Redisson.create();
 
+    ReentrantLock re=new ReentrantLock();
 
     /**
      * P0:节点属性
