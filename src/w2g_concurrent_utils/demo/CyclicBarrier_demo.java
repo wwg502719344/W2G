@@ -5,8 +5,8 @@ import java.util.concurrent.CyclicBarrier;
 /**
  * Created by W2G on 2018/8/26 0026.
  *
- * 只有当CyclicBarrier构造函数中传入的参数都执行了，才会返回相应的结果...
- * 否则不会返回任何东西
+ * 只有当CyclicBarrier构造函数中传入的参数都执行了await方法，才会继续执行后面的代码...
+ * 否则不会继续往下执行
  */
 public class CyclicBarrier_demo {
 
