@@ -1,0 +1,16 @@
+基于netty服务器，运行inboundFilter过滤器，由netty客户端代理这些路由请求
+
+过滤器的几种基本形态
+1-在路由前执行，用于权限校验，路由跳转等
+2-静态类执行，不需要访问集群服务器，直接返回结果，类似熔断
+3-在路由结束后执行
+4-过滤器可选择是异步执行还是同步执行，实现方法是通过继承相关的HttpInboundFilter类实现
+
+
+
+zuul基础文档
+https://blog.csdn.net/weixin_43364172/article/details/82979749
+ELB概念
+https://www.jianshu.com/p/9aae065353f6
+http2和https的区别和历史
+https://www.cnblogs.com/Java3y/p/9392349.html
