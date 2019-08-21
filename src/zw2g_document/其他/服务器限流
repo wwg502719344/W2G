@@ -1,0 +1,30 @@
+限流:通过对一定时间内的并发请求进行限速来保护系统，一旦达到限速速率则进行缓存，排队，降级等处理
+
+
+限流的几种方式:
+1漏桶算法:设定一个恒定的速率，一旦请求的频率超过了这个速率，就会进行降速或是降级操作
+2令牌桶算法:就是以恒定的速率往一个桶中放令牌，如果请求呗处理，则从桶中去除一个令牌，如果桶中
+令牌没有，则拒绝请求
+如果令牌不被消耗或消耗的速率低于使用的速率，则令牌会一直生产，直到达到桶的大小，这时候就会停止
+生产令牌,java实现，RateLimiter使用了令牌桶限流方式
+
+
+RateLimiter的作用:
+用于限流，该类通过令牌桶算法实现限流操作
+public static void main(String[] args){
+    RateLimiter limiter = RateLimiter.create(1);
+
+    for(int i = 1; i < 10; i = i + 2 ) {
+        double waitTime = limiter.acquire(i);
+        System.out.println("cutTime=" + System.currentTimeMillis() + " acq:" + i + " waitTime:" + waitTime);
+    }
+}
+RateLimiter limiter = RateLimiter.create(1),该行代码表示每秒钟创建一个令牌，
+double waitTime = limiter.acquire(i);该行代码表示以阻塞的方式获取令牌，如果
+无法获取资源，则进行相应的处理
+
+
+令牌桶算法限流:
+https://blog.csdn.net/tanga842428/article/details/72818744
+rateLimiter源码解析
+https://www.jianshu.com/p/5d4fe4b2a726

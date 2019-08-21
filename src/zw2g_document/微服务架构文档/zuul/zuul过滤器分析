@@ -22,8 +22,10 @@ http://www.itmuch.com/spring-cloud/zuul/spring-cloud-zuul-filter/
 添加了3个注解，我们在添加注解的时候使用@EnableZuulProxy就可以了，两者不是共存的，是非此即彼的关系
 区别:
 当我们的zuul需要与eureka，rabbion，hystrix共同使用的时候，我们就需要使用proxy
+此处作用于配置文件，支出serviceId的请求转发方法
 RibbonRoutingFilter:serviceId请求转发，该过滤器使用Ribbon，Hystrix和可插拔的HTTP客户端发送请求,
 SimpleHostRoutingFilter:url请求转发
+
 
 
 2-关于在过滤器中的各种http客户端
