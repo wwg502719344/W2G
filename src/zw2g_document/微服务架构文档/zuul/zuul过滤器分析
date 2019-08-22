@@ -17,14 +17,23 @@
 1-基于@EnableZuulServer和@EnableZuulProxy过滤器的关系和区别
 官网关于zuul过滤器的图建议好好看看，或是自己画的
 http://www.itmuch.com/spring-cloud/zuul/spring-cloud-zuul-filter/
+
+关注重点:route类型过滤器
+请求转发过滤器，该过滤器获取请求地址(RequestContext.getCurrentContext().get("forward.to"))
+设置请求路由，路由则是通过配置文件进行配置
+在@enablezuulservr中只能满足普通的请求转发功能，在@enablezuulproxy中，引入的过滤器实现了ribbon
+和hystrix，可以通过serverId进行请求转发
+
 关系:
 这两种注解都是zuul过滤器的注解，proxy可以看成是server的增强版，在基于server的功能上
 添加了3个注解，我们在添加注解的时候使用@EnableZuulProxy就可以了，两者不是共存的，是非此即彼的关系
+
 区别:
 当我们的zuul需要与eureka，rabbion，hystrix共同使用的时候，我们就需要使用proxy
 此处作用于配置文件，支出serviceId的请求转发方法
 RibbonRoutingFilter:serviceId请求转发，该过滤器使用Ribbon，Hystrix和可插拔的HTTP客户端发送请求,
 SimpleHostRoutingFilter:url请求转发
+
 
 
 
@@ -38,6 +47,7 @@ A:发送请求的客户端，ok可以进行请求复用，拦截器，缓存等�
 
 过滤器实现限流
 1-ratelimiter实现限流，类似AQS获取共享锁的方式，设定一个阈值，当指定时间内的共享变量被用完后，将阻塞执行
+此处可参考《服务器限流》相关文章
 
 2-redis实现限流，存储两个key，一个用于计时，一个用于计数，如果在指定时间内超过阈值，则拒绝处理任务
 
@@ -45,7 +55,7 @@ A:发送请求的客户端，ok可以进行请求复用，拦截器，缓存等�
     3-1:
 
 
-
+参考文档:
 zuul基础文档:
 https://blog.csdn.net/weixin_43364172/article/details/82979749
 ELB概念:
@@ -56,5 +66,5 @@ https://www.cnblogs.com/Java3y/p/9392349.html
 https://www.cnblogs.com/shamo89/p/8940606.html
 zuul各种过滤器的作用:
 https://www.cnblogs.com/okong/p/springcloud-ten.html
-zuul中@EnableZuulServer、@EnableZuulProxy两个注解
+@EnableZuulServer、@EnableZuulProxy两个注解
 https://www.cnblogs.com/lexiaofei/p/7098702.html
