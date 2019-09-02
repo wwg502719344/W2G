@@ -46,7 +46,8 @@ M3:关闭user服务，访问被HystrixCommand包裹的接口
 http://localhost:8400/actuator/routes
 
 4-如果需要指定path，url，根据官方文档描述会破坏ribbon/hystrix的特性，但我自己在测试的过程中发现
-被hystrixCommand包裹的方法还是可以进行fallback处理，此处留有疑问(指的是@enablezuulserver?)
+被hystrixCommand包裹的方法还是可以进行fallback处理，此处留有疑问
+A:因为我使用的是@Enablezuulproxy注解，提供的过滤器支持ribbon，hystrix等功能
 
 
 首先需要注意的是我们是将服务提供者的serverid配置在yml中，并且配置连接的端口，而不是服务的消费者
