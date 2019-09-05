@@ -6,6 +6,13 @@
 TCP/IP与http的区别:TCP/IP是网络传输层协议，规定了数据如何传，http协议是tcp的应用层，用于封装传输
 的数据，如果没有http也可以进行数据的传输，但是无法识别数据
 
+socket连接和tcp的关系:tcp只是一种协议，建立通信的协议，本质则是通过socket建立套接字，套接字绑定
+ip和port，listen()函数再去监听这个套接字，此时该套接字就可以监听tcp的三次握手请求，通过建立连接
+套接字，后续的线程就可以通过这个套接字进行tcp通信了
+
+request请求和socket对象的思考:由上面我们可知TCP协议规定了数据传送的协议，http则是封装传输的数据，
+浏览器向服务器发出request请求，这个request请求就是符合http格式的请求，也就是建立的socket连接
+
 
 
 
@@ -27,3 +34,7 @@ https://tech.meituan.com/2016/11/04/nio.html
 https://www.cnblogs.com/heyonggang/p/3660600.html
 tcp/ip与http的区别
 https://www.cnblogs.com/hnhycnlc888/p/9724977.html
+request请求和socket对象有什么区别
+https://blog.csdn.net/xiaofangzi11/article/details/53285930
+***socket和TCP的关系***
+https://www.cnblogs.com/f-ck-need-u/p/7623252.html
