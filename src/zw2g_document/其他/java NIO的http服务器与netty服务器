@@ -1,3 +1,4 @@
+1-基础知识
 定义:NIO是java解决高并发与大量连接，IO处理问题的有效方法，其本质是用于提高服务器应对客户端连接时的
 吞吐量和效率
 
@@ -16,6 +17,15 @@ request请求和socket对象的思考:由上面我们可知TCP协议规定了数
 
 
 
+2-NIO浅谈
+NIO如何提高并发与大量连接:
+
+
+
+
+
+3-netty
+作用:用作开发高并发http服务器
 
 
 
@@ -25,8 +35,7 @@ request请求和socket对象的思考:由上面我们可知TCP协议规定了数
 
 
 
-
-评论引发思考
+评论引发思考(nginx+tomcat与netty的异同)
 https://www.oschina.net/question/1765708_158026
 美团NIO解析
 https://tech.meituan.com/2016/11/04/nio.html
@@ -38,3 +47,12 @@ request请求和socket对象有什么区别
 https://blog.csdn.net/xiaofangzi11/article/details/53285930
 ***socket和TCP的关系***
 https://www.cnblogs.com/f-ck-need-u/p/7623252.html
+netty与tomcat框架的一些问题和思考
+https://www.iteye.com/problems/92400
+***tomcat中的NIO模型***
+https://www.jianshu.com/p/76ff17bc6dea
+netty是做什么的
+https://blog.csdn.net/xiaolicd/article/details/86102012
+web服务器和http服务器的区别
+tcp与netty的关系
+
