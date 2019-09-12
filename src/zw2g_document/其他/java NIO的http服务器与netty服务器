@@ -25,7 +25,7 @@ NIO如何提高并发与大量连接:
 
 
 3-netty
-作用:用作开发高并发http服务器
+作用:用作开发高并发IM服务器
 
 
 
@@ -40,6 +40,7 @@ https://www.oschina.net/question/1765708_158026
 美团NIO解析
 https://tech.meituan.com/2016/11/04/nio.html
 长连接和短连接
+https://www.cnblogs.com/xujiming/p/5448721.html
 https://www.cnblogs.com/heyonggang/p/3660600.html
 tcp/ip与http的区别
 https://www.cnblogs.com/hnhycnlc888/p/9724977.html
@@ -55,4 +56,7 @@ netty是做什么的
 https://blog.csdn.net/xiaolicd/article/details/86102012
 web服务器和http服务器的区别
 tcp与netty的关系
+高并发系列
+https://www.cnblogs.com/crazymakercircle/p/10246934.html#高并发im架构与部分实现
+https://www.cnblogs.com/crazymakercircle/p/9904544.html
 
