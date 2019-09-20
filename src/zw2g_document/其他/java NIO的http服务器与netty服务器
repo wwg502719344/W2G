@@ -14,12 +14,23 @@ ip和port，listen()函数再去监听这个套接字，此时该套接字就可
 request请求和socket对象的思考:由上面我们可知TCP协议规定了数据传送的协议，http则是封装传输的数据，
 浏览器向服务器发出request请求，这个request请求就是符合http格式的请求，也就是建立的socket连接
 
-
-
+1:TCP三次握手结束后，socket实例建立完毕
+2:建立socket连接后，通信双方可以发送数据内容
+3:socket和http的关联
+首先，客户端发起http请求，经过3次握手后，建立起TCP连接；http请求里存放WebSocket支持的版本号等信息，如：Upgrade、Connection、WebSocket-Version等；
+然后，服务器收到客户端的握手请求后，同样采用HTTP协议回馈数据；
+最后，客户端收到连接成功的消息后，开始借助于TCP传输信道进行全双工通信。
+总结:http请求是tcp协议的应用层，socket是封装了tcp请求，http请求也是会产生socket，但这是短链接
+socket网络编程属于长连接，提供相关接口用于网络编程
+个人理解:http协议是最上层的应用层，tcp是数据传输层，两者没有必然的关系，socket则是用于封装tcp连接的
+所谓的socket网络编程，则是基于socket提供的api进行编程，一般的web请求则隐藏了该处的细节，如下
+TCP/IP也要提供可供程序员做网络开发所用的接口，这就是Socket编程接口
 
 2-NIO浅谈
-NIO如何提高并发与大量连接:
+NIO如何提高并发与大量连接:阻塞业务不阻塞请求，提高并发能力
 
+NIO和BIO的根本区别:BIO每个请求对应一个线程，在线程都在处理任务的时候，就没有办法接受新的请求，NIO当中
+通过selector接受请求，不会阻塞请求，单个线程可以处理更多的请求
 
 
 
@@ -59,4 +70,7 @@ tcp与netty的关系
 高并发系列
 https://www.cnblogs.com/crazymakercircle/p/10246934.html#高并发im架构与部分实现
 https://www.cnblogs.com/crazymakercircle/p/9904544.html
+
+****http和socket编程的关系与连接****
+https://blog.csdn.net/honghailiang888/article/details/51121257/#commentsedit
 
