@@ -22,7 +22,8 @@ public static void main(String[] args){
 RateLimiter limiter = RateLimiter.create(1),该行代码表示每秒钟创建一个令牌，
 double waitTime = limiter.acquire(i);该行代码表示以阻塞的方式获取令牌，如果
 无法获取资源，则进行相应的处理
-
+理解:对于rateLimiter分为两步，第一步是创建令牌，通过create方法保证每秒创建令牌的数量
+第二步是消耗令牌，采用的是AQS的方法去消耗生成的令牌，通过阻塞共享式的方法消耗令牌
 
 令牌桶算法限流:
 https://blog.csdn.net/tanga842428/article/details/72818744
