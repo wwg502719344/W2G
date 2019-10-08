@@ -14,8 +14,10 @@
         - feign(该方式使用更为优雅，内部封装了ribbon)
 
     2-2:ribbon的负载均衡和zuul的负载均衡之间的异同
-        zuul针对的是外部请求，是外部请求之间的负载均衡
-        ribbon针对的是服务内部的调用(eureka上注册的服务)，属于服务之间的负载均衡
+        ribbon针对的是服务内部的调用(eureka上注册的服务)，属于服务之间的负载均衡，需要自己构建http请求,调用请求地址
+        feign封装了ribbon，直接取调用生产者的接口地址(调用的是一个抽象方法)
+        zuul针对的是外部请求,基于客户端对服务端的访问，是外部请求之间的负载均衡,zuul的实现包括了ribbon
+
 
     2-3:使用cloud commons提供的与服务治理相关的接口DiscoveryClient、LoadBalancerClient
         1:在restTemplate+Ribbon的负载方式中，restTemplate被添加了注解@LoadBalanced
