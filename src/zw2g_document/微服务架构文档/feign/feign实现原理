@@ -17,11 +17,30 @@ interface:传参，相关接口
 InvocationHandler:传参，绑定执行方法
 
 
+feign调用逻辑
+封装了http的调用逻辑，使之成为面向接口的方式进行调用
+feign的本质则是通过将请求接口的信息封装进实体中，通过http协议框架发送http请求，feign使用的是httpurlConnection
+
+phase1:target动态生成实现类
+// 基于Proxy.newProxyInstance 为接口类创建动态实现，将所有的请求转换给InvocationHandler 处理。
+T proxy = (T) Proxy.newProxyInstance(target.type().getClassLoader(), new Class<?>[]{target.type()}, handler);
+该阶段的主要目的是动态代理生成实现类，invocationHandler是在原方法被调用的时候绑定执行自己的方法
+
+phase2:解析接口，生成相应元数据
+通过feign注解进行解析，获取到相关的数据，feign有一套自己的注解方式，也可以修改成mvc的
+
+phase3:获取数据，封装request
+
+phase4,5,6,7:一些数据组织工作
+
+phase8:发送http请求
+feign内部默认使用httpUrlConnection方式发送http请求，但是这种方式效率比较低下
 
 
 
 
-
+feign设计原理:
+https://www.jianshu.com/p/8c7b92b4396c
 
 动态代理相关基础讲解:
 https://www.jianshu.com/p/95970b089360
