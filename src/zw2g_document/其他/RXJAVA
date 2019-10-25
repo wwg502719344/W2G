@@ -8,12 +8,48 @@ RXJAVA:一个异步调用框架
 观察者和被观察者之间通过订阅产生关系，创建观察者的时候通过触发subscribe与被观察者之间建立联系
 
 具体步骤:
-创建被观察者，将被观察者对象传入到发射事件当中去
-创建观察者，当接受到观察者事件的时候，进行业务处理
-将观察者和被观察者建立订阅联系
+1:创建被观察者(observable)，将被观察者对象传入到发射事件当中去
+Observable<String> story = Observable.create(new ObservableOnSubscribe<String>()
+    {
+        @Override
+        public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+            for (int i=1;i<4;i++){
+                Log.d("TAG","我是小说，我更新了第"+i+"季");
+                emitter.onNext(i+"");
+            }
+        }
+    });
+
+emitter.onNext:发射器，将被观察者发送出去
+通过建立订阅关系与观察者建立联系
+
+2:创建观察者，当接受到观察者事件的时候，进行业务处理
+Observer<String> reader = new Observer<String>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+        Log.d("TAG","我是读者，我和小说订阅了");
+    }
+
+    @Override
+    public void onNext(String value) {
+        Log.d("TAG","我是读者，我拿到了小说的新版本："+value+"版本");
+    }
+
+    @Override
+    public void onError(Throwable e) {
+
+    }
+
+    @Override
+    public void onComplete() {
+        Log.d("TAG","我是读者，小说的新版本被我拿完了");
+    }
+};
+
+3:将观察者和被观察者建立订阅联系
 
 
-
+观察者模式很像java中的等待通知模式
 
 RXJAVA解析
 https://www.jianshu.com/p/414f755983f1

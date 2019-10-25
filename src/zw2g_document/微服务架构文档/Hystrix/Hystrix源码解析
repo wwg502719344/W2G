@@ -13,15 +13,28 @@ Hystrix断路器实现逻辑
 熔断器打开的状态下允许一部分流量进来验收依赖是否可用
 在一定的时间内允许一个请求进入
 
+hystrix的核心三大件
+1:HystrixCommond,HystrixObservableCommond,创建这两个类用来表达对依赖服务的调用，这两个类都传递了
+相关参数，这两个类都是通过观察者模式实现了对请求命令的封装和调用
+2:HystrixCircuitBreak:断路器的核心组件，用来实现针对请求断路开启关闭熔断回退的作用
 
 
+
+
+
+
+
+===============================相关文档=========================================================
 命令模式基础:
 https://blog.csdn.net/zhwyj1019/article/details/79758057
 Hystrix源码分析(上)
 https://www.jianshu.com/p/0649f414cfcf
 Hystrix官方文档翻译
 https://segmentfault.com/a/1190000016185647
-
+HystrixCircuitBreak详解
+https://segmentfault.com/a/1190000016232987
+个人博客内容，值得看一看
+https://segmentfault.com/u/jiuguangyinglideshaonian
 
 ===============================github相关源码=========================================================
 Hystrix官方wiki
