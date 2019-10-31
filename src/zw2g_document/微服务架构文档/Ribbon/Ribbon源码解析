@@ -22,3 +22,9 @@ void setLoadBalancer(ILoadBalancer var1);
 使用RestTemplate进行rest操作的时候，会自动使用负载均衡策略，
 它内部会在RestTemplate中加入LoadBalancerInterceptor这个拦截器，
 这个拦截器的作用就是使用负载均衡。
+
+
+
+
+ribbon实现负载均衡的底层原理
+https://blog.csdn.net/wudiyong22/article/details/80829808
