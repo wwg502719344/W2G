@@ -32,15 +32,7 @@ feign也具备负载均衡的作用，feign内部已经融合了ribbon服务，�
 feign通过调用接口的方式进行请求，通过@FeignClient(name="new-user")进行服务的调用
 
 
-4ribbon实现负载均衡的原理
-ribbon内部提供了一个ILoadBalance接口提供代表负载均衡器的操作，服务的添加，服务的选择，
-获取所有服务器列表等
 
-ILoadBalanced:通过获取eureka中的服务实例来建立服务列表，并保持联系，具体的负载均衡
-则由核心组件IRule来实现
-
-IRule:通过固定算法从服务器列表中选取一个要访问的服务器，默认算法为轮询
-基本算法有权重，轮询，随机，最小访问数
 
 
 

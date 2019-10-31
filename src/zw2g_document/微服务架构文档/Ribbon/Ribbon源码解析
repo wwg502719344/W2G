@@ -1,0 +1,24 @@
+1-Ribbon主要作用是实现请求的负载均衡，
+    通过EurekaClient获取服务信息
+    通过接口ILoadBalance实现服务的选择新增等操作，
+    根据IRule去进行路由
+
+2ribbon实现负载均衡的原理
+ribbon内部提供了一个ILoadBalance接口提供代表负载均衡器的操作，服务的添加，服务的选择，
+获取所有服务器列表等
+
+ILoadBalanced:通过获取eureka中的服务实例来建立服务列表，并保持联系，具体的负载均衡
+则由核心组件IRule来实现
+
+IRule:通过固定算法从服务器列表中选取一个要访问的服务器，默认算法为轮询
+内部接口
+选择服务器(从eureka获取)，基本算法有权重，轮询，随机，最小访问数
+Server choose(Object var1);
+
+void setLoadBalancer(ILoadBalancer var1);
+
+
+3如何使用ribbon功能
+使用RestTemplate进行rest操作的时候，会自动使用负载均衡策略，
+它内部会在RestTemplate中加入LoadBalancerInterceptor这个拦截器，
+这个拦截器的作用就是使用负载均衡。
