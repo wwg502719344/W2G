@@ -20,6 +20,11 @@ cpu飙射，内存飙升处理办法
 2通过MAT进行内存分析
 
 
+
+三:dump是什么
+java dump heap是java一个实例存放和数组对象存放的数据区，是java运行时期的一个快照，通过分析java
+对象的dump来观察运行系统出现问题的地方和原因
+
 MAT独立版下载地址:
 https://www.eclipse.org/mat/downloads.php
 内存分析相关博客:

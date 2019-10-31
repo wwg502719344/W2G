@@ -46,6 +46,14 @@
             <version>2.1.5</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.netflix.eureka/eureka-client -->
+        <dependency>
+            <groupId>com.netflix.eureka</groupId>
+            <artifactId>eureka-client</artifactId>
+            <version>1.9.13</version>
+            <scope>runtime</scope>
+        </dependency>
+
     </dependencies>
 
 	<build>
