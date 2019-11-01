@@ -44,3 +44,6 @@ https://www.jianshu.com/p/8c7b92b4396c
 
 动态代理相关基础讲解:
 https://www.jianshu.com/p/95970b089360
+
+注解@EnableFeignClients工作原理
+https://blog.csdn.net/andy_zhang2007/article/details/86680622
