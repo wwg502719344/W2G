@@ -1,3 +1,12 @@
+源码解析框架:
+1:feign注入IOC容器相关源码
+2:feign动态代理实现相关逻辑及源码
+3:feign整体实现逻辑
+
+
+feign注入容器
+
+
 动态代理:
 首先通过反射的方式生成代理类,就是通过proxy的newInstant方法生成一个代理对象，
 在这个代理对象执行方法的时候，则会触发invocation中的代理方法
@@ -17,7 +26,7 @@ interface:传参，相关接口
 InvocationHandler:传参，绑定执行方法
 
 
-feign调用逻辑
+一:feign调用逻辑
 封装了http的调用逻辑，使之成为面向接口的方式进行调用
 feign的本质则是通过将请求接口的信息封装进实体中，通过http协议框架发送http请求，feign使用的是httpurlConnection
 
@@ -37,7 +46,10 @@ phase8:发送http请求
 feign内部默认使用httpUrlConnection方式发送http请求，但是这种方式效率比较低下
 
 
-
+ImportBeanDefinitionRegistrar解析(代码注入核心)
+1通过扫描器扫描获取需要注册的bean类
+--扫描被feign注解标注的类
+2将扫描到的bean注册到IOC容器当中去
 
 feign设计原理:
 https://www.jianshu.com/p/8c7b92b4396c
@@ -47,3 +59,6 @@ https://www.jianshu.com/p/95970b089360
 
 注解@EnableFeignClients工作原理
 https://blog.csdn.net/andy_zhang2007/article/details/86680622
+
+ImportBeanDefinitionRegistrar
+https://www.jianshu.com/p/2b993ced6a4c
