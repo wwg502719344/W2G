@@ -238,6 +238,8 @@ public class w2g_AQS {
      * P1-2:返回true表示当前线程可以被成功挂起
      * 当前节点的前驱节点是可以被触发的，所以返回true
      * 如果当前节点是无效的，则一直往前找，直到node节点的前驱节点是有效的
+     * pred:前驱节点
+     * node:当前节点
      */
     /*
     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {

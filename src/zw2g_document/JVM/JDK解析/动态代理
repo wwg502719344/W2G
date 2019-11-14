@@ -1,22 +1,38 @@
-代理模式:
+1 代理模式:
 为原本的对象提供一个代理对象，就像中介一样，代理对象包括了比原始对象要多的功能，比如日志，事务操作等，
 代理模式的本质则是通过调用代理类实现我们需要除开业务之外的额外操作，spring AOP就是运用了动态代理的方法
 面向的是接口进行编程
 
-静态代理
+2 静态代理
 创建一个静态代理类，代理类实现目标接口，通过获取目标对象
 调用代理类的业务方法，实现方法的封装
 代码具体实现
 http://localhost:8080/v1/jdk/staticProxy
 
-动态代理
+3 动态代理
 在静态代理中，我们的代理处理类需要实现被代理的接口，所以缺点就是代码耦合度高，想要实现代理功能需要额外
 去创建很多类
 动态代理中，我们不需要创建那些额外的类
 通过生成指定的代理类，根据多态的理念，实现的实际是代理类的具体方法
 
+4 源码整体实现逻辑
+获取生成代理类的参数，类加载器，接口类对象列表，InvocationHandler
+根据类加载器和接口类对象生成代理类的class对象
+根据代理类的class对象获取到代理类的构造方法
+通过构造方法和InvocationHandler构建代理类对象
 具体代码实现
 http://localhost:8080/v1/jdk/dynamicProxy
+
+5 生成代理类的逻辑
+WeakCache类
+获取缓存的代理类或是创建代理类
+proxyClassCache 就是根据KeyFactory和ProxyClassFactory生成的代理对象的集合
+new KeyFactory()->sub-key
+new ProxyClassFactory() -> value 产生代理类的对象
+proxyClassCache = new WeakCache<>(new KeyFactory(), new ProxyClassFactory());
+
+6代理类的创建
+通过ProxyClassFactory的apply方法创建代理类
 
 
 https://www.jianshu.com/p/269afd0a52e6
