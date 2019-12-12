@@ -24,7 +24,10 @@ void setLoadBalancer(ILoadBalancer var1);
 这个拦截器的作用就是使用负载均衡。
 
 
-
+4ribbon和restTemplate的关系
+restTemplate是spring中用于发送http请求的工具组件
+ribbon是用于进行负载均衡的组件
+通过ribbon和restTemplate相互结合，实现请求的负载均衡的功能
 
 ribbon实现负载均衡的底层原理
 https://blog.csdn.net/wudiyong22/article/details/80829808

@@ -44,7 +44,7 @@ A1:bootstrap.yml加载于application.yml之前，并且会对application.yml进�
 由父 Spring ApplicationContext进行加载，父 Spring ApplicationContext加载于application.yml
 之前，spring cloud有个启动上下文，这个启动上下文就是用来加载远端服务的，又因为client需要加载
 远端服务，所以需要配置在bootstrap.yml中,如果我们配置在了application中，是无法加载远程服务的，最后会
-默认拉取8888端口下的服务
+默认拉取8888端口下的服务，bootstrap.yml用于更加早期配置信息读取
 
 参考资料:
 https://www.cnblogs.com/fengli9998/p/8534821.html
