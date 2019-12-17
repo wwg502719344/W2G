@@ -15,7 +15,7 @@ Q4:访问指定配置文件时，访问参数未显示指定的git分支，但�
 Q5:config-client访问config-server，访问失败，一直显示的是配置文件中配置的profile而不是git上的值
 
 
-Q6:{application}/{profile}[/{label}各是什么，作用是是什么
+Q6:{application}/{profile}/{label}各是什么，作用是是什么
 
 
 Q7:bootstrap.xml相当一个怎样的存在
