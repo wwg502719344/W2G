@@ -110,7 +110,7 @@ public class HashMap_Source {
      * 数组下标链表结构
      *
      * (e.hash & oldCap)作用
-     * 元素的在数组中的位置是否需要移动
+     * 元素在扩容前后在数组中的位置是否需要移动
      * 示例1:
      * e.hash=10 0000 1010
      * oldCap=16 0001 0000

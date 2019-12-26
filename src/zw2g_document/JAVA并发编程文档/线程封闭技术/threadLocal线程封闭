@@ -1,4 +1,5 @@
-
+使用线程封闭的场景是共享变量在不同的线程中没有依赖关系，举例，创建自定义excel需要全局变量来记录运行
+的行数，但是在不同的线程间是没有关联关系的，这时候就适合使用threadlocal
 
 threadLocal基本使用与理解
 https://blog.csdn.net/forezp/article/details/77620769
