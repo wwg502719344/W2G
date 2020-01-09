@@ -11,5 +11,7 @@ Q5:hashcode和hash之间的关系
 
 
 
-A1:
+A1:因为hashmap在多线程下可能会造成环链和数据丢失问题，Con将数据存在node中
+，而node的key是不可变量，value和next是volatile类型，保证了数据在多线程
+模式也也是线程安全的
 

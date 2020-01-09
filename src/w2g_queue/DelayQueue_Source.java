@@ -27,6 +27,7 @@ public class DelayQueue_Source {
     private final Comparator<? super E> comparator;
 
 
+
     /**
      * P1
      * 将实现了Delay的元素加入到延迟队列中去
@@ -144,8 +145,9 @@ public class DelayQueue_Source {
         try {
             for (;;) {
                 E first = q.peek(); //获取优先队列中的首个节点
-                if (first == null)  //如果优先队列中没有节点，则该线程进入等待线程
-                    available.await();
+                if (first == null)  //如果优先队列中没有节点
+//需要注意的是在使用delayqueue中时，我们会使用while去获取任务队列中的任务，所以take不到值的时候，显示实际是在等待队列中的，并不会一直执行while循环
+                    available.await();//则当前线程进入等待队列
                 else {  //如果首节点不为空
                     long delay = first.getDelay(NANOSECONDS);   //获取当前元素还需要延时多长时间
                     if (delay <= 0) //如果延时时间小于或是等于0，则移出队列

@@ -9,8 +9,8 @@ BlockingQueue
 
 
     代码:BlockingQueue_source
-    参考:http://tool.oschina.net/apidocs/apidoc?api=jdk-zh
-
+    参考(失效了):http://tool.oschina.net/apidocs/apidoc?api=jdk-zh
+    http://www.matools.com/api/java8
 
 
 DelayQueue源码解析

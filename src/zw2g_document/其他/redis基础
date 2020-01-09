@@ -102,8 +102,9 @@ redis分布式锁基本作用
 
 redis分布式锁的执行命令
 SET keyname keyvalue NX PX 30000
-keyname是进行业务标识的
-keyvalue是唯一值，用于解锁,可以通过UUID.randomUUID()的方式获取
+keyname:是进行业务标识的,线程获取到执行权限就往redis服务器写入keyname，其他线程想要执行发现已经被占领了就进行等待，
+保证多线程下的并发安全
+keyvalue:是唯一值，用于解锁,可以通过UUID.randomUUID()的方式获取，配合lua脚本和eval方法实现解锁
 NX:在key存在的时候，将key的值作为设置为value，不存在则不做任何操作，成功返回1，不成功返回0
 PX 3000:过期毫秒数，标识自动过期时间，防止死锁
 
