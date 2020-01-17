@@ -6,16 +6,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by W2G on 2019/11/14.
- * 预启动核心线程，所以
+ * 核心线程数有2个，最大线程数有5个，队列最大容量为2个
+ *
+ * 先执行核心线程任务，然后任务进入队列，随机创建线程执行
+ *
+ * 队列最多可容纳2个任务，当创建的执行线程数低于5个则继续增加线程执行，当线程数超过5个且队列无法继续加入任务
+ * 则执行拒绝策略
  */
 public class ThreadPoolTest {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         int corePoolSize = 2;
-        int maximumPoolSize = 4;
+        int maximumPoolSize = 5;
         long keepAliveTime = 10;
         TimeUnit unit = TimeUnit.SECONDS;
-        BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(12);
+        BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(2);
         ThreadFactory threadFactory = new NameTreadFactory();
         RejectedExecutionHandler handler = new MyIgnorePolicy();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
@@ -66,7 +71,7 @@ public class ThreadPoolTest {
         public void run() {
             try {
                 System.out.println(this.toString() + " is running!");
-                Thread.sleep(120000); //让任务执行慢点
+                Thread.sleep(9000); //让任务执行慢点
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
