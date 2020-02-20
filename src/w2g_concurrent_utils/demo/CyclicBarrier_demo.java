@@ -28,7 +28,7 @@ public class CyclicBarrier_demo {
         try {
             //当所有线程都执行完await，才能执行继续执行线程，并发执行
             System.out.println("到达主线程输出");
-            cyclicBarrier.await();
+            //cyclicBarrier.await();
         } catch (Exception e) {
         }
         System.out.println("主线程输出");

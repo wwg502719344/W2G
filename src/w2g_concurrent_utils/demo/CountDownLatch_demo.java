@@ -8,28 +8,27 @@ import java.util.concurrent.CountDownLatch;
  *
  */
 public class CountDownLatch_demo {
-    static CountDownLatch countDownLatch=new CountDownLatch(5);
+    static CountDownLatch countDownLatch=new CountDownLatch(4);
 
     public static void main(String[] args) throws InterruptedException {
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("老夫东部第一斗皇");
-                countDownLatch.countDown();
-                System.out.println("在下南海第一斗皇");
-                countDownLatch.countDown();
-
-                System.out.println("洒家西域第一斗皇");
-                countDownLatch.countDown();
-                System.out.println("老子北狄第一斗皇");
-                countDownLatch.countDown();
+                System.out.println("东部测试");
+                //countDownLatch.countDown();
+                System.out.println("南部测试");
+                //countDownLatch.countDown();
+                System.out.println("西部测试");
+                //countDownLatch.countDown();
+                System.out.println("北部测试");
+                //countDownLatch.countDown();
 
             }
         }).start();
 
         //掉用await方法，阻塞主线程,只有当参数countDown为0才能执行主线程，否则无法执行主线程
-        countDownLatch.await();
-        System.out.println("吾乃中土世界第一斗皇");
-
+        //countDownLatch.await();
+        System.out.println("主线程测试");
     }
 }

@@ -1,5 +1,6 @@
 package w2g_lock;
 
+import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.*;
 
@@ -11,6 +12,7 @@ import java.util.concurrent.locks.*;
  */
 public class w2g_condition{
     ReentrantLock lock=new ReentrantLock();
+    //Vector
 /*
     //获取condition
     Lock lock=new ReentrantLock();
