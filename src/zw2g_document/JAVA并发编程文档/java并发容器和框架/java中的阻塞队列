@@ -13,7 +13,7 @@ BlockingQueue
     http://www.matools.com/api/java8
 
 
-DelayQueue源码解析
+1-DelayQueue源码解析
     继承AbstractQueue，实现BlockingQueue
     内部使用PriorityQueue，存放数据，目的是保证数据的有序性
     申明ReentrantLock，实现线程同步
@@ -44,3 +44,9 @@ https://my.oschina.net/lujianing/blog/705894
  2-不接受null值
  3-队列内部的元素实现Delayed接口
     Q:队列内部的元素怎么实现Delayed接口
+
+
+2-synchronousQueue
+该队列的特点就是并不能存储元素，只能保留一个元素，类似传球手的作用，该队列被使用于newCacheThreadPool
+他是一个根据需求创建线程,但是他会复用60秒内的完成任务的线程，但是会主动清除60秒后的无用线程(默认60秒)，
+源码注释中说可以明显提高程序性能在执行一些短的异步的任务，勉强也能算是缓存线程池吧，感觉很勉强

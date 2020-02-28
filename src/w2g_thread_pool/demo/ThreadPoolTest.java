@@ -6,12 +6,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by W2G on 2019/11/14.
- * 核心线程数有2个，最大线程数有5个，队列最大容量为2个
+ * 核心线程数有2个，最大线程数有4个，队列最大容量为2个
  *
- * 先执行核心线程任务，然后任务进入队列，随机创建线程执行
- *
+ * 先执行核心线程任务，然后任务进入队列，创建线程执行,当队列满了后，直接创建线程执行任务
  * 队列最多可容纳2个任务，当创建的执行线程数低于5个则继续增加线程执行，当线程数超过5个且队列无法继续加入任务
- * 则执行拒绝策略
+ * 则执行拒绝策略，如果线程数为5，队列为空，则继续填满队列，但是不能再次添加新的执行线程，执行拒绝策略
  */
 public class ThreadPoolTest {
 
@@ -42,6 +41,7 @@ public class ThreadPoolTest {
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r, "my-thread-" + mThreadNum.getAndIncrement());
+            //此处说明创建多少
             System.out.println(t.getName() + " has been created");
             return t;
         }
@@ -71,7 +71,7 @@ public class ThreadPoolTest {
         public void run() {
             try {
                 System.out.println(this.toString() + " is running!");
-                Thread.sleep(9000); //让任务执行慢点
+                Thread.sleep(10000); //让任务执行慢点
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

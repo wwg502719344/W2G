@@ -3,7 +3,6 @@ package w2g_lock;
 import org.redisson.Redisson;
 
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
