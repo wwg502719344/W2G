@@ -1,5 +1,7 @@
 package w2g_thread_pool.demo;
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
 import java.util.concurrent.*;
 
 /**
@@ -26,8 +28,8 @@ public class ThreadPoolDemo {
     /**
      * 方式二
      */
-    /*ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1,
-            new BasicThreadFactory.Builder().namingPattern("example-schedule-pool-%d").daemon(true).build());*/
+    ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1,
+            new BasicThreadFactory.Builder().namingPattern("example-schedule-pool-%d").daemon(true).build());
 
 
     /**
