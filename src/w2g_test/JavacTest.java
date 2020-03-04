@@ -2,7 +2,7 @@ package w2g_test;
 
 /**
  * Created by W2G on 2020/1/16.
- * 字节码指令集
+ *  jvm指令集
  *  0: ldc           #2                  // String java
  *  2: astore_1
  *  3: ldc           #2                  // String java
@@ -15,7 +15,7 @@ package w2g_test;
  *  astore_1:对值进行保存
  *  获取常量池中的字符串
  *
- *  生成字节码指令方式
+ *  生成jvm指令方式
  *  https://blog.csdn.net/en_joker/article/details/88389643
  *
  *  更多

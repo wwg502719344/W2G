@@ -1,10 +1,10 @@
 BlockingQueue
 阻塞队列的方法接口，相关的阻塞队列需要实现它
     * ArrayBlockQueue
-    * LinkedBlockQueue
+    * LinkedBlockQueue:用于线程池fixThreadPool
     * PriorityBlockQueue
     * DelayQueue
-    * SynchronousQueue
+    * SynchronousQueue:用于线程池cacheThreadPool
     * LinkedBlockQueue
 
 
