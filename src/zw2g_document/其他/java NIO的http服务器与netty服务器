@@ -17,7 +17,8 @@ request请求和socket对象的思考:由上面我们可知TCP协议规定了数
 1:TCP三次握手结束后，socket实例建立完毕
 2:建立socket连接后，通信双方可以发送数据内容
 3:socket和http的关联
-首先，客户端发起http请求，经过3次握手后，建立起TCP连接；http请求里存放WebSocket支持的版本号等信息，如：Upgrade、Connection、WebSocket-Version等；
+首先，客户端发起http请求，经过3次握手后，建立起TCP连接；http请求里存放WebSocket支持的版本号等信息，如：Upgrade、->
+Connection、WebSocket-Version等；
 然后，服务器收到客户端的握手请求后，同样采用HTTP协议回馈数据；
 最后，客户端收到连接成功的消息后，开始借助于TCP传输信道进行全双工通信。
 总结:http请求是tcp协议的应用层，socket是封装了tcp请求，http请求也是会产生socket，但这是短链接
