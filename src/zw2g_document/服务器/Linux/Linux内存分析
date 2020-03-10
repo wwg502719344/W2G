@@ -1,5 +1,5 @@
 内存分析
-cpu飙射，内存飙升处理办法
+cpu飙射，内存飙升处理办法(该处理办法仅针对java服务器相关)
 
 一:分析线程状态
 1首先查看服务器内存占用情况
@@ -27,6 +27,8 @@ java dump heap是java一个实例存放和数组对象存放的数据区，是ja
 
 MAT独立版下载地址:
 https://www.eclipse.org/mat/downloads.php
+MAT使用hprof相关博客
+https://blog.csdn.net/qq_39172525/article/details/80824897
 内存分析相关博客:
 https://www.jianshu.com/p/738b4f3bc44b
 https://mp.weixin.qq.com/s?__biz=MzU2NjIzNDk5NQ==&mid=2247485969&idx=1&sn=7913218658b030d56a03c453a3ffe3f4&chksm=fcaed00dcbd9591ba7b4112d834cf1ffa30eeb03ebc6fe018883370d81ee09c8db62da3324f4&mpshare=1&scene=1&srcid=0510cA3IxGhbX2Ycq0g9YtLx&key=275ea42e4205f37bb91e3e13f9eaa403b689e4c47d420dd1987c6ac649b71f82fccf882fe27610bfaf580a32f841b5233dc1d460efa668937b970c2b9cfaad83f38b1029b116359df1bc91cd7453edd2&ascene=1&uin=MTkyMDIyMzc0Mg%3D%3D&devicetype=Windows+10&version=62060739&lang=zh_CN&pass_ticket=L4PIOCnXCr9Lx3QZd%2FMUpUUZ70swnrn2vDyKwsBR7wI5hv2PtC4JLlyV06UkAmFX
