@@ -7,6 +7,7 @@ import java.util.concurrent.CyclicBarrier;
  *
  * 只有当CyclicBarrier构造函数中传入的参数都执行了await方法，才会继续执行后面的代码...
  * 否则不会继续往下执行
+ * CyclicBarrier可以理解为程序屏障，程序运行到屏障则停止运行
  */
 public class CyclicBarrier_demo {
 

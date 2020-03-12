@@ -5,6 +5,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by W2G on 2018/8/26 0026.
  * 该方法的主要作用就是拦截主线程在countDownLatch完成之前
+ * countDownLatch理解为闸门，只有countDown数量达到了，闸门才会打开
  *
  */
 public class CountDownLatch_demo {
