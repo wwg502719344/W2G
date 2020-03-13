@@ -5,3 +5,8 @@ hashCode()是一个本地方法，用来在散列存储结构中确定对象的�
 在hashmap中，通过tab[i = (n - 1) & hash]方式可以计算出数组下标的位置
 其中(e.hash &; (oldCap-1)) 得到的是下标位置
 
+2-hashcode的实际意义
+更加快速的搜索效率，通过对数据的分组，我们在查询新数据的时候可以避免很多低效的操作
+hashcode的作用和意义:
+https://blog.csdn.net/weixin_38405253/article/details/91922340
+
