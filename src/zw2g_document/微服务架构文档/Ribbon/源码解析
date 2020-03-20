@@ -1,0 +1,51 @@
+1-@LoadBalanced提供ribbon负载均衡能力
+LoadBalanced注释↓
+---Annotation to mark a RestTemplate bean to be configured to use a LoadBalancerClient---
+对restTemplate添加注解去配置使用LoadBalancerClient
+
+
+2-LoadBalancerClient
+该类负责接受请求，在获取具体服务的时候，通过chooes方法选择一个具体的服务实例
+@Override
+public ServiceInstance choose(String serviceId) {
+	Server server = getServer(serviceId);
+	if (server == null) {
+		return null;
+	}
+	return new RibbonServer(serviceId, server, isSecure(server, serviceId),
+			serverIntrospector(serviceId).getMetadata(server));
+}
+
+在getServer方法中，选择具体的服务实例
+protected Server getServer(ILoadBalancer loadBalancer) {
+	if (loadBalancer == null) {
+		return null;
+	}
+	return loadBalancer.chooseServer("default"); // TODO: better handling of key
+}
+由此处可以发现，接口ILoadBalancer提供具体接口方法
+
+
+3-ILoadBalancer
+该接口主要负责新增选择服务实例相关功能
+
+public interface ILoadBalancer {
+    void addServers(List<Server> var1);
+
+    Server chooseServer(Object var1);
+
+    void markServerDown(Server var1);
+
+    /** @deprecated */
+    @Deprecated
+    List<Server> getServerList(boolean var1);
+
+    List<Server> getReachableServers();
+
+    List<Server> getAllServers();
+}
+通过追踪发现，真正进行负载的是接口IRule接口
+
+
+4-IRule
+该接口提供了多种负载均衡的方式

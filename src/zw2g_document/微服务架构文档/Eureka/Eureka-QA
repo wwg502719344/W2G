@@ -6,8 +6,8 @@ A2:server是eureka的服务端，client是客户端，客户端会在启动的�
 
 
 Q3:springboot2.0以上版本和springcloud兼容性问题
-A3:当springboot版本为2.0以上且springcloud为C版时，导入eureka依赖jar包报错，显示jar包缺失，当我们补上依赖包版本号后，不在报jar缺失，
-但是在打包过程中，抛出异常java.lang.NoSuchMethodError，错误的原因是springboot版本和springcloud版本产生了冲突，当我们把。。。
+A3:当springboot版本为2.0以上且springcloud为C版时，导入eureka依赖jar包报错，显示jar包缺失，当我们补上依赖包版本号后，不在报jar->
+缺失，但是在打包过程中，抛出异常java.lang.NoSuchMethodError，错误的原因是springboot版本和springcloud版本产生了冲突，当我们把->
 springclpud换成了F版后打包不再抛异常
 出现这个问题毫无疑问是springboot和springcloud版本不兼容导致的
 错误提示:
