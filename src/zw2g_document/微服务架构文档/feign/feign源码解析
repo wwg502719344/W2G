@@ -1,0 +1,16 @@
+1-启动类添加feign注解
+@EnableFeignClients
+
+进入该annotation内部，该类导入FeifnClientRegister类
+@Import(FeignClientsRegistrar.class)
+
+FeignClientRegister构造方法中，将spring内部标注有的FeignClient的bean实例进行注册
+Map<String, Object> attributes = annotationMetadata
+		.getAnnotationAttributes(
+		FeignClient.class.getCanonicalName());
+
+
+
+
+feign源码流程分析
+https://blog.csdn.net/qq_23202687/article/details/92957118
