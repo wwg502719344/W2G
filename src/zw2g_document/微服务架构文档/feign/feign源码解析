@@ -1,7 +1,7 @@
 1-启动类添加feign注解
 @EnableFeignClients
 
-进入该annotation内部，该类导入FeifnClientRegister类
+进入该annotation内部，该类导入FeignClientRegister类
 @Import(FeignClientsRegistrar.class)
 
 FeignClientRegister构造方法中，将spring内部标注有的FeignClient的bean实例进行注册
@@ -10,7 +10,25 @@ Map<String, Object> attributes = annotationMetadata
 		FeignClient.class.getCanonicalName());
 
 
+2-feign client相关信息被注册到spring当中，但此时并没有被实例化，实例化发生在注入的时候->
+spring的bean实例都是从工厂方法中获取，所以feign中的实例同样是通过工厂方法获取，所以我们
+需要关注feign的工厂方法
+
+2-1 feign实例对象是通过以下方法获取的
+Targeter targeter = (Targeter)this.get(context, Targeter.class);
+通过追踪代码我们发现，最终实际是从spring上下文中获取的对象，该对象
+private Map<String, AnnotationConfigApplicationContext> contexts = new ConcurrentHashMap();
+
+2-2 feign实例被加载进spring中的方法是通过FeignAutoConfiguration
+加载的实例对象通过反射生成
 
 
+
+--------------------------
+相关知识理解
+AnnotationMetadata:注解元数据，获取被注解文件标注的数据
+BeanDefinition:spring在启动的时候会将bean数据解析为该BeanDefinition结构类型
+MethodHandle:用于反射
+--------------------------
 feign源码流程分析
 https://blog.csdn.net/qq_23202687/article/details/92957118
