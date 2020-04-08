@@ -8,11 +8,6 @@ Hystrix源码需要解决的问题
 
 Hystrix则通过运用命令模式，将请求包裹调用，通过将请求操作和接受操作进行解耦操作，实现对命令请求的控制
 
-Hystrix断路器实现逻辑
-当有请求到来的时候，判断熔断器是否已经打开
-熔断器打开的状态下允许一部分流量进来验收依赖是否可用
-在一定的时间内允许一个请求进入
-
 hystrix的核心三大件
 1:HystrixCommond,HystrixObservableCommond,创建这两个类用来表达对依赖服务的调用，这两个类都传递了
 相关参数，这两个类都是通过观察者模式实现了对请求命令的封装和调用
@@ -20,10 +15,110 @@ hystrix的核心三大件
 
 
 
+核心功能1-线程隔离
+线程池隔离:为每一个服务接口构造一个线程池，hystrix保存所有的线程池进入缓存当中，
+相关源码解析
+构建HystrixCommand，其父类进行初始化时构造线程池
+this.threadPool = initThreadPool(threadPool, this.threadPoolKey, threadPoolPropertiesDefaults);
+
+//从线程池工厂获取线程池实例
+private static HystrixThreadPool initThreadPool(HystrixThreadPool fromConstructor, HystrixThreadPoolKey threadPoolKey, HystrixThreadPoolProperties.Setter threadPoolPropertiesDefaults) {
+    if (fromConstructor == null) {
+        // get the default implementation of HystrixThreadPool
+        return HystrixThreadPool.Factory.getInstance(threadPoolKey, threadPoolPropertiesDefaults);
+    } else {
+        return fromConstructor;
+    }
+}
+
+//获取实例方法
+static HystrixThreadPool getInstance(HystrixThreadPoolKey threadPoolKey, HystrixThreadPoolProperties.Setter propertiesBuilder) {
+    // 获取key而不是直接获取对象本身
+    String key = threadPoolKey.name();
+
+    // 在线程池缓存中获取当前实例，如果有的话
+    HystrixThreadPool previouslyCached = threadPools.get(key);
+    if (previouslyCached != null) {
+        return previouslyCached;
+    }
+
+    // 初始化并保存进缓存当中
+    synchronized (HystrixThreadPool.class) {
+        if (!threadPools.containsKey(key)) {
+            threadPools.put(key, new HystrixThreadPoolDefault(threadPoolKey, propertiesBuilder));
+        }
+    }
+    return threadPools.get(key);
+}
 
 
+//该类中通过ThreadPoolExecutor来构建线程池
+public HystrixThreadPoolDefault(HystrixThreadPoolKey threadPoolKey, HystrixThreadPoolProperties.Setter propertiesDefaults) {
+    this.properties = HystrixPropertiesFactory.getThreadPoolProperties(threadPoolKey, propertiesDefaults);
+    HystrixConcurrencyStrategy concurrencyStrategy = HystrixPlugins.getInstance().getConcurrencyStrategy();
+    this.queueSize = properties.maxQueueSize().get();
+
+    this.metrics = HystrixThreadPoolMetrics.getInstance(threadPoolKey,
+            concurrencyStrategy.getThreadPool(threadPoolKey, properties),//获取线程池
+            properties);
+    this.threadPool = this.metrics.getThreadPool();
+    this.queue = this.threadPool.getQueue();
+
+    /* strategy: HystrixMetricsPublisherThreadPool */
+    HystrixMetricsPublisherFactory.createOrRetrievePublisherForThreadPool(threadPoolKey, this.metrics, this.properties);
+}
 
 
+核心功能2-熔断
+Hystrix在运行过程中会向每个commandkey对应的熔断器发送
+
+//在构造方法中初始化熔断器，此处是通过工厂方法创建实例对象，因为在并发操作中通过this会造成对象逸出，所以此处要用工厂方法
+private static HystrixCircuitBreaker initCircuitBreaker
+(
+         boolean enabled, HystrixCircuitBreaker fromConstructor,
+         HystrixCommandGroupKey groupKey, HystrixCommandKey commandKey,
+         HystrixCommandProperties properties, HystrixCommandMetrics metrics
+){
+    if (enabled) {
+        if (fromConstructor == null) {
+            // get the default implementation of HystrixCircuitBreaker
+            return HystrixCircuitBreaker.Factory.getInstance(commandKey, groupKey, properties, metrics);
+        } else {
+            return fromConstructor;
+        }
+    } else {
+        return new NoOpCircuitBreaker();
+    }
+}
+
+
+//
+public static HystrixCircuitBreaker getInstance(
+        HystrixCommandKey key, HystrixCommandGroupKey group, HystrixCommandProperties properties, HystrixCommandMetrics metrics
+) {
+
+    // this should find it for all but the first time
+    HystrixCircuitBreaker previouslyCached = circuitBreakersByCommand.get(key.name());
+    if (previouslyCached != null) {
+        return previouslyCached;
+    }
+
+    // if we get here this is the first time so we need to initialize
+
+    // 通过ConcurrentHashMap保证线程的安全问题
+    // 构建一个HystrixCircuitBreakerImpl，创建一个熔断器
+    HystrixCircuitBreaker cbForCommand = circuitBreakersByCommand.putIfAbsent(key.name(), new HystrixCircuitBreakerImpl(key, group, properties, metrics));
+    if (cbForCommand == null) {
+        // this means the putIfAbsent step just created a new one so let's retrieve and return it
+        return circuitBreakersByCommand.get(key.name());
+    } else {
+        // this means a race occurred and while attempting to 'put' another one got there before
+        // and we instead retrieved it and will now return it
+        return cbForCommand;
+    }
+}
+
+线程池
 ===============================相关文档=========================================================
 命令模式基础:
 https://blog.csdn.net/zhwyj1019/article/details/79758057
