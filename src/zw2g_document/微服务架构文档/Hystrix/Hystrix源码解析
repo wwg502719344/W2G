@@ -118,10 +118,17 @@ public static HystrixCircuitBreaker getInstance(
     }
 }
 
+
+
+核心功能3-服务降级
+服务降级功能的实现通过在@HystrixCommand注解中描述了降级的方法，实现是通过aop的方式实现的
+
 线程池
 ===============================相关文档=========================================================
 命令模式基础:
 https://blog.csdn.net/zhwyj1019/article/details/79758057
+hystrix服务降级源码解析
+https://www.jianshu.com/p/2caadae35472
 Hystrix源码分析(上)
 https://www.jianshu.com/p/0649f414cfcf
 Hystrix官方文档翻译

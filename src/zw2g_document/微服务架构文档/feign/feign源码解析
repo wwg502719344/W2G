@@ -24,11 +24,17 @@ private Map<String, AnnotationConfigApplicationContext> contexts = new Concurren
 
 
 
---------------------------
-相关知识理解
-AnnotationMetadata:注解元数据，获取被注解文件标注的数据
+相关知识理解--------------------------
+AnnotationMetadata:注解元数据，获取被注解文件标注的元数据
+BeanDefinitionBuilder:创建一个BeanDefinition
 BeanDefinition:spring在启动的时候会将bean数据解析为该BeanDefinition结构类型
 MethodHandle:用于反射
+
+
 --------------------------
 feign源码流程分析
 https://blog.csdn.net/qq_23202687/article/details/92957118
+https://segmentfault.com/a/1190000014981170
+
+spring动态生成bean结合feign源码解析
+https://www.jianshu.com/p/899bd8089352
