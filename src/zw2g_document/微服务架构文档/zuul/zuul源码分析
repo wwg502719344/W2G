@@ -19,7 +19,13 @@ RequestContext类
 是ThreadLocal的变量，为该线程独有的上下文内容
 
 
-
+ApplicationEventPublish事件
+异步事件发布功能，在类中通过类ApplicationEventPublish的实例进行事件发布，继承或实现了监听类的方法
+将会执行
+https://github.com/lexburner/zuul-gateway-demo
+查询关键字
+//上面提到的路由刷新监听器
+//发送一个事件就可以实现刷新
 
 
 
@@ -34,3 +40,4 @@ https://www.cnblogs.com/throwable/p/9653067.html
 https://www.fangzhipeng.com/springcloud/2017/08/11/sc-zuul-raw.html
 servlet相关基础知识
 https://my.oschina.net/voole/blog/886468
+
