@@ -187,5 +187,8 @@
    1-bootstrap是一种引导性的配置文件，先于application文件的加载，常用于一些配置文件的加载
    bootstrap.yml 可以理解成系统级别的一些参数配置，这些参数一般是不会变动
    bootstrap.yml被父类applicationContext加载
-   2-application主要用于 Spring Boot 项目的自动化配置。
-   比如说数据库的连接，各种服务的连接等
+   2-spring bus通过mq连接分布式的节点，和多个客户端建立通信通道
+
+
+参考文章，比较全面
+https://www.cnblogs.com/xuwujing/p/10602687.html

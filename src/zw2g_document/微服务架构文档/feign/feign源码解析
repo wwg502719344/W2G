@@ -1,3 +1,22 @@
+一:feign中的拦截器和动态反射原理
+二:feign的源码解析理解
+
+
+
+
+
+一:feign中的拦截器和反射
+
+feign的本质就是一个拦截器，在请求通过接口的时候，接口经过动态反射生成一个反射类，在这个反射类中
+实现了拦截器的功能，feign通过反射类去找到对应的方法处理，在通过jdk内置的httpConnection像指定
+的服务发送http请求
+缺点:feign使用jdk默认的HttpURLConnection，每次连接都会创建一个新的connection连接，效率很
+低，可通过进行配置改成httpclient进行http的请求
+
+
+
+二:feign的源码解析理解
+
 1-启动类添加feign注解
 @EnableFeignClients
 

@@ -15,7 +15,8 @@ netty服务器的优势
 0-基于过滤器类型的注解
 @EnableZuulProxy和@EnableZuulServer是提供过滤功能的两种注解,@EnableZuulProxy是
 @EnableZuulServer的加强版，当我们zuul需要结合ribbon，hystrix的时候，就需要使用注解
-@EnableZuulProxy的相关方法了
+@EnableZuulProxy的相关方法了，在enablezuulproxy的过滤器中添加了一些默认的过滤器，可以
+识别serverId，支持ribbon和hystrix
 
 1-基于@EnableZuulServer和@EnableZuulProxy过滤器的关系和区别
 官网关于zuul过滤器的图建议好好看看，或是自己画的
@@ -71,3 +72,5 @@ zuul各种过滤器的作用:
 https://www.cnblogs.com/okong/p/springcloud-ten.html
 @EnableZuulServer、@EnableZuulProxy两个注解
 https://www.cnblogs.com/lexiaofei/p/7098702.html
+zuul各种默认过滤器
+https://www.cnblogs.com/duanxz/p/7542150.html

@@ -3,7 +3,7 @@ zuul的本质就是对一堆filter的运行加载处理，他们通过requestcon
 
 FilterFileManager类
 该类的作用是加载过滤器文件进入到jvm当中，实现类是groovy实现的，主要方式就是通过启动一个线程去加载所有的
-过滤器类，包括内置的过滤器类和自定义的过滤器类
+过滤器类，包括内置的过滤器类和自定义的过滤器类,zuulFilter是存放在ConcurrentHashMap中的
 
 FilterRegister类
 通过轮询的方式扫描过滤器并加载执行

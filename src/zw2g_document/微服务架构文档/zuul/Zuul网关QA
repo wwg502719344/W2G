@@ -23,7 +23,7 @@ com.netflix.zuul.exception.ZuulException: Hystrix Readed time out
 Q8:通过自定义方式实现访问路由的配置，之前是通过path->service-id的方式
 
 
-
+Q9:zuul实现路由的本质是什么
 
 
 
@@ -74,3 +74,6 @@ A8:之前通过path->service-id的方式来配置zuul路由，当微服务多了
 通过动态配置实现这种配置，github实现动态路由文档
 https://github.com/lexburner/zuul-gateway-demo
 详见Zuul网关开发文档
+
+
+A9：

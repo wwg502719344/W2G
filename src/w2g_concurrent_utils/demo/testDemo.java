@@ -9,9 +9,16 @@ import java.util.Scanner;
  */
 public class testDemo {
     private final static Map<Integer,String> map=new HashMap<Integer,String>();
-
+    private static int a;
+    static{
+        a=1;
+    }
     public static void main(String[] args){
-        System.out.println(ff());
+        //System.out.println(ff());
+
+        a=2;
+        System.out.println(a);
+
     }
 
     public static int ff(){
