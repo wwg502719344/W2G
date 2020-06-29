@@ -1,8 +1,8 @@
+源码解析索引:
 一:feign中的拦截器和动态反射原理
 二:feign的源码解析理解
-
-
-
+三:动态代理代码执行了什么操作
+四:动态代理结束执行了什么操作
 
 
 一:feign中的拦截器和反射
@@ -43,8 +43,20 @@ private Map<String, AnnotationConfigApplicationContext> contexts = new Concurren
 
 
 
+三:动态代理执行了什么操作
+content:feign扫描注解元数据后生成beanDefinition，注册到spring当中，当该类被注入后，就会进行实例化，
+实例化就会从spring上下文中获取content内容，
+targeter类:target对象就是从content中获取的对象，该对象用于动态代理的很多方法
+methodHandle:方法句柄，用于对指定方法的执行，在动态代理中，这个就是动态代理的方法，构建于构造动态代理方法
+的方法中
+DefaultMethodHandler handler = new DefaultMethodHandler(method);
+代理对象用的就是handler
+reuqestTemplate:在进行feign调用的时候，调用inva..handler的invoke方法，生成一个request对象，最后
+调用动态代理对象的handle(方法执行句柄)
+
+
 相关知识理解--------------------------
-AnnotationMetadata:注解元数据，获取被注解文件标注的元数据
+AnnotationMetadata:注解元数据，通过获取注解信息动态代理生成BeanDefinition
 BeanDefinitionBuilder:创建一个BeanDefinition
 BeanDefinition:spring在启动的时候会将bean数据解析为该BeanDefinition结构类型
 MethodHandle:用于反射
@@ -55,5 +67,11 @@ feign源码流程分析
 https://blog.csdn.net/qq_23202687/article/details/92957118
 https://segmentfault.com/a/1190000014981170
 
-spring动态生成bean结合feign源码解析
+methodHandle和lookup等类解析
+https://www.cnblogs.com/Mrfanl/p/10544251.html
+
+spring动态生成bean结合feign源码解析(结合spring注解)
 https://www.jianshu.com/p/899bd8089352
+
+springcloud各个技术作用
+https://baijiahao.baidu.com/s?id=1619729173689752981&wfr=spider&for=pc

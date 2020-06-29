@@ -51,7 +51,7 @@ P5-通过ThreadPoolExecutor创建线程池
 ThreadPoolExecutor(线程池执行类)
 
 
-P6-通过的Executors创建线程池
+P6-通过的Executors创建线程池,系统默认为你创建的线程池
 通过的 Executors 创建的线程池已经为绝大多数的场景做了预配置
 1-Executors.newCachedThreadPool()：无界线程池，可以进行自动线程回收
 2-Executors.newFixedThreadPool(int)：固定线程池大小

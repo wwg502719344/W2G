@@ -1,6 +1,10 @@
 zuul的本质就是对一堆filter的运行加载处理，他们通过requestcontent共享数据，通过轮询加载各种过滤器
 来进行request的处理
 
+RequestContext类
+在tomcat容器中，会为每一个请求分配一个线程，一个线程只有执行完了才能执行别的线程，requestContent类
+含有ThreadLocal变量(线程封闭技术)，为该线程独有的上下文内容
+
 FilterFileManager类
 该类的作用是加载过滤器文件进入到jvm当中，实现类是groovy实现的，主要方式就是通过启动一个线程去加载所有的
 过滤器类，包括内置的过滤器类和自定义的过滤器类,zuulFilter是存放在ConcurrentHashMap中的
@@ -8,16 +12,9 @@ FilterFileManager类
 FilterRegister类
 通过轮询的方式扫描过滤器并加载执行
 
-
 zuulFilter类
 该类是一个处理自定义过滤器的抽象类，我们在自定义的过滤器中需要实现IZuulFilter定义的执行方法和判断方法
 等其余方法，在runFilter中，会主动调用我们自定义过滤器中的两个方法
-
-
-RequestContext类
-在tomcat容器中，会为每一个请求分配一个线程，一个线程只有执行完了才能执行别的线程，requestContent类
-是ThreadLocal的变量，为该线程独有的上下文内容
-
 
 ApplicationEventPublish事件
 异步事件发布功能，在类中通过类ApplicationEventPublish的实例进行事件发布，继承或实现了监听类的方法

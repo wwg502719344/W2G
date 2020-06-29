@@ -1,6 +1,7 @@
 Q:eureka client分为application server和application client，他们的区别是什么
 A:application server用于缓存eureka server中其他的serviceId，application client为当前的服务
 application client通过远程调用application server来调用其他服务
+A-1:applications是eureka中的注册表，返回所有eureka server的注册表信息
 
 
 eureka client实现的核心源码类
@@ -12,11 +13,14 @@ eureka实现服务注册的基本流程
 1在pom中加入eureka client的依赖，在启动类中加入@EnableEurekaClient，该注解的主要作用是为了启用DiscoveryClient
 2在构造DiscoveryClient构造类的时候，会启动3个线程，定时任务线程，心跳续约线程，服务获取线程，并在初始化的时候启动这三个线程
 
-3-1:服务注册，在初始化启动的时候，会创建一个instanceInfoReplicator的start方法，该类实现了Runnable接口，重写了run方法
-，在run方法中进行执行了register方法，在register方法中通过http请求向eureka server发送请求，将自身实例InstanceInfo注册
-到服务端
 
-3-2:续约
+源码中注册和续约流程
+3-1:服务注册，在DiscoverClient构造方法初始化启动的时候(调用initScheduledTasks())，会创建一个instanceInfoReplicator对象，
+对象在start方法中实现了Runnable接口，重写了run方法，在run方法中调用discoveryClient.register()进行服务注册,
+在register方法中通过http请求向eureka server发送请求，将自身实例InstanceInfo注册到服务端
+
+3-2:续约,在构造方法初始化当中，会构造一个时间线程池，该线程池的command执行run方法是执行的HeartbeatThread类，run方法则是
+续约心跳
 
 3-3:下线
 

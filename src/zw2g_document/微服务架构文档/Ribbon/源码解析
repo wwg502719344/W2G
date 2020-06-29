@@ -44,8 +44,8 @@ public interface ILoadBalancer {
 
     List<Server> getAllServers();
 }
-通过追踪发现，真正进行负载的是接口IRule接口
-
+通过追踪发现，在loadbalance中进行负载实现调用的是IRule接口的实现类
+可以通过配置具体的实现类来选择负载策略
 
 4-IRule
 该接口提供了多种负载均衡的方式

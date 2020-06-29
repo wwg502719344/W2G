@@ -1,13 +1,19 @@
 源码解析框架:
+
 一:feign使用动态代理的原因及作用
+一一:feign是如何完成动态代理的
 二:动态代理实现相关逻辑及源码
 三:feign整体实现逻辑
 
 
 一:feign使用动态代理的原因及作用
-feign本质上相当于一个拦截器的作用，针对方法进行业务拦截，通过动态代理生成代理类，当请求接口的时候,feign
+feign本质上相当于一个拦截器的作用，针对方法进行拦截处理，通过动态代理生成代理类，当请求接口的时候,feign
 生成一个代理类，代理类会调用相应的代理方法，由代理类实现http请求对应的微服务
 
+
+一一:feign是如何完成动态代理的
+任何数据都不是无中生有,feign在启动类中通过扫描注解元数据,annotionmetadate通过注册生成
+DeanDefination对象，该对象
 
 
 二:动态代理:
@@ -51,13 +57,14 @@ feign内部默认使用httpUrlConnection方式发送http请求，但是这种方
 
 ImportBeanDefinitionRegistrar解析(代码注入核心)
 1通过扫描器扫描获取需要注册的bean类
---扫描被feign注解标注的类
+--扫描被feign注解标注的类(解析元数据，通过contract生成methodHandle)
 2将扫描到的bean注册到IOC容器当中去
 
 feign设计原理:
 https://www.jianshu.com/p/8c7b92b4396c
 
 动态代理相关基础讲解:
+https://www.jianshu.com/p/295b87eb661b
 https://www.jianshu.com/p/95970b089360
 
 注解@EnableFeignClients工作原理

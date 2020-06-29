@@ -1,8 +1,16 @@
 1-并发环境下为什么使用ConcurrentHashMap
+2-ConcurrentHashMap如何实现并发扩容
+3-ConcurrentHashMap调用put方法源码解析
+4-链表结构转变为红黑树
+5-put操作下相关结构的变换
 
+
+
+1-并发环境下为什么使用ConcurrentHashMap
     1-1：
         java7中HashMap在高并发的情况下，通过put操作会导致HashMap的entry链表形成环链，
-    从而造成entry的next节点用不为空因而产生死循环
+    从而造成entry的next节点用不为空因而产生死循环，在java8中通过位运算的方式解决了环链的问题
+    但仍然不支持并发操作
 
     1-2:
         Unsafe类:java不能直接访问操作系统底层，而是通过native方法来访问，Unsafe提供了硬件级别的原子操作
@@ -12,7 +20,16 @@
         1-2-3：挂起与恢复-LockSupport中的park方法也是调用了Unsafe.park()
         1-2-4：CAS操作
 
-2-ConcurrentHashMap调用put方法源码解析
+2-ConcurrentHashMap如何实现并发扩容
+    forward节点:转移节点，多线程并发扩容的关键，如果table上有节点为空，则设置该空节点为forward
+    节点，通过cas方式设置，防止并发问题，此处允许多线程并发的获取tab的索引帮助数组进行扩容的过程。
+
+    在上面的扩容过程是允许多线程并发执行帮助扩容的，但实际在将数组索引转移到新数组的过程中，却只
+    允许单个线程进行操作，对索引节点加锁处理
+
+
+
+3-ConcurrentHashMap调用put方法源码解析
     首先校验数据，然后根据key值的hashCode计算出hash值(获得hash值和i通过计算可以获取其tab[i]的数据)，然后对传入参数进行操作
     操作步骤如下:
         步骤1:查看tab是否为null，如果为空则进行初始化操作
@@ -23,7 +40,7 @@
         步骤4-2:如果首节点是树节点，则新增一个节点
         步骤5:检查，如果链表结构中节点数量多于8个，则将链表结构转变为树结构
 
-3-链表结构转变为红黑树
+4-链表结构转变为红黑树
     1-原始Node节点
     Node类是table数组的原始节点，table[i]中存放发就是Node节点，链表中存放的也是node节点
     2-treeNode节点
@@ -31,7 +48,7 @@
     3-treebin
     鞥局指定的头结点TreeNode为初始化节点创建treeBin，构造红黑树结构
 
-4-put操作下相关结构的变换
+5-put操作下相关结构的变换
     在步骤5中，如果链表结构的节点数量超出指定的数量，将会由链表结构转变为树结构，涉及相关节点类如下
     1-根据tab和index找到tab位置的节点node，为了防止并发出现，此处加锁，重新生成一个以hd为首节点的TreeNode链表
     2-根据头结点hd构造treeBin结构，并将树结构的root节点写入到index的位置，完成红黑树的构造
