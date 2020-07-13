@@ -17,19 +17,19 @@ public class CountDownLatch_demo {
             @Override
             public void run() {
                 System.out.println("东部测试");
-                //countDownLatch.countDown();
+                countDownLatch.countDown();
                 System.out.println("南部测试");
-                //countDownLatch.countDown();
+                countDownLatch.countDown();
                 System.out.println("西部测试");
                 //countDownLatch.countDown();
                 System.out.println("北部测试");
-                //countDownLatch.countDown();
+                countDownLatch.countDown();
 
             }
         }).start();
 
         //掉用await方法，阻塞主线程,只有当参数countDown为0才能执行主线程，否则无法执行主线程
-        //countDownLatch.await();
+        countDownLatch.await();
         System.out.println("主线程测试");
     }
 }

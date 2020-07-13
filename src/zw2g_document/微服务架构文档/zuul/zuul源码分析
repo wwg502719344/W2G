@@ -1,9 +1,18 @@
-zuul的本质就是对一堆filter的运行加载处理，他们通过requestcontent共享数据，通过轮询加载各种过滤器
+zuul的本质就是对一堆filter的运行加载处理，他们通过requestcontentHolder共享数据，通过轮询加载各种过滤器
 来进行request的处理
 
-RequestContext类
-在tomcat容器中，会为每一个请求分配一个线程，一个线程只有执行完了才能执行别的线程，requestContent类
+RequestContextHolder类
+//通过RequestContextHolder可以获取请求的request对象
+public static HttpServletRequest getRequest()
+{
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+				.getRequestAttributes()).getRequest();
+		return request;
+}
+在tomcat容器中，会为每一个请求分配一个线程，一个线程只有执行完了才能执行别的线程，requestContentHolder类
 含有ThreadLocal变量(线程封闭技术)，为该线程独有的上下文内容
+
+requestContentHolder可以作为过滤器之间相互沟通的媒介，通过该类来获取请求的参数
 
 FilterFileManager类
 该类的作用是加载过滤器文件进入到jvm当中，实现类是groovy实现的，主要方式就是通过启动一个线程去加载所有的
