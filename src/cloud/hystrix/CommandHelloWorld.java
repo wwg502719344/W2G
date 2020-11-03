@@ -1,11 +1,9 @@
 package cloud.hystrix;
 
-import com.netflix.hystrix.HystrixCommand;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-
 /**
  * Created by W2G on 2019/10/21.
  */
+/*
 public class CommandHelloWorld extends HystrixCommand<String> {
     private final String name;
 
@@ -19,3 +17,4 @@ public class CommandHelloWorld extends HystrixCommand<String> {
         return "Hello " + name + "!";
     }
 }
+*/

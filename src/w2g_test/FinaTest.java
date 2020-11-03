@@ -7,7 +7,7 @@ import java.util.HashSet;
  */
 public class FinaTest {
 
-    private final HashSet workers = new HashSet<>();
+   // private final HashSet workers = new HashSet<>();
     private String a="1";
 
 
