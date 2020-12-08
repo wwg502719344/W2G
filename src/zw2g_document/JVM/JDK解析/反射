@@ -1,2 +1,23 @@
 反射源码解析
 https://blog.csdn.net/w372426096/article/details/82661866
+
+业务调用
+public static void main(String[] args) throws Exception {
+    Proxy target = new Proxy();
+    Method method = Proxy.class.getDeclaredMethod("run");
+    method.invoke(target);
+}
+核心实现
+@CallerSensitive
+public Method getDeclaredMethod(String name, Class<?>... parameterTypes)
+    throws NoSuchMethodException, SecurityException {
+    checkMemberAccess(Member.DECLARED, Reflection.getCallerClass(), true);
+    Method method = searchMethods(privateGetDeclaredMethods(false), name, parameterTypes);
+    if (method == null) {
+        throw new NoSuchMethodException(getName() + "." + name + argumentTypesToString(parameterTypes));
+    }
+    return method;
+}
+
+通过调用Proxy类的getDeclaredMethod方法获取到方法对象，核心实现则是通过获取缓存或是jvm中申明的方法列表，返回并寻找到
+制定的方法，通过拷贝的方式返回方法对象，然后进行执行
