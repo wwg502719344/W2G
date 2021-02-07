@@ -19,7 +19,7 @@ public class ThreadPoolTest {
         int maximumPoolSize = 5;
         long keepAliveTime = 10;
         TimeUnit unit = TimeUnit.SECONDS;
-        BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(2);
+        BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue(2);
         ThreadFactory threadFactory = new NameTreadFactory();
         RejectedExecutionHandler handler = new MyIgnorePolicy();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
@@ -38,7 +38,6 @@ public class ThreadPoolTest {
 
         private final AtomicInteger mThreadNum = new AtomicInteger(1);
 
-        @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r, "my-thread-" + mThreadNum.getAndIncrement());
             //此处说明创建多少
@@ -67,7 +66,6 @@ public class ThreadPoolTest {
             this.name = name;
         }
 
-        @Override
         public void run() {
             try {
                 System.out.println(this.toString() + " is running!");

@@ -20,7 +20,7 @@ public class CallMain {
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.
                 newFixedThreadPool(2);
         // 声明保存返回结果的列表，注意类型为Future<Integer>
-        List<Future<Integer>> resultList = new ArrayList<>();
+        List<Future<Integer>> resultList = new ArrayList();
         Random random = new Random();
 
         // For循环中的submit方法在提交线程执行后会有一个返回类型为Future<Integer>的结果。将结果保存在列表中。

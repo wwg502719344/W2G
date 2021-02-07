@@ -1,0 +1,10 @@
+https://www.jianshu.com/p/95ff834c0f53
+
+1启动nacos服务端
+按照指定方式下载nacos
+不需要在项目内部打包，直接在命令行执行打包
+启动项目的时候，不要带cmd，直接执行startup.cmd -m standalone就可以启动成功了
+
+
+2注册nacos服务
+

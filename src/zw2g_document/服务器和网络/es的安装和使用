@@ -1,0 +1,11 @@
+https://www.jb51.net/article/187990.htm
+
+单独安装es(安装思路特别好)
+https://blog.csdn.net/qq_32101993/article/details/100021002
+
+安装kibana
+1-需要连接es，在kibana启动成功后，需要进入容器内部，将kibana.yml的配置进行修改
+elasticsearch.url: http://47.100.170.2:9200
+2-保证和es的版本相同，否则无法安装成功
+
+
