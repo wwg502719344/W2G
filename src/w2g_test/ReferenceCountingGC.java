@@ -2,6 +2,8 @@ package w2g_test;
 
 /**
  * Created by admin on 2021/2/5.
+ * 新对象发生在新生代,GC就是PSyoungGen，PS是收集器的一种，主要是进行新生代数据的gc
+ *
  */
 public class ReferenceCountingGC {
 
