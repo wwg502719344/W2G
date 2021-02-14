@@ -1,0 +1,11 @@
+垃圾回收循环引用的问题
+https://blog.csdn.net/faker____/article/details/83061673?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.control
+
+
+引言:
+对于jvm的垃圾回收来说，存在可达性分析和引用计数法两种方式，引用计数法并不可靠，无法完成对象的回收，一般采用的都是可达性分析的方式进行垃圾回收的判断
+
+
+引用计数器的缺陷
+对于引用计数器来说，通过计算当期对象的引用数量来进行判断是否需要进行垃圾回收，引用计数器记录着对象对其他每一个对象的引用数，当引用指向null的时候
+引用计数器就会减一，但是
