@@ -34,3 +34,7 @@ ${file-extension}:yml/yaml
 
 在读取配置类中添加@RefreshScope，进行实时的配置文件获取
 
+4不同环境config的配置
+首先在nacos中新建配置，针对不同的测试环境可以新建不同的配置文件，配置文件的名称dataid中${spring.profiles.active}
+对应cloud文件中的spring.profile.active
+
