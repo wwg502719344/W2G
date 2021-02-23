@@ -38,3 +38,11 @@ ${file-extension}:yml/yaml
 首先在nacos中新建配置，针对不同的测试环境可以新建不同的配置文件，配置文件的名称dataid中${spring.profiles.active}
 对应cloud文件中的spring.profile.active
 
+5命名空间namespace
+相当于添加了一个配置的栏目，不同的命名空间中即使是配置类的名称相同也没有关系
+spring:
+  cloud:
+    nacos:
+      config:
+        namespace: e144bd87-f2cf-48b4-a9b3-0e3e7a16c836
+
