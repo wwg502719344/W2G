@@ -28,5 +28,9 @@ public class JavacTest {
         String b = "world";
         String c = a + b;
         String d = "hello world";
+
+        int num=50;
+        int finalMoney= 50*((num-1)/50 +1);
+        System.out.println(finalMoney);
     }
 }
