@@ -1,0 +1,48 @@
+https://www.jianshu.com/p/95ff834c0f53
+
+1启动nacos服务端
+docker环境下启动nacos服务，需要注意的是控制一下内存的大小，毕竟小水管
+启动时,默认内存参数是-Xms512m -Xmx512m -Xmn256m
+启动成功后登陆
+http://47.100.170.2:8848/nacos/
+
+2nacos springcloud项目启动发现
+相关项目代码
+https://github.com/nacos-group/nacos-examples/tree/master/nacos-spring-cloud-example/nacos-spring-cloud-discovery-example
+
+nacos server与consumer，provider之间的关系(nacos服务发现关系图)
+nacos server作为服务发现的总站，配置在服务器上，provider和consumer都会像其进行注册，也都可以通过server拿到对应的
+服务名
+
+
+3nacos config配置
+在启动文件中配置nacos作为配置项
+spring:
+  application:
+    name: example
+  cloud:
+    nacos:
+      config:
+        server-addr: 47.100.170.2:8848
+        file-extension: yml
+
+配置完成后，可以在nacos server的配置页面进行添加配置的文件，在添加的时候需要配置dataid，生产dataid的规则
+${prefix}-${spring.profiles.active}.${file-extension}
+${prefix}:默认是服务名称，也可自己配置
+${spring.profiles.active}:对应的环境，可自行配置
+${file-extension}:yml/yaml
+
+在读取配置类中添加@RefreshScope，进行实时的配置文件获取
+
+4不同环境config的配置
+首先在nacos中新建配置，针对不同的测试环境可以新建不同的配置文件，配置文件的名称dataid中${spring.profiles.active}
+对应cloud文件中的spring.profile.active
+
+5命名空间namespace
+相当于添加了一个配置的栏目，不同的命名空间中即使是配置类的名称相同也没有关系
+spring:
+  cloud:
+    nacos:
+      config:
+        namespace: e144bd87-f2cf-48b4-a9b3-0e3e7a16c836
+

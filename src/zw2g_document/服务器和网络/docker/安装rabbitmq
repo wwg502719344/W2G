@@ -1,0 +1,23 @@
+docker下安装mq
+https://www.cnblogs.com/frank-zhang/p/13523926.html
+安装rabbitmq可视化插件
+https://blog.csdn.net/maxchenbug/article/details/106417599
+
+
+1下载镜像文件
+docker pull rabbitmq
+
+
+2启动rabbitmq
+在这里我修改了默认账号密码为admin
+15672：管理页面访问端口
+5672：通信接口
+docker run -dit --name rabbitmq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 15672:15672 -p 5672:5672 d490bcdf459a
+
+
+3登录mq页面，无法访问
+3-1：是否开放安全组端口
+3-2：新版rabbitmq需要开启可视化工具
+docker exec -i -t rabbitmq /bin/bash
+rabbitmq-plugins enable rabbitmq_management
+

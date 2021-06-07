@@ -1,7 +1,5 @@
 package w2g_lock;
 
-import org.redisson.Redisson;
-import org.redisson.core.RLock;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class w2g_redis_lock {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {/*
         Redisson redisson = Redisson.create();
 
         //此处设置锁的key值
@@ -27,7 +25,7 @@ public class w2g_redis_lock {
         finally {
             lock.unlock();
         }
-        redisson.shutdown();
+        redisson.shutdown();*/
     }
 
 }
